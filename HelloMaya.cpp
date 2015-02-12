@@ -36,27 +36,23 @@ public:
 MStatus initializePlugin(MObject obj) {
 	// obj is a handler to the plugin, assign it to a function class to be able
 	// to call methods on it
-	MFnPlugin pluginFn(obj, "HelloMaya", "1.0");
 	MStatus stat;
-	// Set command with name HelloMaya that executes creator method 
+	MFnPlugin pluginFn(obj, "HelloMaya", "1.0", "Any", &stat);
+	checkStatus(stat, "MFnPlugin failed" AT);
+
+	// Set command with name HelloMaya that executes creator method
 	stat = pluginFn.registerCommand("HelloMaya", HelloMaya::creator);
-	checkStatus(MS::kFailure, "registerCommand failed" AT);
-	//if (stat.error()) {
-	// Will print on the output window 
-	// registerCommand failed: <the type of error>
-	//stat.perror("registerCommand failed");
-	//}
+	checkStatus(stat, "registerCommand failed" AT);
+
 	return stat;
 }
 
 MStatus uninitializePlugin(MObject obj) {
 	MFnPlugin pluginFn(obj);
-	MStatus stat;
-	stat = pluginFn.deregisterCommand("HelloMaya");
+	MStatus stat = pluginFn.deregisterCommand("HelloMaya");
+
 	checkStatus(stat, "deregisterCommand failed" AT);
 	checkObject(obj, "object" AT);
-	//if (stat.error()) {
-	//	stat.perror("deregisterCommand failed");
-	//}
+
 	return stat;
 }
