@@ -1,0 +1,5 @@
+*.aps
+*.rc
+*.vcxproj
+*.filters
+x64/
