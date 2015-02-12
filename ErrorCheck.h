@@ -18,7 +18,7 @@ inline void checkBool(bool result) {
 	}
 }
 
-inline void checkStatus(const MStatus& stat, const char* msg) {
+inline void checkStat(const MStatus& stat, const char* msg) {
 	if (stat.error()) {
 		displayError(msg);
 	}

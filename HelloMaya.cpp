@@ -38,11 +38,11 @@ MStatus initializePlugin(MObject obj) {
 	// to call methods on it
 	MStatus stat;
 	MFnPlugin pluginFn(obj, "HelloMaya", "1.0", "Any", &stat);
-	checkStatus(stat, "MFnPlugin failed" AT);
+	checkStat(stat, "MFnPlugin failed" AT);
 
 	// Set command with name HelloMaya that executes creator method
 	stat = pluginFn.registerCommand("HelloMaya", HelloMaya::creator);
-	checkStatus(stat, "registerCommand failed" AT);
+	checkStat(stat, "registerCommand failed" AT);
 
 	return stat;
 }
@@ -51,7 +51,7 @@ MStatus uninitializePlugin(MObject obj) {
 	MFnPlugin pluginFn(obj);
 	MStatus stat = pluginFn.deregisterCommand("HelloMaya");
 
-	checkStatus(stat, "deregisterCommand failed" AT);
+	checkStat(stat, "deregisterCommand failed" AT);
 	checkObject(obj, "object" AT);
 
 	return stat;
