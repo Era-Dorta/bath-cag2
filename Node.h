@@ -5,19 +5,25 @@
  *      Author: gdp24
  */
 
+#include "Board.h"
+
 #ifndef NODE_H_
 #define NODE_H_
+
+#include <ostream>
 
 class Node {
 public:
 	Node();
-	Node(float r, float v, const char board[3][3]);
+	Node(float r, float v, const Board& board);
 	virtual ~Node();
 
 	Node(const Node &otherNode);
-	void operator=(const Node &right );
+	void operator=(const Node &right);
 
-	float checkFinalState(char turn);
+	void computeFinalState(char turn);
+
+	bool isFinalState(char turn);
 
 	char getBoard(unsigned int i, unsigned int j) const;
 	void setBoard(unsigned int i, unsigned int j, char val);
@@ -27,15 +33,10 @@ public:
 	void setV(float v);
 
 private:
-	bool checkHori(char turn, unsigned int i) const;
-	bool checkVert(char turn, unsigned int i) const;
-	bool checkDiag(char turn) const;
-	bool isFull() const;
+	float r;
+	float v;
 
-private:
-		float r;
-		float v;
-		char board[3][3];
+	Board board;
 };
 
 #endif /* NODE_H_ */
