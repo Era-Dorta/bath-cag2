@@ -10,17 +10,20 @@
 Node::Node() {
 	r = 0;
 	v = 0;
+	a = 0;
 }
 
 Node::Node(float r, float v, const Board& board) {
 	this->r = r;
 	this->v = v;
 	this->board = board;
+	this->a = 0;
 }
 
 Node::Node(const Node& otherNode) {
 	r = otherNode.r;
 	v = otherNode.v;
+	a = otherNode.a;
 	board = otherNode.board;
 }
 
@@ -47,6 +50,10 @@ void Node::setBoard(unsigned int i, unsigned int j, char val) {
 	board.setBoard(i, j, val);
 }
 
+void Node::setBoard(unsigned int a, char val){
+	board.setBoard(a, val);
+}
+
 bool Node::isFinalState(char turn) {
 	return r != 0;
 }
@@ -62,6 +69,19 @@ void Node::setV(float v) {
 void Node::operator =(const Node& right) {
 	r = right.r;
 	v = right.v;
+	a = right.a;
 
 	board = right.board;
+}
+
+unsigned int Node::getA() const {
+	return a;
+}
+
+void Node::setA(unsigned int a) {
+	this->a = a;
+}
+
+void Node::setA(unsigned int i, unsigned int j){
+	a = i * 3 + j;
 }

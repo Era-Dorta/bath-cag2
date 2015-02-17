@@ -34,6 +34,10 @@ void Board::setBoard(unsigned int i, unsigned int j, char val) {
 	board[i][j] = val;
 }
 
+void Board::setBoard(unsigned int a, char val){
+	board[a / 3][a % 3] = val;
+}
+
 float Board::checkFinalState(char turn) {
 	float rWin = 10, rLoose = -10, rDraw = 1;
 

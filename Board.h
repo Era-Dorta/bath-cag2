@@ -22,6 +22,7 @@ public:
 
 	char getBoard(unsigned int i, unsigned int j) const;
 	void setBoard(unsigned int i, unsigned int j, char val);
+	void setBoard(unsigned int a, char val);
 
 private:
 	bool checkHori(char turn, unsigned int i) const;
