@@ -5,12 +5,10 @@
  *      Author: gdp24
  */
 
-#include "Board.h"
-
 #ifndef NODE_H_
 #define NODE_H_
 
-#include <ostream>
+#include "Board.h"
 
 class Node {
 public:
