@@ -68,7 +68,7 @@ int main(int, char **) {
 			turn = switchTurn(turn);
 			currentNode = nextNode.node;
 
-			//treeHandler.updateV(alpha, currentNode);
+			treeHandler.updateV(alpha, currentNode);
 		}
 
 		return 0;

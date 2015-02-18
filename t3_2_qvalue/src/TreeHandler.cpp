@@ -52,20 +52,58 @@ SiblingIt TreeHandler::getNextMove(float epsilon, const SiblingIt& startNode,
 }
 
 void TreeHandler::updateV(float alpha, tree_node_<Node> * currentNode) {
-	tree_node_<Node> * updateNode = currentNode, siblingNode;
+	tree_node_<Node> *updateNode = currentNode, *parentNode;
 
-	if (updateNode->parent != 0 && updateNode->parent->parent != 0) {
-		updateNode = updateNode->parent->parent;
-		if (updateNode->data.getV() < currentNode->data.getV()) {
-			updateNode->data.setV(
-					updateNode->data.getV() + alpha * currentNode->data.getV()
-							- updateNode->data.getV());
+	// o won, update the other side of the tree
+	if (currentNode->data.getR() < 0 && updateNode->parent != 0) {
+		updateNode = updateNode->parent;
+	}
+
+	// Arrived at a new state, update parent if current state value is
+	// bigger that parent value
+	while (updateNode->parent != 0 && updateNode->parent->parent != 0) {
+		parentNode = updateNode->parent->parent;
+		if (parentNode->data.getV() < updateNode->data.getV()) {
+			parentNode->data.setV(
+					parentNode->data.getV() + alpha * updateNode->data.getV()
+							- parentNode->data.getV());
 		} else {
 			return;
 		}
-	} else {
-		return;
+		updateNode = parentNode;
 	}
+
+	/* Update code with sibling value check
+	 SiblingIt firstSib, lastSib;
+	 while(updateNode->parent != 0 && updateNode->parent->parent != 0) {
+	 parentNode = updateNode->parent->parent;
+
+	 firstSib = updateNode->parent->first_child;
+	 lastSib = updateNode->parent->last_child;
+
+	 while (firstSib != updateNode) {
+	 if (firstSib->getV() > updateNode->data.getV()) {
+	 return;
+	 }
+	 firstSib++;
+	 }
+
+	 while (lastSib != updateNode) {
+	 if (lastSib->getV() > updateNode->data.getV()) {
+	 return;
+	 }
+	 lastSib--;
+	 }
+
+	 if (parentNode->data.getV() < updateNode->data.getV()) {
+	 parentNode->data.setV(
+	 parentNode->data.getV() + alpha * updateNode->data.getV()
+	 - parentNode->data.getV());
+	 } else {
+	 return;
+	 }
+	 updateNode = parentNode;
+	 }*/
 }
 
 void TreeHandler::buildNode(tree<Node>& tr, TreeIt nodeIt, char turn,

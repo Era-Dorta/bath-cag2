@@ -5,6 +5,8 @@
  *      Author: gdp24
  */
 
+#include <cmath>
+
 #include "Node.h"
 
 Node::Node() {
@@ -60,6 +62,7 @@ bool Node::isFinalState() {
 
 void Node::computeFinalState(char turn) {
 	r = board.checkFinalState(turn);
+	v = fabs((double) r);
 }
 
 void Node::setV(float v) {
