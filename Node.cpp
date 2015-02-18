@@ -43,18 +43,18 @@ float Node::getV() const {
 }
 
 char Node::getBoard(unsigned int i, unsigned int j) const {
-	return board.getBoard(i,j);
+	return board.getBoard(i, j);
 }
 
 void Node::setBoard(unsigned int i, unsigned int j, char val) {
 	board.setBoard(i, j, val);
 }
 
-void Node::setBoard(unsigned int a, char val){
+void Node::setBoard(unsigned int a, char val) {
 	board.setBoard(a, val);
 }
 
-bool Node::isFinalState(char turn) {
+bool Node::isFinalState() {
 	return r != 0;
 }
 
@@ -82,6 +82,6 @@ void Node::setA(unsigned int a) {
 	this->a = a;
 }
 
-void Node::setA(unsigned int i, unsigned int j){
+void Node::setA(unsigned int i, unsigned int j) {
 	a = i * 3 + j;
 }

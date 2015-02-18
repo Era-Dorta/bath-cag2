@@ -23,7 +23,7 @@ public:
 
 	void computeFinalState(char turn);
 
-	bool isFinalState(char turn);
+	bool isFinalState();
 
 	char getBoard(unsigned int i, unsigned int j) const;
 	void setBoard(unsigned int i, unsigned int j, char val);

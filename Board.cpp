@@ -34,7 +34,7 @@ void Board::setBoard(unsigned int i, unsigned int j, char val) {
 	board[i][j] = val;
 }
 
-void Board::setBoard(unsigned int a, char val){
+void Board::setBoard(unsigned int a, char val) {
 	board[a / 3][a % 3] = val;
 }
 
@@ -113,8 +113,8 @@ bool Board::isFull() const {
 
 bool Board::isFinalState() {
 	for (unsigned int i = 0; i < 3; i++) {
-		if (checkHori('x', i) || checkVert('x', i) ||
-				checkHori('o', i) || checkVert('o', i)) {
+		if (checkHori('x', i) || checkVert('x', i) || checkHori('o', i)
+				|| checkVert('o', i)) {
 			return true;
 		}
 	}

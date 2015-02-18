@@ -44,7 +44,7 @@ void buildNode(tree<Node>& tr, TreeIt nodeIt, char turn, unsigned int nextI,
 
 	nodeIt->computeFinalState(turn);
 
-	if (nodeIt->isFinalState(turn)) {
+	if (nodeIt->isFinalState()) {
 		return;
 	}
 
@@ -108,7 +108,7 @@ int main(int, char **) {
 	//TreeIt nextNd;
 
 	tree_node_<Node> * currentNode;
-	SiblingIt nextSib, endSib, nextNode;
+	SiblingIt nextNode;
 
 	buildTree(tr, 'x');
 	cout << "done building size " << tr.size() << endl;
