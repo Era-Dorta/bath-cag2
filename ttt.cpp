@@ -7,6 +7,7 @@
 using namespace std;
 
 typedef tree<Node>::iterator TreeIt;
+typedef tree<Node>::sibling_iterator SiblingIt;
 
 std::ostream & operator<<(std::ostream & os, const Node & nd) {
 	os << "r: " << nd.getR() << " v: " << nd.getV() << std::endl;
@@ -83,6 +84,21 @@ void buildTree(tree<Node>& tr, char turn) {
 			}
 		}
 	}
+
+}
+
+SiblingIt getNextOptimalNode(const SiblingIt& startNode,
+		const SiblingIt& endSib) {
+
+	SiblingIt nextSib = startNode, nextNode = startNode;
+
+	while (++nextSib != endSib) {
+		if (nextSib->getV() > nextNode->getV()) {
+			nextNode = nextSib;
+		}
+	}
+
+	return nextNode;
 }
 
 int main(int, char **) {
@@ -92,32 +108,20 @@ int main(int, char **) {
 	//TreeIt nextNd;
 
 	tree_node_<Node> * currentNode;
-	tree<Node>::sibling_iterator nextSib, endSib, nextNode;
+	SiblingIt nextSib, endSib, nextNode;
 
 	buildTree(tr, 'x');
 	cout << "done building size " << tr.size() << endl;
 
 	char turn = 'x';
 	unsigned int maxGames = 10;
-	float maxV = -100;
-	const tree<Node>::sibling_iterator firstNode = tr.begin().node;
+	const SiblingIt firstNode = tr.begin().node;
 	Board board;
 	for (unsigned int i = 1; i <= maxGames; i++) {
 		currentNode = firstNode.node;
 
-		maxV = -100;
-
 		// Get next move with max V
-		nextSib = tr.begin().node;
-		endSib = tr.end().node;
-		nextNode = nextSib;
-		maxV = nextNode->getV();
-		while (++nextSib != endSib) {
-			if (nextSib->getV() > maxV) {
-				maxV = nextSib->getV();
-				nextNode = nextSib;
-			}
-		}
+		nextNode = getNextOptimalNode(tr.begin().node, tr.end().node);
 
 		// Make the play
 		board.setBoard(nextNode->getA(), turn);
@@ -128,19 +132,10 @@ int main(int, char **) {
 		currentNode = nextNode.node;
 
 		while (!board.isFinalState()) {
-			maxV = -100;
 
 			// Get next move with max V
-			nextSib = currentNode->first_child;
-			endSib = currentNode->last_child;
-			nextNode = nextSib;
-			maxV = nextNode->getV();
-			while (++nextSib != endSib) {
-				if (nextSib->getV() > maxV) {
-					maxV = nextSib->getV();
-					nextNode = nextSib;
-				}
-			}
+			nextNode = getNextOptimalNode(currentNode->first_child,
+					currentNode->last_child);
 
 			// Make the play
 			board.setBoard(nextNode->getA(), turn);
