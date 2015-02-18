@@ -10,23 +10,22 @@
 #include "ExtraFun.h"
 
 TreeHandler::TreeHandler() {
-	// TODO Auto-generated constructor stub
-
 }
 
 TreeHandler::~TreeHandler() {
-	// TODO Auto-generated destructor stub
 }
 
 void TreeHandler::buildTree(tree<Node>& tr, char turn) {
 	Node emptyNode;
 	TreeIt root, nodeIt, nodeIt1;
-	root = tr.begin();
 	char nexTurn = switchTurn(turn);
+
+	// Insert a root node with an empty board for convenience
+	root = tr.insert(tr.begin(), emptyNode);
 
 	for (unsigned int i = 0; i < 3; i++) {
 		for (unsigned int j = 0; j < 3; j++) {
-			nodeIt = tr.insert(root, emptyNode);
+			nodeIt = tr.append_child(root, emptyNode);
 			nodeIt->setBoard(i, j, turn);
 			nodeIt->setA(i, j);
 			for (unsigned int k = 0; k < 3; k++) {
@@ -52,14 +51,15 @@ SiblingIt TreeHandler::getNextMove(float epsilon, const SiblingIt& startNode,
 	}
 }
 
-void TreeHandler::updateV(float alpha, tree_node_<Node> * currentNode){
+void TreeHandler::updateV(float alpha, tree_node_<Node> * currentNode) {
 	tree_node_<Node> * updateNode = currentNode, siblingNode;
 
-	if(updateNode->parent != 0 && updateNode->parent->parent != 0){
+	if (updateNode->parent != 0 && updateNode->parent->parent != 0) {
 		updateNode = updateNode->parent->parent;
-		if(updateNode->data.getV() < currentNode->data.getV()){
-			updateNode->data.setV(updateNode->data.getV() + alpha *
-					currentNode->data.getV() - updateNode->data.getV());
+		if (updateNode->data.getV() < currentNode->data.getV()) {
+			updateNode->data.setV(
+					updateNode->data.getV() + alpha * currentNode->data.getV()
+							- updateNode->data.getV());
 		} else {
 			return;
 		}
@@ -131,6 +131,6 @@ SiblingIt TreeHandler::getNextExploreNode(const SiblingIt& startNode,
 	return nextNode;
 }
 
-float TreeHandler::randf(){
-	return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+float TreeHandler::randf() {
+	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }

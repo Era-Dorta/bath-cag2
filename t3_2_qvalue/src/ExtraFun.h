@@ -17,5 +17,4 @@ inline char switchTurn(char turn) {
 	return 'x';
 }
 
-
 #endif /* EXTRAFUN_H_ */
