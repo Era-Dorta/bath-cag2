@@ -62,20 +62,22 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 		// Parent the new shape node to the previous transform
 		dagMod.reparentNode(newGeomShapeFn.object(), geomTransformPath.node());
 
-		// Assign the new surface to the shading group
+		// Assign the new surface to the shading group or it won't be shown
 		shadingGroupFn.addMember(newGeomShapeFn.object());
 
 		// Create ShapeIntrpltNode node
-		MObject shadowNode = dagMod.MDGModifier::createNode(ShapeIntrpltNode::id);
-		assert(!shadowNode.isNull());
-		MFnDependencyNode shadowNodeFn(shadowNode);
+		MObject intrpltNode = dagMod.MDGModifier::createNode(ShapeIntrpltNode::id);
+		assert(!intrpltNode.isNull());
+		MFnDependencyNode intrpltNodeFn(intrpltNode);
 
-		MPlug inputSurfacePlug = shadowNodeFn.findPlug("inputSurface");
-		MPlug outputSurfacePlug = shadowNodeFn.findPlug("outputSurface");
+		MPlug inputSurfacePlug = intrpltNodeFn.findPlug("inputSurface");
+		MPlug outputSurfacePlug = intrpltNodeFn.findPlug("outputSurface");
 
 		MPlug outGeomPlug = geomShapeFn.findPlug("worldMesh");
 		unsigned int instanceNum = geomShapePath.instanceNumber();
-		outGeomPlug.selectAncestorLogicalIndex(instanceNum); // Set the plug to the correct element in the array
+
+		// Set the plug to the correct element in the array
+		outGeomPlug.selectAncestorLogicalIndex(instanceNum); 
 
 		MPlug inGeomPlug = newGeomShapeFn.findPlug("inMesh");
 
