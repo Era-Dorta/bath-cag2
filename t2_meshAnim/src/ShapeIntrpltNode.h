@@ -18,6 +18,7 @@ public:
 public:
 	static MObject inputSurface;
 	static MObject outputSurface;
+	static MObject interpolateValue;
 };
 
 #endif

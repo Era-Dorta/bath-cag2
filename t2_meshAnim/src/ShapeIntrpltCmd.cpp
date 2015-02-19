@@ -8,6 +8,7 @@
 #include <maya/MPlug.h>
 #include <maya/MPlugArray.h>
 #include <maya/MTime.h>
+#include <maya/MAnimControl.h>
 #include <assert.h>
 
 MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
@@ -54,7 +55,24 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 		MGlobal::displayInfo(geomShapeFn.name());
 
 		if (geomShapeFn.name().indexW("source") != -1){
+
+			// TODO Move to constructor
+			newNodeName = "interpolatorNode";
+
 			duplicateMesh(shadingGroupFn, geomShapePath, geomShapeFn);
+
+			//MString n( meltFn.name() );
+			//MGlobal::displayInfo( "\nMelt node: " + name + " " + shapeFn.name() );
+
+			MTime startTime = MAnimControl::minTime();
+			MTime endTime = MAnimControl::maxTime();
+
+			MString cmd;
+			cmd = MString("setKeyframe -at interpolateValue -t ") + startTime.value() + " -v " + 0.0 + " " + newNodeName;
+			dgMod.commandToExecute(cmd);
+
+			cmd = MString("setKeyframe -at interpolateValue -t ") + endTime.value() + " -v " + 1.0 + " " + newNodeName;
+			dgMod.commandToExecute(cmd);
 		}
 		else if (geomShapeFn.name().indexW("target") != -1){
 
@@ -114,6 +132,10 @@ void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapeP
 	// Create ShapeIntrpltNode node
 	MObject intrpltNode = dgMod.createNode(ShapeIntrpltNode::id);
 	assert(!intrpltNode.isNull());
+
+	// Give the node a custom name
+	dgMod.renameNode(intrpltNode, newNodeName);
+
 	MFnDependencyNode intrpltNodeFn(intrpltNode);
 
 	MPlug inputSurfacePlug = intrpltNodeFn.findPlug("inputSurface");

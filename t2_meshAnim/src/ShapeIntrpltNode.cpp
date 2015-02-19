@@ -17,9 +17,10 @@
 const MTypeId ShapeIntrpltNode::id(0x00334);
 
 MObject ShapeIntrpltNode::inputSurface;
+MObject ShapeIntrpltNode::interpolateValue;
 MObject ShapeIntrpltNode::outputSurface;
-      
-MStatus ShapeIntrpltNode::compute( const MPlug& plug, MDataBlock& data )
+
+MStatus ShapeIntrpltNode::compute(const MPlug& plug, MDataBlock& data)
 {
 	MStatus stat;
 
@@ -28,13 +29,18 @@ MStatus ShapeIntrpltNode::compute( const MPlug& plug, MDataBlock& data )
 	{
 		// Get handlers for the two meshes
 		MDataHandle inputSurfaceHnd = data.inputValue(inputSurface);
+		MDataHandle interpolateValueHnd = data.inputValue(interpolateValue);
 		MDataHandle outputSurfaceHnd = data.outputValue(outputSurface);
 
 		// Copy input into output
 		outputSurfaceHnd.copy(inputSurfaceHnd);
 
+		// Get interpolation value
+		double interpolateVal = interpolateValueHnd.asDouble();
+		interpolateVal = interpolateVal * 10;
+
 		// Dummy interpolation, just translate each vertex 1 on x
-		MPoint surfPoint, translation(1, 0, 0);
+		MPoint surfPoint, translation(interpolateVal, 0, 0);
 		MItGeometry iter(outputSurfaceHnd, false);
 		for (; !iter.isDone(); iter.next())
 		{
@@ -53,24 +59,30 @@ MStatus ShapeIntrpltNode::compute( const MPlug& plug, MDataBlock& data )
 
 void *ShapeIntrpltNode::creator()
 {
-return new ShapeIntrpltNode();
+	return new ShapeIntrpltNode();
 }
 
 MStatus ShapeIntrpltNode::initialize()
 {
-MFnTypedAttribute tAttr;
+	MFnNumericAttribute nAttr;
+	MFnTypedAttribute tAttr;
 
-inputSurface = tAttr.create("inputSurface", "is", MFnData::kMesh);
-tAttr.setHidden( true );
+	inputSurface = tAttr.create("inputSurface", "is", MFnData::kMesh);
+	tAttr.setHidden(true);
 
-outputSurface = tAttr.create("outputSurface", "os", MFnData::kMesh);
-tAttr.setStorable( false );
-tAttr.setHidden( true );
+	interpolateValue = nAttr.create("interpolateValue", "iv", MFnNumericData::kDouble, 0.0);
+	nAttr.setKeyable(true);
 
-addAttribute( inputSurface );
-addAttribute( outputSurface );
+	outputSurface = tAttr.create("outputSurface", "os", MFnData::kMesh);
+	tAttr.setStorable(false);
+	tAttr.setHidden(true);
 
-attributeAffects( inputSurface, outputSurface );
+	addAttribute(inputSurface);
+	addAttribute(interpolateValue);
+	addAttribute(outputSurface);
 
-return MS::kSuccess;
+	attributeAffects(inputSurface, outputSurface);
+	attributeAffects(interpolateValue, outputSurface);
+
+	return MS::kSuccess;
 }
