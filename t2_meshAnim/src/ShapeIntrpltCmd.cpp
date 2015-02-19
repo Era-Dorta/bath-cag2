@@ -35,17 +35,15 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 	MGlobal::getActiveSelectionList(selection);
 	MItSelectionList iter(selection);
 
-	unsigned int count;
+	unsigned int count = 0;
 
 	MDagPath sourceShapePath;
 	MDagPath targetShapePath;
 
 	// Iterate over all the mesh nodes
 	iter.setFilter(MFn::kMesh);
-	for (iter.reset(), count = 0; !iter.isDone(); iter.next(), count++)
+	for (iter.reset(); !iter.isDone(); iter.next())
 	{
-
-
 		MDagPath geomShapePath;
 		iter.getDagPath(geomShapePath);
 
@@ -55,17 +53,16 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 		MFnDagNode geomShapeFn(geomShapePath);
 
-		MGlobal::displayInfo(geomShapeFn.name());
-
 		if (geomShapeFn.name().indexW("source") != -1){
-
 			sourceShapePath = geomShapePath;
+			count++;
 		}
 		else if (geomShapeFn.name().indexW("target") != -1){
 			targetShapePath = geomShapePath;
+			count++;
 		}
-		else {
-			continue;
+		else if (count == 2){
+			break;
 		}
 	}
 
@@ -114,28 +111,27 @@ MStatus ShapeIntrpltCmd::redoIt()
 	return dgMod.doIt();
 }
 
-void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapePath,
+void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &sourceShapePath,
 	MDagPath &targetShapePath){
 
-	MFnDagNode geomShapeFn(geomShapePath);
+	MFnDagNode sourceShapeFn(sourceShapePath);
 
 	// Duplicate the mesh
 	// duplicate(bool instance = false, bool instaceLeaf = false)
 	// Set to true to create instances, instanceLeaf controls whether the instance is
 	// only at the leaf, returns a reference to the new Node
-	MObject newGeomTransform = geomShapeFn.duplicate(false, false);
+	MObject intrpMeshTransform = sourceShapeFn.duplicate(false, false);
 
 	// Save the dag path of the newly created mesh
-	newMesh = newGeomTransform;
+	newMesh = intrpMeshTransform;
 	doMeshUndo = true;
 
-	// Add the mesh with the new shape node to the 
-	MFnDagNode newGeomShapeFn(newGeomTransform);
+	// Get MFnDagNode of the Shape Node of the interpolated mesh
+	MFnDagNode intrpMeshShapeFn(intrpMeshTransform);
+	intrpMeshShapeFn.setObject(intrpMeshShapeFn.child(0));
 
-	newGeomShapeFn.setObject(newGeomShapeFn.child(0));
-
-	// Assign the new surface to the shading group or it won't be shown
-	shadingGroupFn.addMember(newGeomShapeFn.object());
+	// Assign the new mesh to the shading group so it will be rendered
+	shadingGroupFn.addMember(intrpMeshShapeFn.object());
 
 	// Create ShapeIntrpltNode node
 	MObject intrpltNode = dgMod.createNode(ShapeIntrpltNode::id);
@@ -144,27 +140,31 @@ void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapeP
 	// Give the node a custom name
 	dgMod.renameNode(intrpltNode, newNodeName);
 
+	// Get plugs for the interpolator node
 	MFnDependencyNode intrpltNodeFn(intrpltNode);
-
 	MPlug sourceSurfacePlug = intrpltNodeFn.findPlug("sourceSurface");
 	MPlug targetSurfacePlug = intrpltNodeFn.findPlug("targetSurface");
 	MPlug outputSurfacePlug = intrpltNodeFn.findPlug("outputSurface");
 
+	// Get source and targe mesh plugs
 	MFnDagNode targetShapeFn(targetShapePath);
-	MPlug outGeomPlug = geomShapeFn.findPlug("worldMesh");
+	MPlug sourcePlug = sourceShapeFn.findPlug("worldMesh");
 	MPlug targetPlug = targetShapeFn.findPlug("worldMesh");
 
-	unsigned int instanceNum = geomShapePath.instanceNumber();
-
 	// Set the plug to the correct element in the array
-	outGeomPlug.selectAncestorLogicalIndex(instanceNum);
+	unsigned int instanceNum = sourceShapePath.instanceNumber();
+	sourcePlug.selectAncestorLogicalIndex(instanceNum);
 
 	instanceNum = targetShapePath.instanceNumber();
 	targetPlug.selectAncestorLogicalIndex(instanceNum);
 
-	MPlug inGeomPlug = newGeomShapeFn.findPlug("inMesh");
+	// Get input plug for the interpolated mesh shape
+	MPlug intrpMeshPlug = intrpMeshShapeFn.findPlug("inMesh");
 
-	dgMod.connect(outGeomPlug, sourceSurfacePlug);
+	// Conect the inputs of the Interpolator Node
+	dgMod.connect(sourcePlug, sourceSurfacePlug);
 	dgMod.connect(targetPlug, targetSurfacePlug);
-	dgMod.connect(outputSurfacePlug, inGeomPlug);
+
+	// Conect the outputs of the Interpolator Node
+	dgMod.connect(outputSurfacePlug, intrpMeshPlug);
 }

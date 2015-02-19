@@ -21,7 +21,7 @@ public:
 	static MSyntax newSyntax();
 
 private:
-	void duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapePath,
+	void duplicateMesh(MFnSet &shadingGroupFn, MDagPath &sourceShapePath,
 		MDagPath &targetShapePath);
 
 private:
