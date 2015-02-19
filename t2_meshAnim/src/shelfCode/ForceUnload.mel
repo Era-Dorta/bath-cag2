@@ -1,0 +1,2 @@
+file -force -open  "C:/Users/gdp24/Documents/maya/projects/cag2_shape_interp/scenes/horseScene.mb";
+unloadPlugin "ShapePlugin";
