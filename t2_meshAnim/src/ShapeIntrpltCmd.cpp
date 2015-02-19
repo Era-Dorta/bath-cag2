@@ -8,7 +8,6 @@
 #include <maya/MPlug.h>
 #include <maya/MPlugArray.h>
 #include <maya/MTime.h>
-#include <maya/MFnSet.h>
 #include <assert.h>
 
 MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
@@ -41,6 +40,8 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 	iter.setFilter(MFn::kMesh);
 	for (iter.reset(), count = 0; !iter.isDone(); iter.next(), count++)
 	{
+
+
 		MDagPath geomShapePath;
 		iter.getDagPath(geomShapePath);
 
@@ -50,47 +51,22 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 		MFnDagNode geomShapeFn(geomShapePath);
 
-		// Duplicate the mesh
-		// duplicate(bool instance = false, bool instaceLeaf = false)
-		// Set to true to create instances, instanceLeaf controls whether the instance is
-		// only at the leaf, returns a reference to the new Node
-		MObject newGeomTransform = geomShapeFn.duplicate(false, false);
+		MGlobal::displayInfo(geomShapeFn.name());
 
-		// Save the dag path of the newly created mesh
-		newMesh = newGeomTransform;
-		doMeshUndo = true;
+		if (geomShapeFn.name().indexW("source") != -1){
+			duplicateMesh(shadingGroupFn, geomShapePath, geomShapeFn);
+		}
+		else if (geomShapeFn.name().indexW("target") != -1){
 
-		// Add the mesh with the new shape node to the 
-		MFnDagNode newGeomShapeFn(newGeomTransform);
-
-		newGeomShapeFn.setObject(newGeomShapeFn.child(0));
-
-		// Assign the new surface to the shading group or it won't be shown
-		shadingGroupFn.addMember(newGeomShapeFn.object());
-
-		// Create ShapeIntrpltNode node
-		MObject intrpltNode = dgMod.createNode(ShapeIntrpltNode::id);
-		assert(!intrpltNode.isNull());
-		MFnDependencyNode intrpltNodeFn(intrpltNode);
-
-		MPlug inputSurfacePlug = intrpltNodeFn.findPlug("inputSurface");
-		MPlug outputSurfacePlug = intrpltNodeFn.findPlug("outputSurface");
-
-		MPlug outGeomPlug = geomShapeFn.findPlug("worldMesh");
-		unsigned int instanceNum = geomShapePath.instanceNumber();
-
-		// Set the plug to the correct element in the array
-		outGeomPlug.selectAncestorLogicalIndex(instanceNum); 
-
-		MPlug inGeomPlug = newGeomShapeFn.findPlug("inMesh");
-
-		dgMod.connect(outGeomPlug, inputSurfacePlug);
-		dgMod.connect(outputSurfacePlug, inGeomPlug);
+		}
+		else {
+			continue;
+		}
 	}
 
-	if (count == 0)
+	if (count < 2)
 	{
-		MGlobal::displayError("\nSelect one or more geometric objects.");
+		MGlobal::displayError("\nSelect source and target shape.");
 		return MS::kFailure;
 	}
 
@@ -115,3 +91,42 @@ MStatus ShapeIntrpltCmd::redoIt()
 	return dgMod.doIt();
 }
 
+void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapePath,
+	MFnDagNode &geomShapeFn){
+	// Duplicate the mesh
+	// duplicate(bool instance = false, bool instaceLeaf = false)
+	// Set to true to create instances, instanceLeaf controls whether the instance is
+	// only at the leaf, returns a reference to the new Node
+	MObject newGeomTransform = geomShapeFn.duplicate(false, false);
+
+	// Save the dag path of the newly created mesh
+	newMesh = newGeomTransform;
+	doMeshUndo = true;
+
+	// Add the mesh with the new shape node to the 
+	MFnDagNode newGeomShapeFn(newGeomTransform);
+
+	newGeomShapeFn.setObject(newGeomShapeFn.child(0));
+
+	// Assign the new surface to the shading group or it won't be shown
+	shadingGroupFn.addMember(newGeomShapeFn.object());
+
+	// Create ShapeIntrpltNode node
+	MObject intrpltNode = dgMod.createNode(ShapeIntrpltNode::id);
+	assert(!intrpltNode.isNull());
+	MFnDependencyNode intrpltNodeFn(intrpltNode);
+
+	MPlug inputSurfacePlug = intrpltNodeFn.findPlug("inputSurface");
+	MPlug outputSurfacePlug = intrpltNodeFn.findPlug("outputSurface");
+
+	MPlug outGeomPlug = geomShapeFn.findPlug("worldMesh");
+	unsigned int instanceNum = geomShapePath.instanceNumber();
+
+	// Set the plug to the correct element in the array
+	outGeomPlug.selectAncestorLogicalIndex(instanceNum);
+
+	MPlug inGeomPlug = newGeomShapeFn.findPlug("inMesh");
+
+	dgMod.connect(outGeomPlug, inputSurfacePlug);
+	dgMod.connect(outputSurfacePlug, inGeomPlug);
+}
