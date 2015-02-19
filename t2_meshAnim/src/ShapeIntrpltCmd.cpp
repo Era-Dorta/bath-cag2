@@ -56,8 +56,13 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 		// only at the leaf, returns a reference to the new Node
 		MObject newGeomTransform = geomShapeFn.duplicate(false, false);
 
+		// Save the dag path of the newly created mesh
+		newMesh = newGeomTransform;
+		doMeshUndo = true;
+
 		// Add the mesh with the new shape node to the 
 		MFnDagNode newGeomShapeFn(newGeomTransform);
+
 		newGeomShapeFn.setObject(newGeomShapeFn.child(0));
 
 		// Assign the new surface to the shading group or it won't be shown
@@ -94,6 +99,14 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 MStatus ShapeIntrpltCmd::undoIt()
 {
+	MStatus status;
+
+	if (doMeshUndo)
+	{
+		MGlobal::deleteNode(newMesh);
+		doMeshUndo = false;
+	}
+
 	return dgMod.undoIt();
 }
 

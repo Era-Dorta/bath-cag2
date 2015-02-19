@@ -1,8 +1,11 @@
 #ifndef SHAPEINTRPLCMD_H
 #define SHAPEINTRPLCMD_H
 
+#include <vector>
+
 #include <maya/MPxCommand.h>
 #include <maya/MDGModifier.h>
+#include <maya/MDaGPath.h>
 
 class ShapeIntrpltCmd : public MPxCommand 
 {
@@ -17,6 +20,13 @@ public:
 
 private:
 	MDGModifier dgMod;
+
+	// The stack of undo to perform.
+	std::vector<MDGModifier*> mUndo;
+
+	// The intermediate mesh.
+	MObject newMesh;
+	bool doMeshUndo;
 };
 
 #endif
