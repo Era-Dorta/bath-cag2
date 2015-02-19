@@ -39,15 +39,24 @@ MStatus ShapeIntrpltNode::compute(const MPlug& plug, MDataBlock& data)
 
 		// Get interpolation value
 		double interpolateVal = interpolateValueHnd.asDouble();
-		interpolateVal = interpolateVal * 10;
 
 		// Dummy interpolation, just translate each vertex 1 on x
-		MPoint surfPoint, translation(interpolateVal, 0, 0);
-		MItGeometry iter(outputSurfaceHnd, false);
-		for (; !iter.isDone(); iter.next())
+		MPoint sourcePoint, targetPoint, outputPoint;
+		
+		MItGeometry outputIt(outputSurfaceHnd, false);
+		MItGeometry targetIt(targetSurfaceHnd, false);
+		MItGeometry sourceIt(sourceSurfaceHnd, false);
+
+		for (; !outputIt.isDone(); outputIt.next())
 		{
-			surfPoint = iter.position(MSpace::kWorld);
-			iter.setPosition(surfPoint + translation, MSpace::kWorld);
+			sourcePoint = sourceIt.position(MSpace::kWorld);
+			targetPoint = targetIt.position(MSpace::kWorld);
+
+			outputIt.setPosition((1 - interpolateVal) * sourcePoint + 
+				interpolateVal * targetPoint, MSpace::kWorld);
+
+			targetIt.next();
+			sourceIt.next();
 		}
 
 		// Tell de DG that we have updated the outputSurface
