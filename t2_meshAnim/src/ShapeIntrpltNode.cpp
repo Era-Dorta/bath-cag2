@@ -16,7 +16,8 @@
 
 const MTypeId ShapeIntrpltNode::id(0x00334);
 
-MObject ShapeIntrpltNode::inputSurface;
+MObject ShapeIntrpltNode::sourceSurface;
+MObject ShapeIntrpltNode::targetSurface;
 MObject ShapeIntrpltNode::interpolateValue;
 MObject ShapeIntrpltNode::outputSurface;
 
@@ -28,12 +29,13 @@ MStatus ShapeIntrpltNode::compute(const MPlug& plug, MDataBlock& data)
 	if (plug == outputSurface)
 	{
 		// Get handlers for the two meshes
-		MDataHandle inputSurfaceHnd = data.inputValue(inputSurface);
+		MDataHandle sourceSurfaceHnd = data.inputValue(sourceSurface);
+		MDataHandle targetSurfaceHnd = data.inputValue(targetSurface);
 		MDataHandle interpolateValueHnd = data.inputValue(interpolateValue);
 		MDataHandle outputSurfaceHnd = data.outputValue(outputSurface);
 
 		// Copy input into output
-		outputSurfaceHnd.copy(inputSurfaceHnd);
+		outputSurfaceHnd.copy(sourceSurfaceHnd);
 
 		// Get interpolation value
 		double interpolateVal = interpolateValueHnd.asDouble();
@@ -67,7 +69,10 @@ MStatus ShapeIntrpltNode::initialize()
 	MFnNumericAttribute nAttr;
 	MFnTypedAttribute tAttr;
 
-	inputSurface = tAttr.create("inputSurface", "is", MFnData::kMesh);
+	sourceSurface = tAttr.create("sourceSurface", "ss", MFnData::kMesh);
+	tAttr.setHidden(true);
+
+	targetSurface = tAttr.create("targetSurface", "ts", MFnData::kMesh);
 	tAttr.setHidden(true);
 
 	interpolateValue = nAttr.create("interpolateValue", "iv", MFnNumericData::kDouble, 0.0);
@@ -77,11 +82,13 @@ MStatus ShapeIntrpltNode::initialize()
 	tAttr.setStorable(false);
 	tAttr.setHidden(true);
 
-	addAttribute(inputSurface);
+	addAttribute(sourceSurface);
+	addAttribute(targetSurface);
 	addAttribute(interpolateValue);
 	addAttribute(outputSurface);
 
-	attributeAffects(inputSurface, outputSurface);
+	attributeAffects(sourceSurface, outputSurface);
+	attributeAffects(targetSurface, outputSurface);
 	attributeAffects(interpolateValue, outputSurface);
 
 	return MS::kSuccess;

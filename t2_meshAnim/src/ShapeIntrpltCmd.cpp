@@ -37,6 +37,9 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 	unsigned int count;
 
+	MDagPath sourceShapePath;
+	MDagPath targetShapePath;
+
 	// Iterate over all the mesh nodes
 	iter.setFilter(MFn::kMesh);
 	for (iter.reset(), count = 0; !iter.isDone(); iter.next(), count++)
@@ -56,26 +59,10 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 		if (geomShapeFn.name().indexW("source") != -1){
 
-			// TODO Move to constructor
-			newNodeName = "interpolatorNode";
-
-			duplicateMesh(shadingGroupFn, geomShapePath, geomShapeFn);
-
-			//MString n( meltFn.name() );
-			//MGlobal::displayInfo( "\nMelt node: " + name + " " + shapeFn.name() );
-
-			MTime startTime = MAnimControl::minTime();
-			MTime endTime = MAnimControl::maxTime();
-
-			MString cmd;
-			cmd = MString("setKeyframe -at interpolateValue -t ") + startTime.value() + " -v " + 0.0 + " " + newNodeName;
-			dgMod.commandToExecute(cmd);
-
-			cmd = MString("setKeyframe -at interpolateValue -t ") + endTime.value() + " -v " + 1.0 + " " + newNodeName;
-			dgMod.commandToExecute(cmd);
+			sourceShapePath = geomShapePath;
 		}
 		else if (geomShapeFn.name().indexW("target") != -1){
-
+			targetShapePath = geomShapePath;
 		}
 		else {
 			continue;
@@ -87,6 +74,24 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 		MGlobal::displayError("\nSelect source and target shape.");
 		return MS::kFailure;
 	}
+
+	// TODO Move to constructor
+	newNodeName = "interpolatorNode";
+
+	duplicateMesh(shadingGroupFn, sourceShapePath, targetShapePath);
+
+	//MString n( meltFn.name() );
+	//MGlobal::displayInfo( "\nMelt node: " + name + " " + shapeFn.name() );
+
+	MTime startTime = MAnimControl::minTime();
+	MTime endTime = MAnimControl::maxTime();
+
+	MString cmd;
+	cmd = MString("setKeyframe -at interpolateValue -t ") + startTime.value() + " -v " + 0.0 + " " + newNodeName;
+	dgMod.commandToExecute(cmd);
+
+	cmd = MString("setKeyframe -at interpolateValue -t ") + endTime.value() + " -v " + 1.0 + " " + newNodeName;
+	dgMod.commandToExecute(cmd);
 
 	return redoIt();
 }
@@ -110,7 +115,10 @@ MStatus ShapeIntrpltCmd::redoIt()
 }
 
 void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapePath,
-	MFnDagNode &geomShapeFn){
+	MDagPath &targetShapePath){
+
+	MFnDagNode geomShapeFn(geomShapePath);
+
 	// Duplicate the mesh
 	// duplicate(bool instance = false, bool instaceLeaf = false)
 	// Set to true to create instances, instanceLeaf controls whether the instance is
@@ -138,17 +146,25 @@ void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapeP
 
 	MFnDependencyNode intrpltNodeFn(intrpltNode);
 
-	MPlug inputSurfacePlug = intrpltNodeFn.findPlug("inputSurface");
+	MPlug sourceSurfacePlug = intrpltNodeFn.findPlug("sourceSurface");
+	MPlug targetSurfacePlug = intrpltNodeFn.findPlug("targetSurface");
 	MPlug outputSurfacePlug = intrpltNodeFn.findPlug("outputSurface");
 
+	MFnDagNode targetShapeFn(targetShapePath);
 	MPlug outGeomPlug = geomShapeFn.findPlug("worldMesh");
+	MPlug targetPlug = targetShapeFn.findPlug("worldMesh");
+
 	unsigned int instanceNum = geomShapePath.instanceNumber();
 
 	// Set the plug to the correct element in the array
 	outGeomPlug.selectAncestorLogicalIndex(instanceNum);
 
+	instanceNum = targetShapePath.instanceNumber();
+	targetPlug.selectAncestorLogicalIndex(instanceNum);
+
 	MPlug inGeomPlug = newGeomShapeFn.findPlug("inMesh");
 
-	dgMod.connect(outGeomPlug, inputSurfacePlug);
+	dgMod.connect(outGeomPlug, sourceSurfacePlug);
+	dgMod.connect(targetPlug, targetSurfacePlug);
 	dgMod.connect(outputSurfacePlug, inGeomPlug);
 }

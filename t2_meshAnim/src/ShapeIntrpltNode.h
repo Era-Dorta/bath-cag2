@@ -8,7 +8,7 @@
 class ShapeIntrpltNode : public MPxNode
 {
 public:
-	virtual MStatus compute( const MPlug& plug, MDataBlock& data );
+	virtual MStatus compute(const MPlug& plug, MDataBlock& data);
 
 	static  void *creator();
 	static  MStatus initialize();
@@ -16,7 +16,8 @@ public:
 	static const MTypeId id;
 
 public:
-	static MObject inputSurface;
+	static MObject sourceSurface;
+	static MObject targetSurface;
 	static MObject outputSurface;
 	static MObject interpolateValue;
 };

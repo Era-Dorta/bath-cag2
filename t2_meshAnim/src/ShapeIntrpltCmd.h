@@ -22,17 +22,13 @@ public:
 
 private:
 	void duplicateMesh(MFnSet &shadingGroupFn, MDagPath &geomShapePath,
-		MFnDagNode &geomShapeFn);
+		MDagPath &targetShapePath);
 
 private:
 	MDGModifier dgMod;
 
-	// The stack of undo to perform.
-	std::vector<MDGModifier*> mUndo;
-
 	MString newNodeName;
 
-	// The intermediate mesh.
 	MObject newMesh;
 	bool doMeshUndo;
 };
