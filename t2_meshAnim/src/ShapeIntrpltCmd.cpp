@@ -50,23 +50,21 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 		MFnDagNode geomShapeFn(geomShapePath);
 
+		// Duplicate the mesh
 		// duplicate(bool instance = false, bool instaceLeaf = false)
 		// Set to true to create instances, instanceLeaf controls whether the instance is
 		// only at the leaf, returns a reference to the new Node
 		MObject newGeomTransform = geomShapeFn.duplicate(false, false);
 
-		// We want the shape node, so set newGeomShapeFn to point to the shape node
+		// Add the mesh with the new shape node to the 
 		MFnDagNode newGeomShapeFn(newGeomTransform);
 		newGeomShapeFn.setObject(newGeomShapeFn.child(0));
-
-		// Parent the new shape node to the previous transform
-		dagMod.reparentNode(newGeomShapeFn.object(), geomTransformPath.node());
 
 		// Assign the new surface to the shading group or it won't be shown
 		shadingGroupFn.addMember(newGeomShapeFn.object());
 
 		// Create ShapeIntrpltNode node
-		MObject intrpltNode = dagMod.MDGModifier::createNode(ShapeIntrpltNode::id);
+		MObject intrpltNode = dgMod.createNode(ShapeIntrpltNode::id);
 		assert(!intrpltNode.isNull());
 		MFnDependencyNode intrpltNodeFn(intrpltNode);
 
@@ -81,8 +79,8 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 		MPlug inGeomPlug = newGeomShapeFn.findPlug("inMesh");
 
-		dagMod.connect(outGeomPlug, inputSurfacePlug);
-		dagMod.connect(outputSurfacePlug, inGeomPlug);
+		dgMod.connect(outGeomPlug, inputSurfacePlug);
+		dgMod.connect(outputSurfacePlug, inGeomPlug);
 	}
 
 	if (count == 0)
@@ -96,11 +94,11 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 MStatus ShapeIntrpltCmd::undoIt()
 {
-	return dagMod.undoIt();
+	return dgMod.undoIt();
 }
 
 MStatus ShapeIntrpltCmd::redoIt()
 {
-	return dagMod.doIt();
+	return dgMod.doIt();
 }
 

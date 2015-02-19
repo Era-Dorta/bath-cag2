@@ -2,7 +2,7 @@
 #define SHAPEINTRPLCMD_H
 
 #include <maya/MPxCommand.h>
-#include <maya/MDaGModifier.h>
+#include <maya/MDGModifier.h>
 
 class ShapeIntrpltCmd : public MPxCommand 
 {
@@ -16,7 +16,7 @@ public:
 	static MSyntax newSyntax();
 
 private:
-	MDagModifier dagMod;
+	MDGModifier dgMod;
 };
 
 #endif
