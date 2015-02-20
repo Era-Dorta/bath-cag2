@@ -62,7 +62,10 @@ bool Node::isFinalState() {
 
 void Node::computeFinalState(char turn) {
 	r = board.checkFinalState(turn);
-	v = fabs((double) r);
+
+	if (r != 0) {
+		v = r;
+	}
 }
 
 void Node::setV(float v) {
