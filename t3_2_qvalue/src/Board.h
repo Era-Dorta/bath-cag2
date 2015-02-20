@@ -14,11 +14,13 @@ public:
 	virtual ~Board();
 	Board(const Board &otherBoard);
 
-	void operator =(const Board& right);
+	Board& operator =(const Board& right);
 
 	bool isFinalState();
 
 	float checkFinalState(char turn);
+
+	void reset();
 
 	char getBoard(unsigned int i, unsigned int j) const;
 	void setBoard(unsigned int i, unsigned int j, char val);

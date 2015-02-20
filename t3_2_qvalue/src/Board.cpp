@@ -8,22 +8,19 @@
 #include "Board.h"
 
 Board::Board() {
-	for (unsigned int i = 0; i < 3; i++) {
-		for (unsigned int j = 0; j < 3; j++) {
-			this->board[i][j] = 'e';
-		}
-	}
+	reset();
 }
 
 Board::~Board() {
 }
 
-void Board::operator =(const Board& right) {
+Board& Board::operator =(const Board& right) {
 	for (unsigned int i = 0; i < 3; i++) {
 		for (unsigned int j = 0; j < 3; j++) {
 			board[i][j] = right.board[i][j];
 		}
 	}
+	return *this;
 }
 
 char Board::getBoard(unsigned int i, unsigned int j) const {
@@ -96,6 +93,14 @@ Board::Board(const Board& otherBoard) {
 	for (unsigned int i = 0; i < 3; i++) {
 		for (unsigned int j = 0; j < 3; j++) {
 			board[i][j] = otherBoard.board[i][j];
+		}
+	}
+}
+
+void Board::reset() {
+	for (unsigned int i = 0; i < 3; i++) {
+		for (unsigned int j = 0; j < 3; j++) {
+			board[i][j] = 'e';
 		}
 	}
 }
