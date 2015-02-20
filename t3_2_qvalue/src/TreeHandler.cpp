@@ -10,6 +10,7 @@
 #include "ExtraFun.h"
 
 TreeHandler::TreeHandler() {
+	cTurn = 'x';
 }
 
 TreeHandler::~TreeHandler() {
@@ -17,7 +18,7 @@ TreeHandler::~TreeHandler() {
 
 void TreeHandler::buildTree(tree<Node>& tr, char turn) {
 	Node emptyNode;
-	TreeIt root, nodeIt, nodeIt1;
+	NodeIt root, nodeIt, nodeIt1;
 	char nexTurn = switchTurn(turn);
 
 	// Insert a root node with an empty board for convenience
@@ -28,6 +29,7 @@ void TreeHandler::buildTree(tree<Node>& tr, char turn) {
 			nodeIt = tr.append_child(root, emptyNode);
 			nodeIt->setBoard(i, j, turn);
 			nodeIt->setA(i, j);
+			nodeIt->setV(0.5);
 			for (unsigned int k = 0; k < 3; k++) {
 				for (unsigned int l = 0; l < 3; l++) {
 					if (nodeIt->getBoard(k, l) == 'e') {
@@ -40,76 +42,43 @@ void TreeHandler::buildTree(tree<Node>& tr, char turn) {
 	}
 }
 
-SiblingIt TreeHandler::getNextMove(float epsilon, const SiblingIt& startNode,
-		const SiblingIt& endNode) {
+SiblingIt TreeHandler::getNextMove(char turn, float epsilon,
+		const SiblingIt& startNode) {
 
-	if (randf() > epsilon) {
+	cTurn = turn;
+
+	if (cTurn == 'o' || randf() > epsilon) {
 		// Get next move with max V
-		return getNextOptimalNode(startNode, endNode);
+		return getNextOptimalNode(startNode);
 	} else {
-		return getNextExploreNode(startNode, endNode);
+		return getNextExploreNode(startNode);
 	}
 }
 
-void TreeHandler::updateV(float alpha, tree_node_<Node> * currentNode) {
-	tree_node_<Node> *updateNode = currentNode, *parentNode;
+void TreeHandler::updateV(float alpha) {
+	NodeIt parentNode, currentNode;
 
-	// o won, update the other side of the tree
-	if (currentNode->data.getR() < 0 && updateNode->parent != 0) {
-		updateNode = updateNode->parent;
+	while (!optimalMoveStack.empty()) {
+		currentNode = optimalMoveStack.top();
+		parentNode = optimalMoveParentStack.top();
+		parentNode->setV(
+				parentNode->getV()
+						+ alpha * (currentNode->getV() - parentNode->getV()));
+		optimalMoveStack.pop();
+		optimalMoveParentStack.pop();
 	}
-
-	// Arrived at a new state, update parent if current state value is
-	// bigger that parent value
-	while (updateNode->parent != 0 && updateNode->parent->parent != 0) {
-		parentNode = updateNode->parent->parent;
-		if (parentNode->data.getV() < updateNode->data.getV()) {
-			parentNode->data.setV(
-					parentNode->data.getV() + alpha * updateNode->data.getV()
-							- parentNode->data.getV());
-		} else {
-			return;
-		}
-		updateNode = parentNode;
-	}
-
-	/* Update code with sibling value check
-	 SiblingIt firstSib, lastSib;
-	 while(updateNode->parent != 0 && updateNode->parent->parent != 0) {
-	 parentNode = updateNode->parent->parent;
-
-	 firstSib = updateNode->parent->first_child;
-	 lastSib = updateNode->parent->last_child;
-
-	 while (firstSib != updateNode) {
-	 if (firstSib->getV() > updateNode->data.getV()) {
-	 return;
-	 }
-	 firstSib++;
-	 }
-
-	 while (lastSib != updateNode) {
-	 if (lastSib->getV() > updateNode->data.getV()) {
-	 return;
-	 }
-	 lastSib--;
-	 }
-
-	 if (parentNode->data.getV() < updateNode->data.getV()) {
-	 parentNode->data.setV(
-	 parentNode->data.getV() + alpha * updateNode->data.getV()
-	 - parentNode->data.getV());
-	 } else {
-	 return;
-	 }
-	 updateNode = parentNode;
-	 }*/
 }
 
-void TreeHandler::buildNode(tree<Node>& tr, TreeIt nodeIt, char turn,
+void TreeHandler::buildNode(tree<Node>& tr, NodeIt nodeIt, char turn,
 		unsigned int nextI, unsigned int nextJ) {
 	nodeIt->setBoard(nextI, nextJ, turn);
 	nodeIt->setA(nextI, nextJ);
+
+	if (turn == 'x') {
+		nodeIt->setV(0.5);
+	} else {
+		nodeIt->setV(float(rand() % 9));
+	}
 
 	nodeIt->computeFinalState(turn);
 
@@ -121,7 +90,7 @@ void TreeHandler::buildNode(tree<Node>& tr, TreeIt nodeIt, char turn,
 
 	Node newNode(*nodeIt);
 
-	TreeIt node1;
+	NodeIt node1;
 	for (unsigned int i = 0; i < 3; i++) {
 		for (unsigned int j = 0; j < 3; j++) {
 			if (nodeIt->getBoard(i, j) == 'e') {
@@ -132,39 +101,41 @@ void TreeHandler::buildNode(tree<Node>& tr, TreeIt nodeIt, char turn,
 	}
 }
 
-SiblingIt TreeHandler::getNextOptimalNode(const SiblingIt& startNode,
-		const SiblingIt& endNode) {
+SiblingIt TreeHandler::getNextOptimalNode(const SiblingIt& startNode) {
 
 	SiblingIt nextSib = startNode, nextNode = startNode;
 
-	while (++nextSib != endNode) {
+	// Advance to compare with the next sibling
+	nextSib++;
+
+	// Find the sibling with the bigger V
+	for (; nextSib != startNode.end(); ++nextSib) {
 		if (nextSib->getV() > nextNode->getV()) {
 			nextNode = nextSib;
 		}
 	}
 
+	if (cTurn == 'x' && nextNode.node->parent
+			&& nextNode.node->parent->parent) {
+		optimalMoveStack.push(nextNode);
+		optimalMoveParentStack.push(nextNode.node->parent->parent);
+	} else if (cTurn == 'o' && nextNode.number_of_children() == 0) {
+		optimalMoveStack.push(nextNode);
+		optimalMoveParentStack.push(nextNode.node->parent);
+	}
 	return nextNode;
 }
 
-SiblingIt TreeHandler::getNextExploreNode(const SiblingIt& startNode,
-		const SiblingIt& endNode) {
+SiblingIt TreeHandler::getNextExploreNode(const SiblingIt& startNode) {
 
-	SiblingIt nextSib = startNode, nextNode = startNode;
-	unsigned int numSibling = 0;
-	while (++nextSib != endNode) {
-		numSibling++;
-	}
+	SiblingIt nextNode = startNode;
 
-	nextSib = startNode;
-	nextNode = startNode;
+	unsigned int numSibling = NodeIt(startNode.parent_).number_of_children();
 
 	// Pick a sibling at random
 	numSibling = rand() % numSibling;
-	unsigned int i = 0;
 
-	while (i < numSibling) {
-		nextNode++;
-	}
+	nextNode += numSibling;
 
 	return nextNode;
 }
