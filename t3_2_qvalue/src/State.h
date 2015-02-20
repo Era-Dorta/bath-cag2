@@ -5,19 +5,19 @@
  *      Author: gdp24
  */
 
-#ifndef NODE_H_
-#define NODE_H_
+#ifndef STATE_H_
+#define STATE_H_
 
 #include "Board.h"
 
-class Node {
+class State {
 public:
-	Node();
-	Node(float r, float v, const Board& board);
-	virtual ~Node();
+	State();
+	State(float r, float v, const Board& board);
+	virtual ~State();
 
-	Node(const Node &otherNode);
-	void operator=(const Node &right);
+	State(const State &otherNode);
+	void operator=(const State &right);
 
 	void computeFinalState(char turn);
 
@@ -42,4 +42,4 @@ private:
 	Board board;
 };
 
-#endif /* NODE_H_ */
+#endif /* STATE_H_ */
