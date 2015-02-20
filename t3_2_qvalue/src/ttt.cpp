@@ -74,7 +74,7 @@ int main(int, char **) {
 	cout << "done building size " << tr.size() << endl;
 
 	char turn = 'x', other = 'o';
-	unsigned int maxGames = 10;
+	unsigned int maxGames = 1000000;
 	float epsilon = (float) 0.2;
 	float alpha = (float) 0.1;
 
@@ -85,8 +85,8 @@ int main(int, char **) {
 	unsigned int numGames;
 	for (numGames = 1; numGames <= maxGames; numGames++) {
 		currentNode = firstNode.node;
-		cout << "next turn " << turn << endl;
-		cout << currentNode << endl;
+		//cout << "next turn " << turn << endl;
+		//cout << currentNode << endl;
 
 		while (!board.isFinalState()) {
 
@@ -97,8 +97,8 @@ int main(int, char **) {
 			// Make the play
 			board.setBoard(nextNode->getA(), turn);
 
-			cout << "next turn " << other << endl;
-			cout << nextNode.node << endl;
+			//	cout << "next turn " << other << endl;
+			//	cout << nextNode.node << endl;
 
 			other = turn;
 			turn = switchTurn(turn);
@@ -112,7 +112,7 @@ int main(int, char **) {
 		turn = 'x';
 		other = 'o';
 
-		cout << "---------- Game end ----------------" << endl;
+		//cout << "---------- Game end ----------------" << endl;
 	}
 	numGames--;
 
