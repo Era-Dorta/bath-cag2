@@ -3,14 +3,14 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "Node.h"
 #include "TreeHandler.h"
 #include "Board.h"
 #include "ExtraFun.h"
+#include "State.h"
 
 using namespace std;
 
-std::ostream & operator<<(std::ostream & os, const tree_node_<Node> *nd) {
+std::ostream & operator<<(std::ostream & os, const tree_node_<State> *nd) {
 	float values[3][3] = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
 
 	SiblingIt nextSib, endSib;
@@ -37,7 +37,7 @@ std::ostream & operator<<(std::ostream & os, const tree_node_<Node> *nd) {
 	return os;
 }
 
-std::ostream & operator<<(std::ostream & os, const Node & nd) {
+std::ostream & operator<<(std::ostream & os, const State & nd) {
 	os << "r: " << nd.getR() << " v: " << nd.getV() << std::endl;
 	for (unsigned int i = 0; i < 3; i++) {
 		for (unsigned int j = 0; j < 3; j++) {
@@ -68,7 +68,7 @@ int main(int, char **) {
 
 	Board board;
 	TreeHandler treeHandler;
-	tree<Node> tr;
+	tree<State> tr;
 
 	treeHandler.buildTree(tr, 'x');
 	cout << "done building size " << tr.size() << endl;
@@ -78,11 +78,12 @@ int main(int, char **) {
 	float epsilon = (float) 0.2;
 	float alpha = (float) 0.1;
 
-	tree_node_<Node> * currentNode;
+	tree_node_<State> * currentNode;
 	const SiblingIt firstNode = tr.begin().node;
 	SiblingIt nextNode;
 
-	for (unsigned int i = 1; i <= maxGames; i++) {
+	unsigned int numGames;
+	for (numGames = 1; numGames <= maxGames; numGames++) {
 		currentNode = firstNode.node;
 		cout << "next turn " << turn << endl;
 		cout << currentNode << endl;
@@ -113,5 +114,8 @@ int main(int, char **) {
 
 		cout << "---------- Game end ----------------" << endl;
 	}
+	numGames--;
+
+	cout << "Played " << numGames << " games" << endl;
 
 }

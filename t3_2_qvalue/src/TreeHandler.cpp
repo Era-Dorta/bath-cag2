@@ -16,8 +16,8 @@ TreeHandler::TreeHandler() {
 TreeHandler::~TreeHandler() {
 }
 
-void TreeHandler::buildTree(tree<Node>& tr, char turn) {
-	Node emptyNode;
+void TreeHandler::buildTree(tree<State>& tr, char turn) {
+	State emptyNode;
 	NodeIt root, nodeIt, nodeIt1;
 	char nexTurn = switchTurn(turn);
 
@@ -69,7 +69,7 @@ void TreeHandler::updateV(float alpha) {
 	}
 }
 
-void TreeHandler::buildNode(tree<Node>& tr, NodeIt nodeIt, char turn,
+void TreeHandler::buildNode(tree<State>& tr, NodeIt nodeIt, char turn,
 		unsigned int nextI, unsigned int nextJ) {
 	nodeIt->setBoard(nextI, nextJ, turn);
 	nodeIt->setA(nextI, nextJ);
@@ -88,7 +88,7 @@ void TreeHandler::buildNode(tree<Node>& tr, NodeIt nodeIt, char turn,
 
 	turn = switchTurn(turn);
 
-	Node newNode(*nodeIt);
+	State newNode(*nodeIt);
 
 	NodeIt node1;
 	for (unsigned int i = 0; i < 3; i++) {

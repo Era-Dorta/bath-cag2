@@ -10,26 +10,26 @@
 
 #include <stack>
 
+#include "State.h"
 #include "tree.hh"
-#include "Node.h"
 
-typedef tree<Node>::iterator NodeIt;
-typedef tree<Node>::sibling_iterator SiblingIt;
+typedef tree<State>::iterator NodeIt;
+typedef tree<State>::sibling_iterator SiblingIt;
 
 class TreeHandler {
 public:
 	TreeHandler();
 	virtual ~TreeHandler();
 
-	void buildTree(tree<Node>& tr, char turn);
+	void buildTree(tree<State>& tr, char turn);
 
 	SiblingIt getNextMove(char turn, float epsilon, const SiblingIt& startNode);
 
 	void updateV(float alpha);
 
 private:
-	void buildNode(tree<Node>& tr, NodeIt nodeIt, char turn, unsigned int nextI,
-			unsigned int nextJ);
+	void buildNode(tree<State>& tr, NodeIt nodeIt, char turn,
+			unsigned int nextI, unsigned int nextJ);
 
 	SiblingIt getNextOptimalNode(const SiblingIt& startNode);
 
