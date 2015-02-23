@@ -49,11 +49,11 @@ MStatus ShapeIntrpltNode::compute(const MPlug& plug, MDataBlock& data)
 
 		for (; !outputIt.isDone(); outputIt.next())
 		{
-			sourcePoint = sourceIt.position(MSpace::kWorld);
-			targetPoint = targetIt.position(MSpace::kWorld);
+			sourcePoint = sourceIt.position();
+			targetPoint = targetIt.position();
 
 			outputIt.setPosition((1 - interpolateVal) * sourcePoint + 
-				interpolateVal * targetPoint, MSpace::kWorld);
+				interpolateVal * targetPoint);
 
 			targetIt.next();
 			sourceIt.next();
