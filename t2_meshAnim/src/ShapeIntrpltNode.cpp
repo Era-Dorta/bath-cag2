@@ -42,7 +42,7 @@ MStatus ShapeIntrpltNode::compute(const MPlug& plug, MDataBlock& data)
 
 		// Dummy interpolation, just translate each vertex 1 on x
 		MPoint sourcePoint, targetPoint, outputPoint;
-		
+
 		MItGeometry outputIt(outputSurfaceHnd, false);
 		MItGeometry targetIt(targetSurfaceHnd, false);
 		MItGeometry sourceIt(sourceSurfaceHnd, false);
@@ -52,7 +52,7 @@ MStatus ShapeIntrpltNode::compute(const MPlug& plug, MDataBlock& data)
 			sourcePoint = sourceIt.position();
 			targetPoint = targetIt.position();
 
-			outputIt.setPosition((1 - interpolateVal) * sourcePoint + 
+			outputIt.setPosition((1 - interpolateVal) * sourcePoint +
 				interpolateVal * targetPoint);
 
 			targetIt.next();
