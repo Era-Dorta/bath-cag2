@@ -96,14 +96,14 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 MStatus ShapeIntrpltCmd::undoIt()
 {
 	MStatus status;
+	status = dgMod.undoIt();
 
-	if (doMeshUndo)
+	if (status == MS::kSuccess && doMeshUndo)
 	{
-		MGlobal::deleteNode(newMesh);
+		status = MGlobal::deleteNode(newMesh);
 		doMeshUndo = false;
 	}
-
-	return dgMod.undoIt();
+	return status;
 }
 
 MStatus ShapeIntrpltCmd::redoIt()
