@@ -4,5 +4,5 @@ while(!$empty){
 	$empty = `undoInfo -q -undoQueueEmpty`;
 }
 undoInfo -state off;
-unloadPlugin "VfxPlugin";
+unloadPlugin $pluginName;
 undoInfo -state on;

@@ -1,0 +1,4 @@
+$pluginName = "VfxPlugin";
+$command = "VfxDo";
+//$pluginName = "ShapePlugin";
+//$command = "shapeIntrpl";
