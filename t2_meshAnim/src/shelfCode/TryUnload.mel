@@ -1,8 +1,8 @@
-int $empty = eval("undoInfo -q -undoQueueEmpty");
+$empty = `undoInfo -q -undoQueueEmpty`;
 while(!$empty){
  	undo;
-	$empty = eval("undoInfo -q -undoQueueEmpty");
+	$empty = `undoInfo -q -undoQueueEmpty`;
 }
 undoInfo -state off;
-unloadPlugin "ShapePlugin";
+unloadPlugin "VfxPlugin";
 undoInfo -state on;
