@@ -57,6 +57,8 @@ public:
 		MapSearchNode m_UserState;
 	};
 
+	typedef vector<Node *>::iterator NodeIt;
+
 	// For sorting the heap the STL needs compare function that lets us compare
 	// the f value of two nodes
 
@@ -154,11 +156,6 @@ private:
 	Node *m_Goal;
 
 	Node *m_CurrentSolutionNode;
-
-	//Debug : need to keep these two iterators around
-	// for the user Dbg functions
-	typename vector<Node *>::iterator iterDbgOpen;
-	typename vector<Node *>::iterator iterDbgClosed;
 
 	// debugging : count memory allocation and free's
 	int m_AllocateNodeCount;

@@ -152,7 +152,7 @@ unsigned int AStarSearch::SearchStep() {
 
 		if (!ret) {
 
-			typename vector<Node *>::iterator successor;
+			NodeIt successor;
 
 			// free the nodes that may previously have been added
 			for (successor = m_Successors.begin();
@@ -170,7 +170,7 @@ unsigned int AStarSearch::SearchStep() {
 		}
 
 		// Now handle each successor to the current node ...
-		for (typename vector<Node *>::iterator successor = m_Successors.begin();
+		for (NodeIt successor = m_Successors.begin();
 				successor != m_Successors.end(); successor++) {
 
 			// 	The g value for this successor ...
@@ -183,7 +183,7 @@ unsigned int AStarSearch::SearchStep() {
 
 			// First linear search of open list to find node
 
-			typename vector<Node *>::iterator openlist_result;
+			NodeIt openlist_result;
 
 			for (openlist_result = m_OpenList.begin();
 					openlist_result != m_OpenList.end(); openlist_result++) {
@@ -205,7 +205,7 @@ unsigned int AStarSearch::SearchStep() {
 				}
 			}
 
-			typename vector<Node *>::iterator closedlist_result;
+			NodeIt closedlist_result;
 
 			for (closedlist_result = m_ClosedList.begin();
 					closedlist_result != m_ClosedList.end();
@@ -385,7 +385,7 @@ int AStarSearch::GetStepCount() {
 
 void AStarSearch::FreeAllNodes() {
 	// iterate open list and delete all nodes
-	typename vector<Node *>::iterator iterOpen = m_OpenList.begin();
+	NodeIt iterOpen = m_OpenList.begin();
 
 	while (iterOpen != m_OpenList.end()) {
 		Node *n = (*iterOpen);
@@ -397,7 +397,7 @@ void AStarSearch::FreeAllNodes() {
 	m_OpenList.clear();
 
 	// iterate closed list and delete unused nodes
-	typename vector<Node *>::iterator iterClosed;
+	NodeIt iterClosed;
 
 	for (iterClosed = m_ClosedList.begin(); iterClosed != m_ClosedList.end();
 			iterClosed++) {
@@ -414,7 +414,7 @@ void AStarSearch::FreeAllNodes() {
 
 void AStarSearch::FreeUnusedNodes() {
 	// iterate open list and delete unused nodes
-	typename vector<Node *>::iterator iterOpen = m_OpenList.begin();
+	NodeIt iterOpen = m_OpenList.begin();
 
 	while (iterOpen != m_OpenList.end()) {
 		Node *n = (*iterOpen);
@@ -431,7 +431,7 @@ void AStarSearch::FreeUnusedNodes() {
 	m_OpenList.clear();
 
 	// iterate closed list and delete unused nodes
-	typename vector<Node *>::iterator iterClosed;
+	NodeIt iterClosed;
 
 	for (iterClosed = m_ClosedList.begin(); iterClosed != m_ClosedList.end();
 			iterClosed++) {
@@ -445,7 +445,6 @@ void AStarSearch::FreeUnusedNodes() {
 	}
 
 	m_ClosedList.clear();
-
 }
 
 AStarSearch::Node *AStarSearch::AllocateNode() {
