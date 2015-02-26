@@ -83,14 +83,14 @@ public:
 	// constructor just initialises private data
 	AStarSearch() :
 			m_State(SEARCH_STATE_NOT_INITIALISED), m_Steps(0), m_Start(0), m_Goal(
-					NULL), m_CurrentSolutionNode( NULL), m_FixedSizeAllocator(
-					1000), m_AllocateNodeCount(0), m_CancelRequest(false) {
+			NULL), m_CurrentSolutionNode( NULL), m_FixedSizeAllocator(1000), m_AllocateNodeCount(
+					0), m_CancelRequest(false) {
 	}
 
 	AStarSearch(int MaxNodes) :
 			m_State(SEARCH_STATE_NOT_INITIALISED), m_Steps(0), m_Start(0), m_Goal(
-					NULL), m_CurrentSolutionNode( NULL), m_FixedSizeAllocator(
-					MaxNodes), m_AllocateNodeCount(0), m_CancelRequest(false) {
+			NULL), m_CurrentSolutionNode( NULL), m_FixedSizeAllocator(MaxNodes), m_AllocateNodeCount(
+					0), m_CancelRequest(false) {
 	}
 
 	// call at any time to cancel the search and free up all the memory
