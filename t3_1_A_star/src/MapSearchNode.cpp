@@ -34,10 +34,7 @@ bool MapSearchNode::IsSameState(MapSearchNode &rhs) {
 }
 
 void MapSearchNode::PrintNodeInfo() {
-	char str[100];
-	sprintf(str, "Node position : (%d,%d)\n", x, y);
-
-	cout << str;
+	cout << "Node position : (" << x << "," << y << ")" << endl;
 }
 
 // Here's the heuristic function that estimates the distance from a Node
@@ -60,8 +57,11 @@ bool MapSearchNode::IsGoal(MapSearchNode &nodeGoal) {
 // AddSuccessor to give the successors to the AStar class. The A* specific initialisation
 // is done for each node internally, so here you just set the state information that
 // is specific to the application
-bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch,
-		MapSearchNode *parent_node) {
+bool MapSearchNode::GetSuccessors(MapSearchNode *parent_node,
+		std::vector<int>& newX, std::vector<int>& newY) {
+
+	newX.clear();
+	newY.clear();
 
 	int parent_x = -1;
 	int parent_y = -1;
@@ -71,32 +71,30 @@ bool MapSearchNode::GetSuccessors(AStarSearch<MapSearchNode> *astarsearch,
 		parent_y = parent_node->y;
 	}
 
-	MapSearchNode NewNode;
-
 	// push each possible move except allowing the search to go backwards
 
 	if ((Map::GetMap(x - 1, y) < 9)
 			&& !((parent_x == x - 1) && (parent_y == y))) {
-		NewNode = MapSearchNode(x - 1, y);
-		astarsearch->AddSuccessor(NewNode);
+		newX.push_back(x - 1);
+		newY.push_back(y);
 	}
 
 	if ((Map::GetMap(x, y - 1) < 9)
 			&& !((parent_x == x) && (parent_y == y - 1))) {
-		NewNode = MapSearchNode(x, y - 1);
-		astarsearch->AddSuccessor(NewNode);
+		newX.push_back(x);
+		newY.push_back(y - 1);
 	}
 
 	if ((Map::GetMap(x + 1, y) < 9)
 			&& !((parent_x == x + 1) && (parent_y == y))) {
-		NewNode = MapSearchNode(x + 1, y);
-		astarsearch->AddSuccessor(NewNode);
+		newX.push_back(x + 1);
+		newY.push_back(y);
 	}
 
 	if ((Map::GetMap(x, y + 1) < 9)
 			&& !((parent_x == x) && (parent_y == y + 1))) {
-		NewNode = MapSearchNode(x, y + 1);
-		astarsearch->AddSuccessor(NewNode);
+		newX.push_back(x);
+		newY.push_back(y + 1);
 	}
 
 	return true;

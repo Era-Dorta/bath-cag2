@@ -5,7 +5,7 @@
 #include <math.h>
 #include <vector>
 
-#include "stlastar.h"
+#include "AStarSearch.h"
 #include "MapSearchNode.h"
 #include "Map.h"
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 	// Create an instance of the search class...
 	Map map;
 
-	AStarSearch<MapSearchNode> astarsearch;
+	AStarSearch astarsearch;
 
 	unsigned int SearchCount = 0;
 
@@ -72,10 +72,9 @@ int main(int argc, char *argv[]) {
 
 			SearchSteps++;
 
-		} while (SearchState
-				== AStarSearch<MapSearchNode>::SEARCH_STATE_SEARCHING);
+		} while (SearchState == AStarSearch::SEARCH_STATE_SEARCHING);
 
-		if (SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_SUCCEEDED) {
+		if (SearchState == AStarSearch::SEARCH_STATE_SUCCEEDED) {
 			cout << "Search found goal state\n";
 
 			MapSearchNode *node = astarsearch.GetSolutionStart();
@@ -105,13 +104,11 @@ int main(int argc, char *argv[]) {
 				}
 				cout << endl;
 			}
-			//cout << "Solution steps " << steps << endl;
 
 			// Once you're done with the solution you can free the nodes up
 			astarsearch.FreeSolutionNodes();
 
-		} else if (SearchState
-				== AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED) {
+		} else if (SearchState == AStarSearch::SEARCH_STATE_FAILED) {
 			cout << "Search terminated. Did not find goal state\n";
 
 		}

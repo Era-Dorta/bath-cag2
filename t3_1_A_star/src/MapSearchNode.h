@@ -8,7 +8,7 @@
 #ifndef MAPSEARCHNODE_H_
 #define MAPSEARCHNODE_H_
 
-#include "stlastar.h"
+#include <vector>
 
 class MapSearchNode {
 public:
@@ -20,8 +20,8 @@ public:
 
 	float GoalDistanceEstimate(MapSearchNode &nodeGoal);
 	bool IsGoal(MapSearchNode &nodeGoal);
-	bool GetSuccessors(AStarSearch<MapSearchNode> *astarsearch,
-			MapSearchNode *parent_node);
+	bool GetSuccessors(MapSearchNode *parent_node, std::vector<int>& newX,
+			std::vector<int>& newY);
 	float GetCost(MapSearchNode &successor);
 	bool IsSameState(MapSearchNode &rhs);
 
