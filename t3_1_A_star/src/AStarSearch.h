@@ -110,25 +110,6 @@ public:
 	// Returns FLT_MAX if goal is not defined or there is no solution
 	float GetSolutionCost();
 
-	// For educational use and debugging it is useful to be able to view
-	// the open and closed list at each step, here are two functions to allow that.
-
-	MapSearchNode *GetOpenListStart();
-
-	MapSearchNode *GetOpenListStart(float &f, float &g, float &h);
-
-	MapSearchNode *GetOpenListNext();
-
-	MapSearchNode *GetOpenListNext(float &f, float &g, float &h);
-
-	MapSearchNode *GetClosedListStart();
-
-	MapSearchNode *GetClosedListStart(float &f, float &g, float &h);
-
-	MapSearchNode *GetClosedListNext();
-
-	MapSearchNode *GetClosedListNext(float &f, float &g, float &h);
-
 	// Get the number of steps
 	int GetStepCount();
 
