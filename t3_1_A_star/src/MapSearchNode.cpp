@@ -53,10 +53,6 @@ bool MapSearchNode::IsGoal(MapSearchNode &nodeGoal) {
 	return false;
 }
 
-// This generates the successors to the given Node. It uses a helper function called
-// AddSuccessor to give the successors to the AStar class. The A* specific initialisation
-// is done for each node internally, so here you just set the state information that
-// is specific to the application
 bool MapSearchNode::GetSuccessors(MapSearchNode *parent_node,
 		std::vector<int>& newX, std::vector<int>& newY) {
 

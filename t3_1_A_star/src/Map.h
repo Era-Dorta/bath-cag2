@@ -10,7 +10,7 @@
 
 #include <vector>
 
-// The world map
+// The world map, map data in Map.cpp
 
 const int MAP_WIDTH = 20;
 const int MAP_HEIGHT = 20;

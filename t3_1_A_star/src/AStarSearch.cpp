@@ -226,13 +226,6 @@ unsigned int AStarSearch::SearchStep() {
 				// remove it from Closed
 				FreeNode((*closedlist_result));
 				m_ClosedList.erase(closedlist_result);
-
-				// Fix thanks to ...
-				// Greg Douglas <gregdouglasmail@gmail.com>
-				// who noticed that this code path was incorrect
-				// Here we have found a new state which is already CLOSED
-				// anus
-
 			}
 
 			// Update old version of this node
@@ -241,10 +234,6 @@ unsigned int AStarSearch::SearchStep() {
 				FreeNode((*openlist_result));
 				m_OpenList.erase(openlist_result);
 
-				// re-make the heap
-				// make_heap rather than sort_heap is an essential bug fix
-				// thanks to Mike Ryynanen for pointing this out and then explaining
-				// it in detail. sort_heap called on an invalid heap does not work
 				make_heap(m_OpenList.begin(), m_OpenList.end(),
 						HeapCompare_f());
 
@@ -262,7 +251,7 @@ unsigned int AStarSearch::SearchStep() {
 
 		m_ClosedList.push_back(n);
 
-	} // end else (not goal so expand)
+	}
 
 	return m_State; // Succeeded bool is false at this point.
 

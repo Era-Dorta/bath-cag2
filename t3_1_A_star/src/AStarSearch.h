@@ -122,9 +122,7 @@ private:
 	void FreeNode(Node *node);
 
 private:
-	// data
 
-	// Heap (simple vector but used as a heap, cf. Steve Rabin's game gems article)
 	vector<Node *> m_OpenList;
 
 	// Closed list is a vector.
