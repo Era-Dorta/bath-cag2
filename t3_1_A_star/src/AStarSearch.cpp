@@ -33,8 +33,8 @@ void AStarSearch::SetStartAndGoalStates(MapSearchNode &Start,
 
 	assert((m_Start != NULL && m_Goal != NULL));
 
-	m_Start->m_UserState = Start;
-	m_Goal->m_UserState = Goal;
+	m_Start->m_StateNode = Start;
+	m_Goal->m_StateNode = Goal;
 
 	m_State = SEARCH_STATE_SEARCHING;
 
@@ -42,7 +42,7 @@ void AStarSearch::SetStartAndGoalStates(MapSearchNode &Start,
 	// The user only needs fill out the state information
 
 	m_Start->g = 0;
-	m_Start->h = m_Start->m_UserState.GoalDistanceEstimate(m_Goal->m_UserState);
+	m_Start->h = m_Start->m_StateNode.GoalDistanceEstimate(m_Goal->m_StateNode);
 	m_Start->f = m_Start->g + m_Start->h;
 	m_Start->parent = 0;
 
@@ -86,7 +86,7 @@ unsigned int AStarSearch::SearchStep() {
 	m_OpenList.pop_back();
 
 	// Check for the goal, once we pop that we're done
-	if (n->m_UserState.IsGoal(m_Goal->m_UserState)) {
+	if (n->m_StateNode.IsGoal(m_Goal->m_StateNode)) {
 		// The user is going to use the Goal Node he passed in
 		// so copy the parent pointer of n
 		m_Goal->parent = n->parent;
@@ -94,7 +94,7 @@ unsigned int AStarSearch::SearchStep() {
 
 		// A special case is that the goal was passed in as the start state
 		// so handle that here
-		if (false == n->m_UserState.IsSameState(m_Start->m_UserState)) {
+		if (false == n->m_StateNode.IsSameState(m_Start->m_StateNode)) {
 			FreeNode(n);
 
 			// set the child pointers in each node (except Goal which has no child)
@@ -129,8 +129,8 @@ unsigned int AStarSearch::SearchStep() {
 		// User provides this functions and uses AddSuccessor to add each successor of
 		// node 'n' to m_Successors
 		std::vector<int> x, y;
-		bool ret = n->m_UserState.GetSuccessors(
-				n->parent ? &n->parent->m_UserState : NULL, x, y);
+		bool ret = n->m_StateNode.GetSuccessors(
+				n->parent ? &n->parent->m_StateNode : NULL, x, y);
 
 		for (unsigned int i = 0; i < x.size(); i++) {
 			MapSearchNode newNode(x[i], y[i]);
@@ -162,7 +162,7 @@ unsigned int AStarSearch::SearchStep() {
 
 			// 	The g value for this successor ...
 			float newg = n->g
-					+ n->m_UserState.GetCost((*successor)->m_UserState);
+					+ n->m_StateNode.GetCost((*successor)->m_StateNode);
 
 			// Now we need to find whether the node is on the open or closed lists
 			// If it is but the node that is already on them is better (lower g)
@@ -174,8 +174,8 @@ unsigned int AStarSearch::SearchStep() {
 
 			for (openlist_result = m_OpenList.begin();
 					openlist_result != m_OpenList.end(); openlist_result++) {
-				if ((*openlist_result)->m_UserState.IsSameState(
-						(*successor)->m_UserState)) {
+				if ((*openlist_result)->m_StateNode.IsSameState(
+						(*successor)->m_StateNode)) {
 					break;
 				}
 			}
@@ -197,8 +197,8 @@ unsigned int AStarSearch::SearchStep() {
 			for (closedlist_result = m_ClosedList.begin();
 					closedlist_result != m_ClosedList.end();
 					closedlist_result++) {
-				if ((*closedlist_result)->m_UserState.IsSameState(
-						(*successor)->m_UserState)) {
+				if ((*closedlist_result)->m_StateNode.IsSameState(
+						(*successor)->m_StateNode)) {
 					break;
 				}
 			}
@@ -220,8 +220,8 @@ unsigned int AStarSearch::SearchStep() {
 
 			(*successor)->parent = n;
 			(*successor)->g = newg;
-			(*successor)->h = (*successor)->m_UserState.GoalDistanceEstimate(
-					m_Goal->m_UserState);
+			(*successor)->h = (*successor)->m_StateNode.GoalDistanceEstimate(
+					m_Goal->m_StateNode);
 			(*successor)->f = (*successor)->g + (*successor)->h;
 
 			// Remove successor from closed if it was on it
@@ -276,7 +276,7 @@ bool AStarSearch::AddSuccessor(MapSearchNode &State) {
 	Node *node = AllocateNode();
 
 	if (node) {
-		node->m_UserState = State;
+		node->m_StateNode = State;
 
 		m_Successors.push_back(node);
 
@@ -313,7 +313,7 @@ void AStarSearch::FreeSolutionNodes() {
 MapSearchNode *AStarSearch::GetSolutionStart() {
 	m_CurrentSolutionNode = m_Start;
 	if (m_Start) {
-		return &m_Start->m_UserState;
+		return &m_Start->m_StateNode;
 	} else {
 		return NULL;
 	}
@@ -327,7 +327,7 @@ MapSearchNode *AStarSearch::GetSolutionNext() {
 
 			m_CurrentSolutionNode = m_CurrentSolutionNode->child;
 
-			return &child->m_UserState;
+			return &child->m_StateNode;
 		}
 	}
 
@@ -337,7 +337,7 @@ MapSearchNode *AStarSearch::GetSolutionNext() {
 MapSearchNode *AStarSearch::GetSolutionEnd() {
 	m_CurrentSolutionNode = m_Goal;
 	if (m_Goal) {
-		return &m_Goal->m_UserState;
+		return &m_Goal->m_StateNode;
 	} else {
 		return NULL;
 	}
@@ -351,7 +351,7 @@ MapSearchNode *AStarSearch::GetSolutionPrev() {
 
 			m_CurrentSolutionNode = m_CurrentSolutionNode->parent;
 
-			return &parent->m_UserState;
+			return &parent->m_StateNode;
 		}
 	}
 

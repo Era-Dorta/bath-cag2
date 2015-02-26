@@ -8,12 +8,10 @@
 #ifndef ASTARSEARCH_H_
 #define ASTARSEARCH_H_
 
-// used for text debugging
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
 
-// stl includes
 #include <algorithm>
 #include <set>
 #include <vector>
@@ -23,7 +21,6 @@ using namespace std;
 
 #include "MapSearchNode.h"
 
-// The AStar search class. MapSearchNode is the users state space type
 class AStarSearch {
 
 public:
@@ -39,7 +36,6 @@ public:
 	};
 
 	// A node represents a possible state in the search
-	// The user provided state type is included inside this type
 
 public:
 	class Node {
@@ -54,7 +50,7 @@ public:
 
 		Node();
 
-		MapSearchNode m_UserState;
+		MapSearchNode m_StateNode;
 	};
 
 	typedef vector<Node *>::iterator NodeIt;
