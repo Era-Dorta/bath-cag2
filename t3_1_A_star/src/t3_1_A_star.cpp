@@ -55,8 +55,8 @@ int main() {
 
 	// Define the goal state
 	MapSearchNode nodeEnd;
-	nodeEnd.x = 4;
-	nodeEnd.y = 0;
+	nodeEnd.x = 10;
+	nodeEnd.y = 8;
 
 	// Set Start and goal states
 
@@ -96,16 +96,16 @@ int main() {
 
 		solution_map[nodeEnd.y * MAP_WIDTH + nodeEnd.x] = 12;
 
-		cout << " 00000000001111111111" << endl;
-		cout << " ";
+		cout << " X 00000000001111111111" << endl;
+		cout << "   ";
 		for (int i = 0; i < MAP_WIDTH; i++) {
 			cout << i % 10;
 		}
-		cout << endl;
+		cout << endl << "Y                     " << endl;
 
 		unsigned int k = 0;
 		for (int i = 0; i < MAP_WIDTH; i++) {
-			cout << k << i % 10;
+			cout << k << i % 10 << " ";
 			for (int j = 0; j < MAP_HEIGHT; j++) {
 				cout << toChar(solution_map[i * MAP_HEIGHT + j]);
 			}
