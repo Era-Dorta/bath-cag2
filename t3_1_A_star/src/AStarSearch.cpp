@@ -7,10 +7,6 @@
 
 #include "AStarSearch.h"
 
-//Node::Node() :
-//		parent(0), child(0), g(0.0f), h(0.0f), f(0.0f) {
-//}
-
 AStarSearch::Node::Node() :
 		parent(0), child(0), g(0.0f), h(0.0f), f(0.0f) {
 }
