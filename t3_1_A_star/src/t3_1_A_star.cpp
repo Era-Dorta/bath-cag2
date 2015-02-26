@@ -117,8 +117,6 @@ int main(int argc, char *argv[]) {
 		}
 
 		SearchCount++;
-
-		astarsearch.EnsureMemoryFreed();
 	}
 
 	return 0;

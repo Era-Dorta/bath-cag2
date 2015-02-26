@@ -11,7 +11,6 @@
 // used for text debugging
 #include <iostream>
 #include <stdio.h>
-//#include <conio.h>
 #include <assert.h>
 
 // stl includes
@@ -21,9 +20,6 @@
 #include <cfloat>
 
 using namespace std;
-
-// fast fixed size memory allocator, used for fast node memory management
-#include "fsa.h"
 
 // Fixed size memory allocator can be disabled to compare performance
 // Uses std new and delete instead if you turn it off
@@ -83,14 +79,14 @@ public:
 	// constructor just initialises private data
 	AStarSearch() :
 			m_State(SEARCH_STATE_NOT_INITIALISED), m_Steps(0), m_Start(0), m_Goal(
-			NULL), m_CurrentSolutionNode( NULL), m_FixedSizeAllocator(1000), m_AllocateNodeCount(
-					0), m_CancelRequest(false) {
+			NULL), m_CurrentSolutionNode( NULL), m_AllocateNodeCount(0), m_CancelRequest(
+					false) {
 	}
 
 	AStarSearch(int MaxNodes) :
 			m_State(SEARCH_STATE_NOT_INITIALISED), m_Steps(0), m_Start(0), m_Goal(
-			NULL), m_CurrentSolutionNode( NULL), m_FixedSizeAllocator(MaxNodes), m_AllocateNodeCount(
-					0), m_CancelRequest(false) {
+			NULL), m_CurrentSolutionNode( NULL), m_AllocateNodeCount(0), m_CancelRequest(
+					false) {
 	}
 
 	// call at any time to cancel the search and free up all the memory
@@ -533,10 +529,6 @@ public:
 		return m_Steps;
 	}
 
-	void EnsureMemoryFreed() {
-		assert(m_AllocateNodeCount == 0);
-	}
-
 private:
 	// methods
 
@@ -612,21 +604,14 @@ private:
 
 	// Node memory management
 	Node *AllocateNode() {
-		Node *address = m_FixedSizeAllocator.alloc();
-
-		if (!address) {
-			return NULL;
-		}
-		m_AllocateNodeCount++;
-		Node *p = new (address) Node;
+		Node *p = new Node;
 		return p;
 	}
 
 	void FreeNode(Node *node) {
 
 		m_AllocateNodeCount--;
-		node->~Node();
-		m_FixedSizeAllocator.free(node);
+		delete node;
 	}
 
 private:
@@ -653,9 +638,6 @@ private:
 	Node *m_Goal;
 
 	Node *m_CurrentSolutionNode;
-
-	// Memory
-	FixedSizeAllocator<Node> m_FixedSizeAllocator;
 
 	//Debug : need to keep these two iterators around
 	// for the user Dbg functions
