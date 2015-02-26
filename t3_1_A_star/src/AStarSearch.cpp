@@ -22,23 +22,11 @@ bool AStarSearch::HeapCompare_f::operator ()(const Node* x,
 
 AStarSearch::AStarSearch() :
 		m_State(SEARCH_STATE_NOT_INITIALISED), m_Steps(0), m_Start(0), m_Goal(
-		NULL), m_CurrentSolutionNode( NULL), m_AllocateNodeCount(0), m_CancelRequest(
-				false) {
-}
-
-AStarSearch::AStarSearch(int MaxNodes) :
-		m_State(SEARCH_STATE_NOT_INITIALISED), m_Steps(0), m_Start(0), m_Goal(
-		NULL), m_CurrentSolutionNode( NULL), m_AllocateNodeCount(0), m_CancelRequest(
-				false) {
-}
-
-void AStarSearch::CancelSearch() {
-	m_CancelRequest = true;
+		NULL), m_CurrentSolutionNode( NULL) {
 }
 
 void AStarSearch::SetStartAndGoalStates(MapSearchNode &Start,
 		MapSearchNode &Goal) {
-	m_CancelRequest = false;
 
 	m_Start = AllocateNode();
 	m_Goal = AllocateNode();
@@ -83,8 +71,7 @@ unsigned int AStarSearch::SearchStep() {
 
 	// Failure is defined as emptying the open list as there is nothing left to
 	// search...
-	// New: Allow user abort
-	if (m_OpenList.empty() || m_CancelRequest) {
+	if (m_OpenList.empty()) {
 		FreeAllNodes();
 		m_State = SEARCH_STATE_FAILED;
 		return m_State;
@@ -453,7 +440,5 @@ AStarSearch::Node *AStarSearch::AllocateNode() {
 }
 
 void AStarSearch::FreeNode(Node *node) {
-
-	m_AllocateNodeCount--;
 	delete node;
 }

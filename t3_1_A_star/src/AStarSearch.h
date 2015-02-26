@@ -69,15 +69,8 @@ public:
 	};
 
 public:
-	// methods
 
-	// constructor just initialises private data
 	AStarSearch();
-
-	AStarSearch(int MaxNodes);
-
-	// call at any time to cancel the search and free up all the memory
-	void CancelSearch();
 
 	// Set Start and goal states
 	void SetStartAndGoalStates(MapSearchNode &Start, MapSearchNode &Goal);
@@ -156,11 +149,6 @@ private:
 	Node *m_Goal;
 
 	Node *m_CurrentSolutionNode;
-
-	// debugging : count memory allocation and free's
-	int m_AllocateNodeCount;
-
-	bool m_CancelRequest;
 };
 
 #endif /* ASTARSEARCH_H_ */
