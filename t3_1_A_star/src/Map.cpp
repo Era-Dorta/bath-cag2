@@ -8,7 +8,7 @@
 #include "Map.h"
 
 std::vector<int> world_map(MAP_WIDTH * MAP_HEIGHT);
-int auxMap[MAP_WIDTH * MAP_HEIGHT] = {
+int auxMap[] = {
 
 // 0001020304050607080910111213141516171819
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,   // 00

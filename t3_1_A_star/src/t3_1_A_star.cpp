@@ -1,5 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <iostream>
 #include <stdio.h>
 #include <math.h>
@@ -40,6 +38,12 @@ int main() {
 	// we cannot pass.
 	// While printing . are 1, # are 9, S is the start position, * is the a
 	// node in the path and G is the goal
+	// Map coordinates are like image coordinates
+	// 0 -- X -- Width->
+	// |
+	// Y
+	// |
+	// Height
 
 	Map map;
 	AStarSearch astarsearch;
@@ -51,8 +55,8 @@ int main() {
 
 	// Define the goal state
 	MapSearchNode nodeEnd;
-	nodeEnd.x = 5;
-	nodeEnd.y = 10;
+	nodeEnd.x = 4;
+	nodeEnd.y = 0;
 
 	// Set Start and goal states
 
@@ -77,7 +81,7 @@ int main() {
 
 		std::vector<int> solution_map(map.getWorldMap());
 
-		solution_map[node->x * MAP_WIDTH + node->y] = 10;
+		solution_map[node->y * MAP_HEIGHT + node->x] = 10;
 
 		for (;;) {
 			node = astarsearch.GetSolutionNext();
@@ -85,18 +89,30 @@ int main() {
 			if (!node) {
 				break;
 			}
-			solution_map[node->x * MAP_WIDTH + node->y] = 11;
+			solution_map[node->y * MAP_HEIGHT + node->x] = 11;
 			steps++;
 
 		};
 
-		solution_map[nodeEnd.x * MAP_WIDTH + nodeEnd.y] = 12;
+		solution_map[nodeEnd.y * MAP_WIDTH + nodeEnd.x] = 12;
 
+		cout << " 00000000001111111111" << endl;
+		cout << " ";
 		for (int i = 0; i < MAP_WIDTH; i++) {
+			cout << i % 10;
+		}
+		cout << endl;
+
+		unsigned int k = 0;
+		for (int i = 0; i < MAP_WIDTH; i++) {
+			cout << k << i % 10;
 			for (int j = 0; j < MAP_HEIGHT; j++) {
-				cout << toChar(solution_map[i * MAP_WIDTH + j]);
+				cout << toChar(solution_map[i * MAP_HEIGHT + j]);
 			}
 			cout << endl;
+			if (i == 9) {
+				k = 1;
+			}
 		}
 
 		astarsearch.FreeSolutionNodes();
@@ -108,5 +124,3 @@ int main() {
 
 	return 0;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
