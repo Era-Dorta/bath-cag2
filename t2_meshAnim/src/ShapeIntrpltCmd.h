@@ -5,7 +5,7 @@
 
 #include <maya/MPxCommand.h>
 #include <maya/MDGModifier.h>
-#include <maya/MDaGPath.h>
+#include <maya/MDagPath.h>
 #include <maya/MFnSet.h>
 #include <maya/MFnDagNode.h>
 
