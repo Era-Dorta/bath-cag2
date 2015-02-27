@@ -28,6 +28,37 @@ char toChar(int x) {
 	}
 }
 
+void printPath(Map& map, MapSearchNode& nodeEnd, AStarSearch& astarsearch) {
+	MapSearchNode* node = astarsearch.GetSolutionStart();
+	std::vector<int> solution_map(map.getWorldMap());
+	solution_map[node->y * MAP_HEIGHT + node->x] = 10;
+	for (;;) {
+		node = astarsearch.GetSolutionNext();
+		if (!node) {
+			break;
+		}
+		solution_map[node->y * MAP_HEIGHT + node->x] = 11;
+	};
+	solution_map[nodeEnd.y * MAP_WIDTH + nodeEnd.x] = 12;
+	cout << " X 00000000001111111111" << endl;
+	cout << "   ";
+	for (int i = 0; i < MAP_WIDTH; i++) {
+		cout << i % 10;
+	}
+	cout << endl << "Y                     " << endl;
+	unsigned int k = 0;
+	for (int i = 0; i < MAP_WIDTH; i++) {
+		cout << k << i % 10 << " ";
+		for (int j = 0; j < MAP_HEIGHT; j++) {
+			cout << toChar(solution_map[i * MAP_HEIGHT + j]);
+		}
+		cout << endl;
+		if (i == 9) {
+			k = 1;
+		}
+	}
+}
+
 // Main
 
 int main() {
@@ -72,55 +103,16 @@ int main() {
 
 	} while (SearchState == AStarSearch::SEARCH_STATE_SEARCHING);
 
-	if (SearchState == AStarSearch::SEARCH_STATE_SUCCEEDED) {
-		cout << "Search found goal state\n";
-
-		MapSearchNode *node = astarsearch.GetSolutionStart();
-
-		int steps = 0;
-
-		std::vector<int> solution_map(map.getWorldMap());
-
-		solution_map[node->y * MAP_HEIGHT + node->x] = 10;
-
-		for (;;) {
-			node = astarsearch.GetSolutionNext();
-
-			if (!node) {
-				break;
-			}
-			solution_map[node->y * MAP_HEIGHT + node->x] = 11;
-			steps++;
-
-		};
-
-		solution_map[nodeEnd.y * MAP_WIDTH + nodeEnd.x] = 12;
-
-		cout << " X 00000000001111111111" << endl;
-		cout << "   ";
-		for (int i = 0; i < MAP_WIDTH; i++) {
-			cout << i % 10;
-		}
-		cout << endl << "Y                     " << endl;
-
-		unsigned int k = 0;
-		for (int i = 0; i < MAP_WIDTH; i++) {
-			cout << k << i % 10 << " ";
-			for (int j = 0; j < MAP_HEIGHT; j++) {
-				cout << toChar(solution_map[i * MAP_HEIGHT + j]);
-			}
-			cout << endl;
-			if (i == 9) {
-				k = 1;
-			}
-		}
-
-		astarsearch.FreeSolutionNodes();
-
-	} else if (SearchState == AStarSearch::SEARCH_STATE_FAILED) {
+	if (SearchState != AStarSearch::SEARCH_STATE_SUCCEEDED) {
 		cout << "Search terminated. Did not find goal state\n";
-
+		return 0;
 	}
+
+	cout << "Search found goal state\n";
+
+	printPath(map, nodeEnd, astarsearch);
+
+	astarsearch.FreeSolutionNodes();
 
 	return 0;
 }
