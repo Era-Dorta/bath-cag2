@@ -8,13 +8,17 @@
 #ifndef STATE_H_
 #define STATE_H_
 
-enum Action {TAKE, SETTLE};
-
+enum Action {
+	TAKE, SETTLE
+};
+enum SettleState {
+	BOTH_TAKING, ONE_SETTLE, BOTH_SETTLE
+};
 class State {
 public:
 	State();
-	State(float r, float v, Action a, unsigned int cardSum, char turn,
-			bool pSettled, bool bSettled);
+	State(float r, float v, Action a, unsigned int pCardSum,
+			unsigned int bCardSum, char turn, SettleState settleState);
 	virtual ~State();
 
 	void computeFinalState(char turn);
@@ -30,24 +34,22 @@ public:
 	unsigned int getCardSum() const;
 	void setCardSum(unsigned int cardSum);
 	void addCard(unsigned int cardVal);
-	bool isSettled() const;
-	void setSettled(bool settled);
-	bool isSettled() const;
-	void setSettled(bool settled);
 	char getTurn() const;
 	void setTurn(char turn);
+	SettleState getSettleState() const;
+	void setSettleState(SettleState settleState);
 
 private:
 	float r;
 	float v;
 
 	Action a;
-	unsigned int cardSum;
+	unsigned int pCardSum;
+	unsigned int bCardSum;
 	char turn;
-	bool pSettled;
-	bool bSettled;
+	SettleState settleState;
 
-	const static unsigned int maxTake;
+	static const unsigned int maxTake;
 };
 
 #endif /* STATE_H_ */

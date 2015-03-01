@@ -6,30 +6,49 @@
  */
 
 #include <cmath>
+#include <iostream>
 
 #include "State.h"
 
-unsigned int State::maxTake = 21;
+const unsigned int State::maxTake = 21;
 
 State::State() {
 	r = 0;
 	v = 0;
 	a = TAKE;
-	cardSum = 0;
+	pCardSum = 0;
+	bCardSum = 0;
 	turn = 'p';
-	pSettled = false;
-	bSettled = false;
+	settleState = BOTH_TAKING;
 }
 
-State::State(float r, float v, Action a, unsigned int cardSum, char turn,
-		bool pSettled, bool bSettled) {
+State::State(float r, float v, Action a, unsigned int pCardSum,
+		unsigned int bCardSum, char turn, SettleState settleState) {
 	this->r = r;
 	this->v = v;
 	this->a = a;
-	this->cardSum = cardSum;
+	this->pCardSum = pCardSum;
+	this->bCardSum = bCardSum;
 	this->turn = turn;
-	this->pSettled = pSettled;
-	this->bSettled = bSettled;
+	this->settleState = settleState;
+
+	if (a == SETTLE) {
+		switch (settleState) {
+		case BOTH_TAKING: {
+			this->settleState = ONE_SETTLE;
+			break;
+		}
+		case ONE_SETTLE: {
+			this->settleState = BOTH_SETTLE;
+			break;
+		}
+		case BOTH_SETTLE: {
+			std::cerr << "Settle action when both players already settled"
+					<< std::endl;
+			break;
+		}
+		}
+	}
 }
 
 State::~State() {
@@ -52,18 +71,27 @@ bool State::isFinalState() {
 }
 
 void State::computeFinalState(char turn) {
-	if(cardSum > 21){
-		if(turn == 'p'){
-			r = -10;
-		} else {
-			r = 10;
-		}
+	if (pCardSum > 21) {
+		r = 10;
+		v = r;
+		return;
+	}
+	if (bCardSum > 21) {
+		r = -10;
 		v = r;
 		return;
 	}
 
-	if(a == SETTLE){
-
+	if (settleState == BOTH_SETTLE) {
+		if (pCardSum >= bCardSum) {
+			r = 10;
+			v = r;
+			return;
+		} else {
+			r = -10;
+			v = r;
+			return;
+		}
 	}
 }
 
@@ -72,39 +100,35 @@ void State::setV(float v) {
 }
 
 Action State::getA() const {
-return a;
+	return a;
 }
 
 void State::setA(Action a) {
-this->a = a;
-}
-
-unsigned int State::getCardSum() const {
-return cardSum;
-}
-
-void State::setCardSum(unsigned int cardSum) {
-this->cardSum = cardSum;
+	this->a = a;
 }
 
 void State::addCard(unsigned int cardVal) {
-	cardSum += cardVal;
+	if (turn == 'p') {
+		pCardSum += cardVal;
+	} else {
+		bCardSum += cardVal;
+	}
 }
 
-bool State::isSettled() const {
-	return bSettled;
+unsigned int State::getCardSum() const {
+	if (turn == 'p') {
+		return pCardSum;
+	} else {
+		return bCardSum;
+	}
 }
 
-void State::setSettled(bool settled) {
-	bSettled = settled;
-}
-
-bool State::isSettled() const {
-	return pSettled;
-}
-
-void State::setSettled(bool settled) {
-	pSettled = settled;
+void State::setCardSum(unsigned int cardSum) {
+	if (turn == 'p') {
+		pCardSum = cardSum;
+	} else {
+		bCardSum = cardSum;
+	}
 }
 
 char State::getTurn() const {
@@ -113,4 +137,12 @@ char State::getTurn() const {
 
 void State::setTurn(char turn) {
 	this->turn = turn;
+}
+
+SettleState State::getSettleState() const {
+	return settleState;
+}
+
+void State::setSettleState(SettleState settleState) {
+	this->settleState = settleState;
 }
