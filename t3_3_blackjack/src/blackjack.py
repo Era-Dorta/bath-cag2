@@ -11,10 +11,10 @@ def reset_deck():
     global deck
     deck = []
     for _ in range(4):
-        #Ace to 10
-        for j in range(1,11):
+        # Ace to 10
+        for j in range(1, 11):
             deck.extend([j])
-        #Jack, queen, king
+        # Jack, queen, king
         for _ in range(3):
             deck.extend([10])
 
@@ -24,7 +24,7 @@ def empty_hand():
 
 # Return whether the hand has a usable ace.
 # Note that a hand may contain an ace, but it might not be usable.
-def hand_has_useable_ace(hand):
+def hand_has_usable_ace(hand):
     total, ace = hand
     return ((ace) and ((total + 10) <= 21))
 
@@ -32,7 +32,7 @@ def hand_has_useable_ace(hand):
 # The value of the hand is either total or total + 10 (if the ace is usable)
 def hand_value(hand):
     total, _ = hand
-    if (hand_has_useable_ace(hand)):
+    if (hand_has_usable_ace(hand)):
         return (total + 10)
     else:
         return total
@@ -106,18 +106,18 @@ def play_dealer_hand(hand):
 def select_random_state(all_states):
     reset_deck()
     n = len(all_states)
-    r = random.randint(0,n-1)
+    r = random.randint(0, n - 1)
     state = all_states[r]
     return state
 
 # Select an action at random
 def select_random_action():
-    r = random.randint(1,2)
+    r = random.randint(1, 2)
     return (r == 1)
 
 # Select the best action using current Q-values.
 def select_best_action(Q, state):
-    if (Q[(state,True)] > Q[(state,False)]):
+    if (Q[(state, True)] > Q[(state, False)]):
         return True
     else:
         return False
@@ -130,13 +130,17 @@ def select_e_greedy_action(Q, state, epsilon):
     else:
         return select_best_action(Q, state)
 
-def remove_cards_from_deck(card, val):
+def remove_cards_from_deck(card, val, usable):
     global deck
     deck.remove(card)
-    # Remove a non 10 card
-    if val % 10 != 0: 
-        deck.remove(val % 10)
     aux_val = val
+    # If usable make sure we remove a 1
+    if usable:
+        deck.remove(1)
+        aux_val = aux_val - 1
+    # Remove a non 10 card
+    if aux_val % 10 != 0: 
+        deck.remove(aux_val % 10)
     # Remove any remaining 10 cards until val is reached
     while aux_val >= 10:
         deck.remove(10)
@@ -144,26 +148,26 @@ def remove_cards_from_deck(card, val):
 
 # Given the state, return player and dealer hand consistent with it.
 def hands_from_state(state):
-    card, val, useable = state
-    if (useable):
+    card, val, usable = state
+    if (usable):
         val = val - 10
-    player_hand = (val, useable)
+    player_hand = (val, usable)
     dealer_hand = empty_hand()
     dealer_hand = hand_add_card(dealer_hand, card)
-    remove_cards_from_deck(card, val)
+    remove_cards_from_deck(card, val, usable)
     return card, dealer_hand, player_hand
 
 # Given the dealer's card and player's hand, return the state.
 def state_from_hands(card, player_hand):
     val = hand_value(player_hand)
-    useable = hand_has_useable_ace(player_hand)
-    return (card, val, useable)
+    usable = hand_has_usable_ace(player_hand)
+    return (card, val, usable)
 
 # Return a list of the possible states.
 def state_list():
     states = []
-    for card in range(1,11):
-        for val in range(11,22):
+    for card in range(1, 11):
+        for val in range(11, 22):
             states.append((card, val, False))
             states.append((card, val, True))
     return states
@@ -173,26 +177,26 @@ def initialize_state_action_value_map():
     states = state_list()
     M = {}
     for state in states:
-        M[(state,False)] = 0.0
-        M[(state,True)] = 0.0
+        M[(state, False)] = 0.0
+        M[(state, True)] = 0.0
     return M
 
 # Print a (state, action) -> value map
 def print_state_action_value_map(Q):
-    for useable in [True, False]:
-        if useable:
+    for usable in [True, False]:
+        if usable:
             print 'Usable ace'
         else:
-            print 'No usable ace'
+            print 'Non usable ace'
         print 'Values for staying:'
-        for val in range(21,10,-1):
-            for card in range(1,11):
-                print '%5.2f' % Q[((card,val,useable),False)], ' ',
+        for val in range(21, 10, -1):
+            for card in range(1, 11):
+                print '%5.2f' % Q[((card, val, usable), False)], ' ',
             print '| %d' % val
         print 'Values for hitting:'
-        for val in range(21,10,-1):
-            for card in range(1,11):
-                print '%5.2f' % Q[((card,val,useable),True)], ' ',
+        for val in range(21, 10, -1):
+            for card in range(1, 11):
+                print '%5.2f' % Q[((card, val, usable), True)], ' ',
             print '| %d' % val
         print ' '
 
@@ -204,31 +208,31 @@ def print_Q(Q):
 # Print the state-value function (V) given the Q-values
 def print_V(Q):
     print '---- V(s) ----'
-    for useable in [True, False]:
-        if useable:
+    for usable in [True, False]:
+        if usable:
             print 'Usable ace'
         else:
             print 'No usable ace'
-        for val in range(21,10,-1):
-            for card in range(1,11):
-                if (Q[((card,val,useable),True)] > Q[((card,val,useable),False)]):
-                    print '%5.2f' % Q[((card,val,useable),True)], ' ',
+        for val in range(21, 10, -1):
+            for card in range(1, 11):
+                if (Q[((card, val, usable), True)] > Q[((card, val, usable), False)]):
+                    print '%5.2f' % Q[((card, val, usable), True)], ' ',
                 else:
-                    print '%5.2f' % Q[((card,val,useable),False)], ' ',
+                    print '%5.2f' % Q[((card, val, usable), False)], ' ',
             print '| %d' % val
         print ' '
 
 # Print a policy given the Q-values
 def print_policy(Q):
     print '---- Policy ----'
-    for useable in [True, False]:
-        if useable:
+    for usable in [True, False]:
+        if usable:
             print 'Usable ace'
         else:
             print 'No usable ace'
-        for val in range(21,10,-1):
-            for card in range(1,11):
-                if (Q[((card,val,useable),True)] > Q[((card,val,useable),False)]):
+        for val in range(21, 10, -1):
+            for card in range(1, 11):
+                if (Q[((card, val, usable), True)] > Q[((card, val, usable), False)]):
                     print 'X',
                 else:
                     print ' ',
@@ -243,11 +247,11 @@ def initialize_Q():
     for state in states:
         _, val, _ = state
         if (val < 20):
-            M[(state,False)] = -0.001
-            M[(state,True)] = 0.001    # favour hitting
+            M[(state, False)] = -0.001
+            M[(state, True)] = 0.001  # favour hitting
         else:
-            M[(state,False)] = 0.001  # favour sticking
-            M[(state,True)] = -0.001
+            M[(state, False)] = 0.001  # favour sticking
+            M[(state, True)] = -0.001
     return M
 
 # Q-learning.
@@ -276,16 +280,16 @@ def q_learning(n_iter, alpha, epsilon):
                 if (hand_value(player_hand) > 21):
                     # update Q-value
                     count[sa] = count[sa] + 1.0
-                    Q[sa] = Q[sa] + alpha/count[sa] * ((-1.0) - Q[sa])
+                    Q[sa] = Q[sa] + alpha / count[sa] * ((-1.0) - Q[sa])
                     keep_playing = False
                 else:
                     # update Q-value
                     s_next = state_from_hands(dealer_card, player_hand)
-                    q_best = Q[(s_next,False)]
-                    if (Q[(s_next,True)] > q_best):
-                        q_best = Q[(s_next,True)]
+                    q_best = Q[(s_next, False)]
+                    if (Q[(s_next, True)] > q_best):
+                        q_best = Q[(s_next, True)]
                     count[sa] = count[sa] + 1.0
-                    Q[sa] = Q[sa] + alpha/count[sa] * (q_best - Q[sa])
+                    Q[sa] = Q[sa] + alpha / count[sa] * (q_best - Q[sa])
                     # update state
                     state = s_next
             else:
@@ -295,7 +299,7 @@ def q_learning(n_iter, alpha, epsilon):
                 R = game_reward(player_hand, dealer_hand)
                 # update Q value
                 count[sa] = count[sa] + 1.0
-                Q[sa] = Q[sa] + alpha/count[sa] * (R - Q[sa])
+                Q[sa] = Q[sa] + alpha / count[sa] * (R - Q[sa])
                 keep_playing = False
     return Q
 
@@ -307,9 +311,9 @@ def expected_gain(Q, n_iter):
         player_hand = deal_player_hand()
         _, dealer_card = deal_dealer_hand()
         state = state_from_hands(dealer_card, player_hand)
-        v = Q[(state,False)]
-        if (Q[(state,True)] > v):
-            v = Q[(state,True)]
+        v = Q[(state, False)]
+        if (Q[(state, True)] > v):
+            v = Q[(state, True)]
         gain = gain + v
     print 'Expected gain: %6.3f' % (gain / float(n_iter))
     print ' '
@@ -318,7 +322,7 @@ def expected_gain(Q, n_iter):
 if __name__ == '__main__':
     # set parameters
     n_iter_mc = 10000
-    n_iter_q  = 10000
+    n_iter_q = 10000
     n_games = 1000
     alpha = 1
     epsilon = 0.1
