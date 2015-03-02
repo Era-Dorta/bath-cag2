@@ -164,7 +164,7 @@ def initialize_state_action_value_map():
     return M
 
 # Print a (state, action) -> value map
-def print_state_action_value_map(M):
+def print_state_action_value_map(Q):
     for useable in [True, False]:
         if useable:
             print 'Usable ace'
@@ -173,12 +173,12 @@ def print_state_action_value_map(M):
         print 'Values for staying:'
         for val in range(21,10,-1):
             for card in range(1,11):
-                print '%5.2f' % M[((card,val,useable),False)], ' ',
+                print '%5.2f' % Q[((card,val,useable),False)], ' ',
             print '| %d' % val
         print 'Values for hitting:'
         for val in range(21,10,-1):
             for card in range(1,11):
-                print '%5.2f' % M[((card,val,useable),True)], ' ',
+                print '%5.2f' % Q[((card,val,useable),True)], ' ',
             print '| %d' % val
         print ' '
 
@@ -236,18 +236,13 @@ def initialize_Q():
             M[(state,True)] = -0.001
     return M
 
-# Initialise number of times each (state,action) pair has been observed.
-def initialize_count():
-    count = initialize_state_action_value_map()
-    return count
-
 # Q-learning.
 #
 # Run Q-learning for the specified number of iterations and return the Q-values.
 def q_learning(n_iter, alpha, epsilon):
     # initialise Q and count
     Q = initialize_Q()
-    count = initialize_count()
+    count = initialize_state_action_value_map()
     # get list of all states
     all_states = state_list()
     # iterate
