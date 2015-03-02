@@ -104,6 +104,7 @@ def play_dealer_hand(hand):
 
 # Select a state at random.
 def select_random_state(all_states):
+    reset_deck()
     n = len(all_states)
     r = random.randint(0,n-1)
     state = all_states[r]
@@ -129,6 +130,18 @@ def select_e_greedy_action(Q, state, epsilon):
     else:
         return select_best_action(Q, state)
 
+def remove_cards_from_deck(card, val):
+    global deck
+    deck.remove(card)
+    # Remove a non 10 card
+    if val % 10 != 0: 
+        deck.remove(val % 10)
+    aux_val = val
+    # Remove any remaining 10 cards until val is reached
+    while aux_val >= 10:
+        deck.remove(10)
+        aux_val = aux_val - 10
+
 # Given the state, return player and dealer hand consistent with it.
 def hands_from_state(state):
     card, val, useable = state
@@ -137,6 +150,7 @@ def hands_from_state(state):
     player_hand = (val, useable)
     dealer_hand = empty_hand()
     dealer_hand = hand_add_card(dealer_hand, card)
+    remove_cards_from_deck(card, val)
     return card, dealer_hand, player_hand
 
 # Given the dealer's card and player's hand, return the state.
@@ -249,10 +263,10 @@ def q_learning(n_iter, alpha, epsilon):
     for _ in range(n_iter):
         # initialise state
         state = select_random_state(all_states)
-        reset_deck()
         dealer_card, dealer_hand, player_hand = hands_from_state(state)
+        keep_playing = True
         # choose actions, update Q
-        while (True):
+        while (keep_playing):
             action = select_e_greedy_action(Q, state, epsilon)
             sa = (state, action)
             if (action):
@@ -263,7 +277,7 @@ def q_learning(n_iter, alpha, epsilon):
                     # update Q-value
                     count[sa] = count[sa] + 1.0
                     Q[sa] = Q[sa] + alpha/count[sa] * ((-1.0) - Q[sa])
-                    break
+                    keep_playing = False
                 else:
                     # update Q-value
                     s_next = state_from_hands(dealer_card, player_hand)
@@ -282,7 +296,7 @@ def q_learning(n_iter, alpha, epsilon):
                 # update Q value
                 count[sa] = count[sa] + 1.0
                 Q[sa] = Q[sa] + alpha/count[sa] * (R - Q[sa])
-                break
+                keep_playing = False
     return Q
 
 # Compute the expected value of the game using the learned Q-values.
