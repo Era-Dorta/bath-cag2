@@ -5,6 +5,19 @@ import random
 #  - total is the point total of cards in the hand (counting aces as 1)
 #  - ace is true if the hand contains an ace
 
+global deck
+
+def reset_deck():
+    global deck
+    deck = []
+    for _ in range(4):
+        #Ace to 10
+        for j in range(1,11):
+            deck.extend([j])
+        #Jack, queen, king
+        for _ in range(3):
+            deck.extend([10])
+
 # Return the empty hand.
 def empty_hand():
     return (0, False)
@@ -48,12 +61,13 @@ def game_reward(player_hand, dealer_hand):
     elif (player_val > dealer_val):
         return 10.0
 
-# Draw a card from an random deck with infinite cards.
+# Draw a card from the deck
 # Return the face value of the card (1 to 10).
 def draw_card():
-    card = random.randint(1,13)
-    if (card > 10):
-        card = 10
+    global deck
+    card_ind = random.randint(0, len(deck) - 1)
+    card = deck[card_ind]
+    del deck[card_ind]
     return card
 
 # Deal a player hand given the function to draw cards.
@@ -237,9 +251,10 @@ def q_learning(n_iter, alpha, epsilon):
     # get list of all states
     all_states = state_list()
     # iterate
-    for _ in range(0,n_iter):
+    for _ in range(n_iter):
         # initialise state
         state = select_random_state(all_states)
+        reset_deck()
         dealer_card, dealer_hand, player_hand = hands_from_state(state)
         # choose actions, update Q
         while (True):
@@ -265,7 +280,7 @@ def q_learning(n_iter, alpha, epsilon):
                     # update state
                     state = s_next
             else:
-                # allow the dealer to play
+                # let the dealer play
                 dealer_hand = play_dealer_hand(dealer_hand)
                 # compute return
                 R = game_reward(player_hand, dealer_hand)
@@ -278,7 +293,8 @@ def q_learning(n_iter, alpha, epsilon):
 # Compute the expected value of the game using the learned Q-values.
 def expected_gain(Q, n_iter):
     gain = 0.0
-    for _ in range(0,n_iter):
+    for _ in range(n_iter):
+        reset_deck()
         player_hand = deal_player_hand()
         _, dealer_card = deal_dealer_hand()
         state = state_from_hands(dealer_card, player_hand)
@@ -292,9 +308,9 @@ def expected_gain(Q, n_iter):
 # Main program
 if __name__ == '__main__':
     # set parameters
-    n_iter_mc = 100000
-    n_iter_q  = 100000
-    n_games = 10000
+    n_iter_mc = 10000
+    n_iter_q  = 10000
+    n_games = 1000
     alpha = 1
     epsilon = 0.1
     print 'Q-LEARNING'
@@ -303,5 +319,4 @@ if __name__ == '__main__':
     print_V(Q)
     print_policy(Q)
     expected_gain(Q, n_games)
-
     exit(0)    
