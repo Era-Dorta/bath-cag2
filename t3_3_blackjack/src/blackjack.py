@@ -33,7 +33,7 @@ def hand_add_card(hand, card):
         ace = True
     return (total, ace)
 
-# Return the reward of the game (-1, 0, or 1) given the final player and dealer
+# Return the reward of the game (-10 or 10) given the final player and dealer
 # hands.
 def game_reward(player_hand, dealer_hand):
     player_val = hand_value(player_hand)
@@ -42,14 +42,13 @@ def game_reward(player_hand, dealer_hand):
         return -10.0
     elif (dealer_val > 21):
         return 10.0
-    elif (player_val < dealer_val):
+    # On equally valued hands, the player looses
+    elif (player_val <= dealer_val):
         return -10.0
-    elif (player_val == dealer_val):
-        return 1.0
     elif (player_val > dealer_val):
         return 10.0
 
-# Draw a card from an unbiased deck.
+# Draw a card from an random deck with infinite cards.
 # Return the face value of the card (1 to 10).
 def draw_card():
     card = random.randint(1,13)
@@ -82,10 +81,10 @@ def play_dealer_hand(hand):
         hand = hand_add_card(hand, draw_card())
     return hand
 
-# States are tuples (card, val, useable) where
+# States are tuples (card, value, usable) where
 #  - card is the card the dealer is showing
-#  - val is the current value of the player's hand
-#  - useable is whether or not the player has a useable ace
+#  - value is the current value of the player's hand
+#  - usable is whether or not the player has a usable ace
 
 # Actions are either stay (False) or hit (True)
 
