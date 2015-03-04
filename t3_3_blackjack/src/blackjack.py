@@ -115,15 +115,11 @@ def select_random_action():
 
 # Select the best action using current Q-values.
 def select_best_action(Q, state):
-    if (Q[(state, True)] > Q[(state, False)]):
-        return True
-    else:
-        return False
+    return Q[(state, True)] > Q[(state, False)]
 
 # Select an action according to the epsilon-greedy policy
 def select_e_greedy_action(Q, state, epsilon):
-    r = random.random()
-    if (r < epsilon):
+    if (random.random() < epsilon):
         return select_random_action()
     else:
         return select_best_action(Q, state)
