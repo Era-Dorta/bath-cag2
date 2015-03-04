@@ -52,12 +52,12 @@ def game_reward(player_hand, dealer_hand):
     player_val = hand_value(player_hand)
     dealer_val = hand_value(dealer_hand)
     if (player_val > 21):
-        return -10.0
+        return -1.0
     elif (dealer_val > 21):
         return 10.0
     # On equally valued hands, the player looses
     elif (player_val <= dealer_val):
-        return -10.0
+        return -1.0
     elif (player_val > dealer_val):
         return 10.0
 
@@ -219,11 +219,12 @@ def print_V(Q):
 # Print a policy given the Q-values
 def print_policy(Q):
     print '---- Policy ----'
+    print 'X -> Take, Blank -> Stay\n'
     for usable in [True, False]:
         if usable:
-            print 'Usable ace'
+            print 'With usable ace\t Total hand value'
         else:
-            print 'No usable ace'
+            print 'Without usable ace\t Total hand value'
         for val in range(21, 10, -1):
             for card in range(1, 11):
                 if (Q[((card, val, usable), True)] > Q[((card, val, usable), False)]):
@@ -231,7 +232,7 @@ def print_policy(Q):
                 else:
                     print ' ',
             print '| %d' % val
-        print ' '
+        print '1 2 3 4 5 6 7 8 9 10 -> Dealer card\n'
 
 # Initialise Q-values so that they produce the initial policy of sticking
 # only on 20 or 21.
