@@ -280,7 +280,8 @@ def q_learning(n_iter, alpha, epsilon):
                 if (hand_value(player_hand) > 21):
                     # update Q-value
                     count[sa] = count[sa] + 1.0
-                    Q[sa] = Q[sa] + alpha / count[sa] * ((-1.0) - Q[sa])
+                    R = game_reward(player_hand, dealer_hand)
+                    Q[sa] = Q[sa] + alpha / count[sa] * (R - Q[sa])
                     keep_playing = False
                 else:
                     # update Q-value
