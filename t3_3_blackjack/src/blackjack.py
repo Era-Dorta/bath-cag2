@@ -107,13 +107,11 @@ def select_random_state(all_states):
     reset_deck()
     n = len(all_states)
     r = random.randint(0, n - 1)
-    state = all_states[r]
-    return state
+    return all_states[r]
 
 # Select an action at random
 def select_random_action():
-    r = random.randint(1, 2)
-    return (r == 1)
+    return (random.randint(1, 2) == 1)
 
 # Select the best action using current Q-values.
 def select_best_action(Q, state):
