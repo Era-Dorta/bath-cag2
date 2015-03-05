@@ -49,17 +49,19 @@ def hand_add_card(hand, card):
 # Return the reward of the game (-10 or 10) given the final player and dealer
 # hands.
 def game_reward(player_hand, dealer_hand):
+    R_Win = 10.0
+    R_Loose = -1.0
     player_val = hand_value(player_hand)
     dealer_val = hand_value(dealer_hand)
     if (player_val > 21):
-        return -1.0
+        return R_Loose
     elif (dealer_val > 21):
-        return 10.0
+        return R_Win
     # On equally valued hands, the player looses
     elif (player_val <= dealer_val):
-        return -1.0
+        return R_Loose
     elif (player_val > dealer_val):
-        return 10.0
+        return R_Win
 
 # Draw a card from the deck
 # Return the face value of the card (1 to 10).
