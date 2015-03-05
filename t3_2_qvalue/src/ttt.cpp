@@ -75,8 +75,17 @@ int main(int, char **) {
 
 	char turn = 'x';
 	unsigned int maxGames = 1000000;
+
+	// Exploration rate, 1 for exploring, 0 for greedy policy
 	float epsilon = (float) 0.2;
-	float alpha = (float) 0.1;
+
+	// Learning rate, 1 will update the states a lot, 0 will not update,
+	// decrease on each step for convergence
+	float alpha = (float) 1;
+
+	// Gamma is the discount factor, 0 for immediate rewards, 1 for future
+	// rewards
+	float gamma = (float) 1;
 
 	tree_node_<State> * currentNode;
 	const SiblingIt firstNode = tr.begin().node;
@@ -97,16 +106,16 @@ int main(int, char **) {
 			// Make the play
 			board.setBoard(nextNode->getA(), turn);
 
-			//	cout << "next turn " << other << endl;
-			//	cout << nextNode.node << endl;
+			//cout << "next turn " << switchTurn(turn) << endl;
+			//cout << nextNode.node << endl;
 
-			treeHandler.updateQ(alpha/(float)numGames);
+			treeHandler.updateQ(alpha / (float) numGames, gamma);
 
 			turn = switchTurn(turn);
 			currentNode = nextNode.node;
 		}
 
-		treeHandler.updateQ(alpha/(float)numGames);
+		treeHandler.updateQ(alpha / (float) numGames, gamma);
 
 		board.reset();
 
