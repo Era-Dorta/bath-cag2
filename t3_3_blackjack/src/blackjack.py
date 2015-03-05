@@ -191,8 +191,7 @@ def print_state_action_value_map(Q):
         for val in range(21, 10, -1):
             for card in range(1, 11):
                 print '%5.2f' % Q[((card, val, usable), True)], ' ',
-            print '| %d' % val
-        print ' '
+            print '| %d\n' % val
 
 # Print the state-action-value function (Q)
 def print_Q(Q):
@@ -213,8 +212,7 @@ def print_V(Q):
                     print '%5.2f' % Q[((card, val, usable), True)], ' ',
                 else:
                     print '%5.2f' % Q[((card, val, usable), False)], ' ',
-            print '| %d' % val
-        print ' '
+            print '| %d\n' % val
 
 # Print a policy given the Q-values
 def print_policy(Q):
@@ -311,21 +309,22 @@ def expected_gain(Q, n_iter):
         if (Q[(state, True)] > v):
             v = Q[(state, True)]
         gain = gain + v
-    print 'Expected gain: %6.3f' % (gain / float(n_iter))
-    print ' '
+    print 'Expected gain: %6.3f\n' % (gain / float(n_iter))
 
 # Main program
 if __name__ == '__main__':
     # set parameters
-    n_iter_mc = 10000
-    n_iter_q = 10000
-    n_games = 1000
+    n_iter_learning = 10000
     alpha = 1
     epsilon = 0.1
     print 'Q-LEARNING'
-    Q = q_learning(n_iter_q, alpha, epsilon)
+    
+    Q = q_learning(n_iter_learning, alpha, epsilon)
+    
     print_Q(Q)
     print_V(Q)
     print_policy(Q)
+    
+    n_games = 1000
     expected_gain(Q, n_games)
     exit(0)    
