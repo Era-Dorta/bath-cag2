@@ -73,7 +73,7 @@ int main(int, char **) {
 	treeHandler.buildTree(tr, 'x');
 	cout << "done building size " << tr.size() << endl;
 
-	char turn = 'x', other = 'o';
+	char turn = 'x';
 	unsigned int maxGames = 1000000;
 	float epsilon = (float) 0.2;
 	float alpha = (float) 0.1;
@@ -100,17 +100,17 @@ int main(int, char **) {
 			//	cout << "next turn " << other << endl;
 			//	cout << nextNode.node << endl;
 
-			other = turn;
+			treeHandler.updateQ(alpha/(float)numGames);
+
 			turn = switchTurn(turn);
 			currentNode = nextNode.node;
 		}
 
-		treeHandler.updateV(alpha);
+		treeHandler.updateQ(alpha/(float)numGames);
 
 		board.reset();
 
 		turn = 'x';
-		other = 'o';
 
 		//cout << "---------- Game end ----------------" << endl;
 	}

@@ -140,6 +140,10 @@ SiblingIt TreeHandler::getNextExploreNode(const SiblingIt& startNode) {
 	return nextNode;
 }
 
+void TreeHandler::updateQ(float alpha) {
+	updateV(alpha);
+}
+
 float TreeHandler::randf() {
 	return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }
