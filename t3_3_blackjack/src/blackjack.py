@@ -241,6 +241,8 @@ def initialize_Q():
     M = {}
     for state in states:
         _, val, _ = state
+        # To improve the learning rate, set the initial policy values to hit
+        # below 20 and to stick after 20
         if (val < 20):
             M[(state, False)] = -0.001
             M[(state, True)] = 0.001  # favour hitting
@@ -316,7 +318,8 @@ def expected_gain(Q, n_iter):
 # Main program
 if __name__ == '__main__':
     # set parameters
-    n_iter_learning = 10000
+    random.seed(0)
+    n_iter_learning = 100000
     alpha = 1
     epsilon = 0.1
     print 'Q-LEARNING'
