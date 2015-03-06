@@ -10,74 +10,12 @@
 
 using namespace std;
 
-std::ostream & operator<<(std::ostream & os, const tree_node_<State> *nd) {
-	float values[3][3] = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
-
-	SiblingIt nextSib, endSib;
-
-	nextSib = nd->first_child;
-	endSib = nextSib.end();
-
-	for (; nextSib != endSib; ++nextSib) {
-		unsigned int a = nextSib->getA();
-		values[a / 3][a % 3] = nextSib->getV();
-	}
-
-	os << "r: " << nd->data.getR() << " v: " << nd->data.getV() << std::endl;
-	for (unsigned int i = 0; i < 3; i++) {
-		for (unsigned int j = 0; j < 3; j++) {
-			os << nd->data.getBoard(i, j);
-		}
-		os << "\t";
-		for (unsigned int j = 0; j < 3; j++) {
-			os << values[i][j] << " ";
-		}
-		os << std::endl;
-	}
-	return os;
-}
-
-std::ostream & operator<<(std::ostream & os, const State & nd) {
-	os << "r: " << nd.getR() << " v: " << nd.getV() << std::endl;
-	for (unsigned int i = 0; i < 3; i++) {
-		for (unsigned int j = 0; j < 3; j++) {
-			os << nd.getBoard(i, j);
-		}
-		os << std::endl;
-	}
-	return os;
-}
-
-std::ostream & operator<<(std::ostream & os, const Board & board) {
-	for (unsigned int i = 0; i < 3; i++) {
-		for (unsigned int j = 0; j < 3; j++) {
-			os << board.getBoard(i, j);
-		}
-		os << std::endl;
-	}
-	return os;
-}
-
 int main(int, char **) {
-	/* initialize random seed: */
-	srand(0);
 
-	// Set precision for easy formatting
-	std::cout.precision(2);
-	std::cout << std::fixed;
-
-	Board board;
-	TreeHandler treeHandler;
-	tree<State> tr;
-
-	treeHandler.buildTree(tr, 'x');
-	cout << "done building size " << tr.size() << endl;
-
-	char turn = 'x';
-	unsigned int maxGames = 1000000;
+	unsigned int nTrainGames = 1000000;
 
 	// Exploration rate, 1 for exploring, 0 for greedy policy
-	float epsilon = (float) 0.2;
+	double epsilon;
 
 	// Learning rate, 1 will update the states a lot, 0 will not update,
 	// decrease on each step for convergence
@@ -87,44 +25,85 @@ int main(int, char **) {
 	// rewards
 	float gamma = (float) 1;
 
-	tree_node_<State> * currentNode;
-	const SiblingIt firstNode = tr.begin().node;
-	SiblingIt nextNode;
+	// ------------------------------------
+	// ------------- TRAINING -------------
+	// ------------------------------------
 
-	unsigned int numGames;
-	for (numGames = 1; numGames <= maxGames; numGames++) {
-		currentNode = firstNode.node;
-		//cout << "next turn " << turn << endl;
-		//cout << currentNode << endl;
+	// Set precision for easy formatting
+	std::cout.precision(2);
+	std::cout << std::fixed;
 
-		while (!board.isFinalState()) {
+	Board board;
+	TreeHandler treeHandler;
+	tree<State> tr;
 
-			// Get next move with max V
-			nextNode = treeHandler.getNextMove(turn, epsilon,
-					currentNode->first_child);
+	float expectedGain;
+	unsigned int nWin, nLoose, nDraw;
 
-			// Make the play
-			board.setBoard(nextNode->getA(), turn);
+	for (epsilon = 0.0; epsilon <= 1.0; epsilon += 0.1) {
 
-			//cout << "next turn " << switchTurn(turn) << endl;
-			//cout << nextNode.node << endl;
+		// Rebuild the tree state space
+		srand(12);
+		char turn = 'x';
+		tr.clear();
+		treeHandler.buildTree(tr, turn);
+		const SiblingIt firstNode = tr.begin().node;
+		tree_node_<State> * currentNode;
+		SiblingIt nextNode;
 
-			treeHandler.updateQ(alpha / (float) numGames, gamma);
+		nWin = 0;
+		nLoose = 0;
+		nDraw = 0;
+		expectedGain = 0.0;
 
-			turn = switchTurn(turn);
-			currentNode = nextNode.node;
+		for (unsigned int i = 1; i <= nTrainGames; i++) {
+			currentNode = firstNode.node;
+			//cout << "next turn " << turn << endl;
+			//cout << currentNode << endl;
+			turn = 'x';
+
+			board.reset();
+
+			while (!board.isFinalState()) {
+
+				// Get next move, either maxV or explore move
+				nextNode = treeHandler.getNextMove(turn, (float) epsilon,
+						currentNode->first_child);
+
+				// Make the play
+				board.setBoard(nextNode->getA(), turn);
+
+				//cout << "next turn " << switchTurn(turn) << endl;
+				//cout << nextNode.node << endl;
+
+				treeHandler.updateQ(alpha / (float) i, gamma);
+
+				turn = switchTurn(turn);
+				currentNode = nextNode.node;
+			}
+
+			//cout << currentNode << endl;
+
+			treeHandler.updateQ(alpha / (float) i, gamma);
+
+			expectedGain += currentNode->data.getR();
+
+			if (currentNode->data.getR() == 10) {
+				nWin++;
+			} else if (currentNode->data.getR() == -10) {
+				nLoose++;
+			} else {
+				nDraw++;
+			}
+
+			//cout << "---------- Game end ----------------" << endl;
 		}
 
-		treeHandler.updateQ(alpha / (float) numGames, gamma);
+		expectedGain = expectedGain / (float) nTrainGames;
 
-		board.reset();
-
-		turn = 'x';
-
-		//cout << "---------- Game end ----------------" << endl;
+		cout << "Qlearning with " << nTrainGames << " games, explore rate: "
+				<< epsilon * 100 << "%" << endl;
+		cout << "Mean gain: " << expectedGain << " win: " << nWin << ", loose: "
+				<< nLoose << ", draw: " << nDraw << endl << endl;
 	}
-	numGames--;
-
-	cout << "Played " << numGames << " games" << endl;
-
 }
