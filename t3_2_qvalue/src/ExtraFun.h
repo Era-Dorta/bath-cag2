@@ -17,7 +17,7 @@ inline char switchTurn(char turn) {
 	return 'x';
 }
 
-inline std::ostream & operator<<(std::ostream & os, const tree_node_<State> *nd) {
+/*inline std::ostream & operator<<(std::ostream & os, const tree_node_<State> *nd) {
 	float values[3][3] = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
 
 	SiblingIt nextSib, endSib;
@@ -63,6 +63,6 @@ inline std::ostream & operator<<(std::ostream & os, const Board & board) {
 		os << std::endl;
 	}
 	return os;
-}
+}*/
 
 #endif /* EXTRAFUN_H_ */
