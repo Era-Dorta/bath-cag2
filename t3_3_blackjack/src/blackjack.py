@@ -218,13 +218,13 @@ def print_V(Q):
 
 # Print a policy given the Q-values
 def print_policy(Q):
-    print '---- Policy ----'
-    print 'X -> Take, Blank -> Stay\n'
+    print '---- Policy ----\n'
+    print 'X = Hit, Blank = Stick\n'
     for usable in [True, False]:
         if usable:
-            print 'With usable ace\t Total hand value'
+            print 'With usable ace     | Player hand value'
         else:
-            print 'Without usable ace\t Total hand value'
+            print 'Without usable ace  | Player hand value'
         for val in range(21, 10, -1):
             for card in range(1, 11):
                 if (Q[((card, val, usable), True)] > Q[((card, val, usable), False)]):
@@ -232,7 +232,7 @@ def print_policy(Q):
                 else:
                     print ' ',
             print '| %d' % val
-        print '1 2 3 4 5 6 7 8 9 10 -> Dealer card\n'
+        print '1 2 3 4 5 6 7 8 9 10 -> Dealer seen card\n'
 
 # Initialise Q-values so that they produce the initial policy of sticking
 # only on 20 or 21.
@@ -255,6 +255,9 @@ def initialize_Q():
 #
 # Run Q-learning for the specified number of iterations and return the Q-values.
 def q_learning(n_iter, alpha, epsilon):
+    gain = 0.0
+    n_win = 0
+    n_loose = 0
     # initialise Q and count
     Q = initialize_Q()
     count = initialize_state_action_value_map()
@@ -279,6 +282,7 @@ def q_learning(n_iter, alpha, epsilon):
                     count[sa] = count[sa] + 1.0
                     R = game_reward(player_hand, dealer_hand)
                     Q[sa] = Q[sa] + alpha / count[sa] * (R - Q[sa])
+                    n_loose += 1
                     keep_playing = False
                 else:
                     # update Q-value
@@ -298,38 +302,28 @@ def q_learning(n_iter, alpha, epsilon):
                 # update Q value
                 count[sa] = count[sa] + 1.0
                 Q[sa] = Q[sa] + alpha / count[sa] * (R - Q[sa])
+                if (R > 0.0):
+                    n_win += 1
+                else:
+                    n_loose += 1
                 keep_playing = False
+        gain = gain + Q[sa]
+    print 'Mean gain: %.2f, win games: %d, lost games: %d\n' % (gain / float(n_iter), n_win, n_loose)
     return Q
-
-# Compute the expected value of the game using the learned Q-values.
-def expected_gain(Q, n_iter):
-    gain = 0.0
-    for _ in range(n_iter):
-        reset_deck()
-        player_hand = deal_player_hand()
-        _, dealer_card = deal_dealer_hand()
-        state = state_from_hands(dealer_card, player_hand)
-        v = Q[(state, False)]
-        if (Q[(state, True)] > v):
-            v = Q[(state, True)]
-        gain = gain + v
-    print 'Expected gain: %6.3f\n' % (gain / float(n_iter))
 
 # Main program
 if __name__ == '__main__':
     # set parameters
     random.seed(0)
-    n_iter_learning = 100000
+    n_games = 100000
     alpha = 1
     epsilon = 0.1
-    print 'Q-LEARNING'
+    print 'Q-LEARNING, playing %d games with %d%% explore rate\n' % (n_games, epsilon * 100)
     
-    Q = q_learning(n_iter_learning, alpha, epsilon)
+    Q = q_learning(n_games, alpha, epsilon)
     
-    print_Q(Q)
-    print_V(Q)
+    # print_Q(Q)
+    # print_V(Q)
     print_policy(Q)
     
-    n_games = 1000
-    expected_gain(Q, n_games)
     exit(0)    
