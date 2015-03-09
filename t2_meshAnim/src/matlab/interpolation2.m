@@ -138,8 +138,8 @@ for t = 0:0.1:1
         H(vh2+1,vh3+1) = H(vh2+1,vh3+1) + inP(3,4)*inP(3,6) + inP(4,4)*inP(4,6);
         H(vh3+1,vh2+1) = H(vh2+1,vh3+1);
         
-        A = ((1-t)*eye(2) + t*Rgamma) * ((1-t)*eye(2) + t*S); 
-               
+        A = ((1-t)*eye(2) + t*Rgamma) * ((1-t)*eye(2) + t*S);
+        
         c = c + norm(A,'fro')^2;
         
         G(vh1) = G(vh1) - A(1,1)*inP(1,1) - A(1,2)*inP(2,1);
