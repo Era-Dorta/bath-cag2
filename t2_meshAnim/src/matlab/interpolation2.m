@@ -39,115 +39,133 @@ T = [1, 2, 3; 2, 4, 3; 3, 4, 5; 6, 8, 4; 4, 7, 5; 2, 6, 4; 6, 8, 4; 8, 9, 7];
 
 %T = [1, 2, 3; 2, 3, 4];
 
-% Main loop.
+%% Compute invariant matrix H
+
+% Compute for first triangle
+Rgamma = cell(size(T,1),1);
+S = cell(size(T,1),1);
+inP = cell(size(T,1),1);
+
+% First triangle. Ap + l = q.
+Ptr = [p(1,1), p(1,2), 0, 0, 1, 0; ...
+    0, 0, p(1,1), p(1,2), 0, 1; ...
+    p(2,1), p(2,2), 0, 0, 1, 0; ...
+    0, 0, p(2,1), p(2,2), 0, 1; ...
+    p(3,1), p(3,2), 0, 0, 1, 0; ...
+    0, 0, p(3,1), p(3,2), 0, 1];
+
+Qtr = [q(1,1); q(1,2); q(2,1); q(2,2); q(3,1); q(3,2)];
+
+% A and l.
+Afulltr = Ptr \ Qtr;
+Atr = [Afulltr(1) Afulltr(2); Afulltr(3) Afulltr(4)];
+
+% Decompose A for interpolation.
+[U, D, V] = svd(Atr);
+Rgamma{1} = U*V';
+S{1} = V*D*V';
+
+inP{1} = inv(Ptr);
+
+% Base case - one triangle.
+H = zeros((size(p,1)-1)*2);
+H(1,1) = inP{1}(1,3)^2 + inP{1}(2,3)^2;
+H(2,2) = inP{1}(3,4)^2 + inP{1}(4,4)^2;
+H(3,3) = inP{1}(1,5)^2 + inP{1}(2,5)^2;
+H(4,4) = inP{1}(3,6)^2 + inP{1}(4,6)^2;
+H(3,1) = inP{1}(1,3)*inP{1}(1,5) + inP{1}(2,3)*inP{1}(2,5);
+H(4,2) = inP{1}(3,4)*inP{1}(3,6) + inP{1}(4,4)*inP{1}(4,6);
+H(1,3) = inP{1}(1,3)*inP{1}(1,5) + inP{1}(2,3)*inP{1}(2,5);
+H(2,4) = inP{1}(3,4)*inP{1}(3,6) + inP{1}(4,4)*inP{1}(4,6);
+
+%% H for the rest of the triangles
+for i = 2: size(T,1)
+    vertex1 = T(i,1);
+    vertex2 = T(i,2);
+    vertex3 = T(i,3);
+    
+    P = [p(vertex1,1), p(vertex1,2), 0, 0, 1, 0; ...
+        0, 0, p(vertex1,1), p(vertex1,2), 0, 1; ...
+        p(vertex2,1), p(vertex2,2), 0, 0, 1, 0; ...
+        0, 0, p(vertex2,1), p(vertex2,2), 0, 1; ...
+        p(vertex3,1), p(vertex3,2), 0, 0, 1, 0; ...
+        0, 0, p(vertex3,1), p(vertex3,2), 0, 1];
+    
+    Q = [q(vertex1,1); q(vertex1,2); q(vertex2,1); q(vertex2,2); q(vertex3,1); q(vertex3,2)];
+    
+    Afulltri = P \ Q;
+    Atri = [Afulltri(1) Afulltri(2); Afulltri(3) Afulltri(4)];
+    
+    [U, D, V] = svd(Atri);
+    Rgamma{i} = U*V';
+    S{i} = V*D*V';
+    
+    inP{i} = inv(P);
+    
+    % Add for more than one triangle.
+    vh1 = 2*vertex1 - 3;
+    vh2 = 2*vertex2 - 3;
+    vh3 = 2*vertex3 - 3;
+    
+    H(vh1,vh1) = H(vh1,vh1) + inP{i}(1,1)^2 + inP{i}(2,1)^2;
+    H(vh1+1,vh1+1) = H(vh1+1,vh1+1) + inP{i}(3,2)^2 + inP{i}(4,2)^2;
+    H(vh2,vh2) = H(vh2,vh2) + inP{i}(1,3)^2 + inP{i}(2,3)^2;
+    H(vh2+1,vh2+1) = H(vh2+1,vh2+1) + inP{i}(3,4)^2 + inP{i}(4,4)^2;
+    H(vh3,vh3) = H(vh3,vh3) + inP{i}(1,5)^2 + inP{i}(2,5)^2;
+    H(vh3+1,vh3+1) = H(vh3+1,vh3+1) + inP{i}(3,6)^2 + inP{i}(4,6)^2;
+    
+    H(vh1,vh2) = H(vh1,vh2) + inP{i}(1,1)*inP{i}(1,3) + inP{i}(2,1)*inP{i}(2,3);
+    H(vh2,vh1) = H(vh1,vh2);
+    H(vh1,vh3) = H(vh1,vh3) + inP{i}(1,1)*inP{i}(1,5) + inP{i}(2,1)*inP{i}(2,5);
+    H(vh3,vh1) = H(vh1,vh3);
+    H(vh2,vh3) = H(vh2,vh3) + inP{i}(1,3)*inP{i}(1,5) + inP{i}(2,3)*inP{i}(2,5);
+    H(vh3,vh2) = H(vh2,vh3);
+    H(vh1+1,vh2+1) = H(vh1+1,vh2+1) + inP{i}(3,2)*inP{i}(3,4) + inP{i}(4,2)*inP{i}(4,4);
+    H(vh2+1,vh1+1) = H(vh1+1,vh2+1);
+    H(vh1+1,vh3+1) = H(vh1+1,vh3+1) + inP{i}(3,2)*inP{i}(3,6) + inP{i}(4,2)*inP{i}(4,6);
+    H(vh3+1,vh1+1) = H(vh1+1,vh3+1);
+    H(vh2+1,vh3+1) = H(vh2+1,vh3+1) + inP{i}(3,4)*inP{i}(3,6) + inP{i}(4,4)*inP{i}(4,6);
+    H(vh3+1,vh2+1) = H(vh2+1,vh3+1);
+end
+
+%% Main loop.
 for t = 0:0.1:1
     
     v1x = (1-t)*p(1,1) + t*q(1,1);
     v1y = (1-t)*p(1,2) + t*q(1,2);
     
+    A = ((1-t)*eye(2) + t*Rgamma{1}) * ((1-t)*eye(2) + t*S{1});
     
-    % First triangle. Ap + l = q.
-    Ptr = [p(1,1), p(1,2), 0, 0, 1, 0; ...
-        0, 0, p(1,1), p(1,2), 0, 1; ...
-        p(2,1), p(2,2), 0, 0, 1, 0; ...
-        0, 0, p(2,1), p(2,2), 0, 1; ...
-        p(3,1), p(3,2), 0, 0, 1, 0; ...
-        0, 0, p(3,1), p(3,2), 0, 1];
-    
-    Qtr = [q(1,1); q(1,2); q(2,1); q(2,2); q(3,1); q(3,2)];
-    
-    % A and l.
-    Afulltr = Ptr \ Qtr;
-    Atr = [Afulltr(1) Afulltr(2); Afulltr(3) Afulltr(4)];
-    
-    % Decompose A for interpolation.
-    [U, D, V] = svd(Atr);
-    Rgamma = U*V';
-    S = V*D*V';
-    
-    inP = inv(Ptr);
-    
-    A = ((1-t)*eye(2) + t*Rgamma) * ((1-t)*eye(2) + t*S);
-    
-    c = norm(A,'fro')^2 - 2* (A(1,1)*inP(1,1)*v1x + A(1,2)*inP(2,1)*v1x + ...
-        A(2,1)*inP(3,2)*v1y + A(2,2)*inP(4,2)*v1y) + ...
-        inP(1,1)^2*v1x^2 + inP(2,1)^2*v1x^2 + inP(3,2)^2*v1y^2 + inP(4,2)^2*v1y^2;
-    
-    % Base case - one triangle.
-    H = zeros((size(p,1)-1)*2);
-    H(1,1) = inP(1,3)^2 + inP(2,3)^2;
-    H(2,2) = inP(3,4)^2 + inP(4,4)^2;
-    H(3,3) = inP(1,5)^2 + inP(2,5)^2;
-    H(4,4) = inP(3,6)^2 + inP(4,6)^2;
-    H(3,1) = inP(1,3)*inP(1,5) + inP(2,3)*inP(2,5);
-    H(4,2) = inP(3,4)*inP(3,6) + inP(4,4)*inP(4,6);
-    H(1,3) = inP(1,3)*inP(1,5) + inP(2,3)*inP(2,5);
-    H(2,4) = inP(3,4)*inP(3,6) + inP(4,4)*inP(4,6);
+    c = norm(A,'fro')^2 - 2* (A(1,1)*inP{1}(1,1)*v1x + A(1,2)*inP{1}(2,1)*v1x + ...
+        A(2,1)*inP{1}(3,2)*v1y + A(2,2)*inP{1}(4,2)*v1y) + ...
+        inP{1}(1,1)^2*v1x^2 + inP{1}(2,1)^2*v1x^2 + inP{1}(3,2)^2*v1y^2 + inP{1}(4,2)^2*v1y^2;
     
     G = zeros((size(p,1)-1)*2,1);
-    G(1) = -(A(1,1)*inP(1,3) + A(1,2)*inP(2,3)) + inP(1,1)*inP(1,3)*v1x + inP(2,1)*inP(2,3)*v1x;
-    G(2) = -(A(2,1)*inP(3,4) + A(2,2)*inP(4,4)) + inP(3,2)*inP(3,4)*v1y + inP(4,2)*inP(4,4)*v1y;
-    G(3) = -(A(1,1)*inP(1,5) + A(1,2)*inP(2,5)) + inP(1,1)*inP(1,5)*v1x + inP(2,1)*inP(2,5)*v1x;
-    G(4) = -(A(2,1)*inP(3,6) + A(2,2)*inP(4,6)) + inP(3,2)*inP(3,6)*v1y + inP(4,2)*inP(4,6)*v1y;
+    G(1) = -(A(1,1)*inP{1}(1,3) + A(1,2)*inP{1}(2,3)) + inP{1}(1,1)*inP{1}(1,3)*v1x + inP{1}(2,1)*inP{1}(2,3)*v1x;
+    G(2) = -(A(2,1)*inP{1}(3,4) + A(2,2)*inP{1}(4,4)) + inP{1}(3,2)*inP{1}(3,4)*v1y + inP{1}(4,2)*inP{1}(4,4)*v1y;
+    G(3) = -(A(1,1)*inP{1}(1,5) + A(1,2)*inP{1}(2,5)) + inP{1}(1,1)*inP{1}(1,5)*v1x + inP{1}(2,1)*inP{1}(2,5)*v1x;
+    G(4) = -(A(2,1)*inP{1}(3,6) + A(2,2)*inP{1}(4,6)) + inP{1}(3,2)*inP{1}(3,6)*v1y + inP{1}(4,2)*inP{1}(4,6)*v1y;
     
     for i = 2: size(T,1)
         vertex1 = T(i,1);
         vertex2 = T(i,2);
         vertex3 = T(i,3);
         
-        P = [p(vertex1,1), p(vertex1,2), 0, 0, 1, 0; ...
-            0, 0, p(vertex1,1), p(vertex1,2), 0, 1; ...
-            p(vertex2,1), p(vertex2,2), 0, 0, 1, 0; ...
-            0, 0, p(vertex2,1), p(vertex2,2), 0, 1; ...
-            p(vertex3,1), p(vertex3,2), 0, 0, 1, 0; ...
-            0, 0, p(vertex3,1), p(vertex3,2), 0, 1];
-        
-        Q = [q(vertex1,1); q(vertex1,2); q(vertex2,1); q(vertex2,2); q(vertex3,1); q(vertex3,2)];
-        
-        Afulltri = P \ Q;
-        Atri = [Afulltri(1) Afulltri(2); Afulltri(3) Afulltri(4)];
-        
-        [U, D, V] = svd(Atri);
-        Rgamma = U*V';
-        S = V*D*V';
-        
-        inP = inv(P);
-        
         % Add for more than one triangle.
         vh1 = 2*vertex1 - 3;
         vh2 = 2*vertex2 - 3;
         vh3 = 2*vertex3 - 3;
         
-        H(vh1,vh1) = H(vh1,vh1) + inP(1,1)^2 + inP(2,1)^2;
-        H(vh1+1,vh1+1) = H(vh1+1,vh1+1) + inP(3,2)^2 + inP(4,2)^2;
-        H(vh2,vh2) = H(vh2,vh2) + inP(1,3)^2 + inP(2,3)^2;
-        H(vh2+1,vh2+1) = H(vh2+1,vh2+1) + inP(3,4)^2 + inP(4,4)^2;
-        H(vh3,vh3) = H(vh3,vh3) + inP(1,5)^2 + inP(2,5)^2;
-        H(vh3+1,vh3+1) = H(vh3+1,vh3+1) + inP(3,6)^2 + inP(4,6)^2;
-        
-        H(vh1,vh2) = H(vh1,vh2) + inP(1,1)*inP(1,3) + inP(2,1)*inP(2,3);
-        H(vh2,vh1) = H(vh1,vh2);
-        H(vh1,vh3) = H(vh1,vh3) + inP(1,1)*inP(1,5) + inP(2,1)*inP(2,5);
-        H(vh3,vh1) = H(vh1,vh3);
-        H(vh2,vh3) = H(vh2,vh3) + inP(1,3)*inP(1,5) + inP(2,3)*inP(2,5);
-        H(vh3,vh2) = H(vh2,vh3);
-        H(vh1+1,vh2+1) = H(vh1+1,vh2+1) + inP(3,2)*inP(3,4) + inP(4,2)*inP(4,4);
-        H(vh2+1,vh1+1) = H(vh1+1,vh2+1);
-        H(vh1+1,vh3+1) = H(vh1+1,vh3+1) + inP(3,2)*inP(3,6) + inP(4,2)*inP(4,6);
-        H(vh3+1,vh1+1) = H(vh1+1,vh3+1);
-        H(vh2+1,vh3+1) = H(vh2+1,vh3+1) + inP(3,4)*inP(3,6) + inP(4,4)*inP(4,6);
-        H(vh3+1,vh2+1) = H(vh2+1,vh3+1);
-        
-        A = ((1-t)*eye(2) + t*Rgamma) * ((1-t)*eye(2) + t*S);
+        A = ((1-t)*eye(2) + t*Rgamma{i}) * ((1-t)*eye(2) + t*S{i});
         
         c = c + norm(A,'fro')^2;
         
-        G(vh1) = G(vh1) - A(1,1)*inP(1,1) - A(1,2)*inP(2,1);
-        G(vh1+1) = G(vh1+1) - A(2,1)*inP(3,2) - A(2,2)*inP(4,2);
-        G(vh2) = G(vh2) - A(1,1)*inP(1,3) - A(1,2)*inP(2,3);
-        G(vh2+1) = G(vh2+1) - A(2,1)*inP(3,4) - A(2,2)*inP(4,4);
-        G(vh3) = G(vh3) - A(1,1)*inP(1,5) - A(1,2)*inP(2,5);
-        G(vh3+1) = G(vh3+1) - A(2,1)*inP(3,6) - A(2,2)*inP(4,6);
+        G(vh1) = G(vh1) - A(1,1)*inP{i}(1,1) - A(1,2)*inP{i}(2,1);
+        G(vh1+1) = G(vh1+1) - A(2,1)*inP{i}(3,2) - A(2,2)*inP{i}(4,2);
+        G(vh2) = G(vh2) - A(1,1)*inP{i}(1,3) - A(1,2)*inP{i}(2,3);
+        G(vh2+1) = G(vh2+1) - A(2,1)*inP{i}(3,4) - A(2,2)*inP{i}(4,4);
+        G(vh3) = G(vh3) - A(1,1)*inP{i}(1,5) - A(1,2)*inP{i}(2,5);
+        G(vh3+1) = G(vh3+1) - A(2,1)*inP{i}(3,6) - A(2,2)*inP{i}(4,6);
         
     end
     
@@ -176,5 +194,7 @@ for t = 0:0.1:1
     triplot(T, q(:, 1), q(:,2), 'r');
     triplot(T, x(:, 1), x(:,2), 'g');
     waitforbuttonpress;
-    
+    clf(figure(1));
 end
+close(figure(1));
+disp('done');
