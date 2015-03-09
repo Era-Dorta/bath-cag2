@@ -27,7 +27,7 @@ close all;
 
 % Comment all unused points.
 p = [0,0; 0,2; 2,0; 2,2; 4,0; 0,4; 4,2; 2,4; 4,4];
-q = [0,0; 0,2; 2,0; 2,2; 4,0; 0,4; 5,2; 2,4; 4,5];
+q = [0,0; 0,2; 2,0; 2,2; 5,0; 0,4; 5,2; 1,4; 4,5];
 %q = [0,0; 0,4; 4,0; 4,3; 5,1; 0,5; 4,2; 2,4; 5,5];
 
 %p = [0,2; 2,0; 2,2; 4,0];
@@ -67,8 +67,7 @@ for t = 0:0.1:1
     
     inP = inv(Ptr);
     
-    angle = t*acosd(Rgamma(1));
-    A = [cosd(angle) -sind(angle); sind(angle) cosd(angle)] * ((1-t)*eye(2) + t*S);
+    A = ((1-t)*eye(2) + t*Rgamma) * ((1-t)*eye(2) + t*S);
     
     c = norm(A,'fro')^2 - 2* (A(1,1)*inP(1,1)*v1x + A(1,2)*inP(2,1)*v1x + ...
         A(2,1)*inP(3,2)*v1y + A(2,2)*inP(4,2)*v1y) + ...
@@ -95,6 +94,7 @@ for t = 0:0.1:1
         vertex1 = T(i,1);
         vertex2 = T(i,2);
         vertex3 = T(i,3);
+        
         P = [p(vertex1,1), p(vertex1,2), 0, 0, 1, 0; ...
             0, 0, p(vertex1,1), p(vertex1,2), 0, 1; ...
             p(vertex2,1), p(vertex2,2), 0, 0, 1, 0; ...
@@ -138,12 +138,8 @@ for t = 0:0.1:1
         H(vh2+1,vh3+1) = H(vh2+1,vh3+1) + inP(3,4)*inP(3,6) + inP(4,4)*inP(4,6);
         H(vh3+1,vh2+1) = H(vh2+1,vh3+1);
         
-        angle = t*acosd(Rgamma(1));
-        A = [cosd(angle) -sind(angle); sind(angle) cosd(angle)] * ((1-t)*eye(2) + t*S);
-        
-        v1x = (1-t)*p(1,1) + t*q(1,1);
-        v1y = (1-t)*p(1,2) + t*q(1,2);
-        
+        A = ((1-t)*eye(2) + t*Rgamma) * ((1-t)*eye(2) + t*S); 
+               
         c = c + norm(A,'fro')^2;
         
         G(vh1) = G(vh1) - A(1,1)*inP(1,1) - A(1,2)*inP(2,1);
