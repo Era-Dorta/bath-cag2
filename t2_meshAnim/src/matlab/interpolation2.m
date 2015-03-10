@@ -29,19 +29,24 @@ clear all;
 close all;
 
 % Comment all unused points.
-%p = [0,0; 0,2; 2,0; 2,2; 4,0; 0,4; 4,2; 2,4; 4,4];
-%q = [0,0; 0,2; 2,0; 2,2; 5,0; 0,4; 5,2; 1,4; 4,5];
+p = [0,0; 0,2; 2,0; 2,2; 4,0; 0,4; 4,2; 2,4; 4,4];
+q = [0,0; 0,2; 2,0; 2,2; 5,0; 0,4; 5,2; 1,4; 4,5];
 %q = [0,0; 0,4; 4,0; 4,3; 5,1; 0,5; 4,2; 2,4; 5,5];
+p(:,3) = 0;
+p(1,3) = 0.5;
+p(2,3) = -0.5;
+p(3,3) = -0.5;
+p(4,3) = 0.25;
 
-p = [0,0,1; 2,0,1; 0,2,1; 3,0,1];
+%p = [0,0,1; 2,0,1; 0,2,1; 3,0,1];
 % q = [0,0,1; 2,0,1; 0,2,2; 5,0,1];
-q = bsxfun(@plus, p, [3, 0, 0]);
+%q = bsxfun(@plus, p, [6, 0, 0]);
 
 % Define triangles.
 % T = [1, 2, 3; 2, 3, 4; 3, 4, 5];%; 4, 5, 7; 2, 4, 6; 4, 6, 8; 7, 8, 9];
-%T = [1, 2, 3; 2, 4, 3; 3, 4, 5; 6, 8, 4; 4, 7, 5; 2, 6, 4; 6, 8, 4; 8, 9, 7];
+T = [1, 2, 3; 2, 4, 3; 3, 4, 5; 6, 8, 4; 4, 7, 5; 2, 6, 4; 6, 8, 4; 8, 9, 7];
 
-T = [1, 2, 3; 2, 3, 4];
+%T = [1, 2, 3; 2, 3, 4];
 
 %% Compute invariant matrix H
 
@@ -234,21 +239,12 @@ for t = 0:0.1:1
     end
     
     
-    % Formulate and solve a quadratic form.
-    cGH = [c G'; G H];
-    
-    f = zeros(size(cGH,1),1);
-    Aeq = zeros(size(cGH,1));
-    beq = zeros(size(cGH,1),1);
-    Aeq(1,1) = 1;
-    beq(1) = 1;
-    u = quadprog(cGH,f,[],[],Aeq, beq);
+    % Solve the system
+    u = - H \ G;
     
     % Deshape the solution for plotting.
-    uno1 = u(2:end);
-    % ureshape = [uno1(1:3)'; uno1(4:6)'; uno1(7:9)'];
-    for j = 1:3:size(uno1,1)
-        ureshape(j/3+2/3,:) = [uno1(j),uno1(j+1),uno1(j+2)];
+    for j = 1:3:size(u,1)
+        ureshape(j/3+2/3,:) = [u(j),u(j+1),u(j+2)];
     end
     x = [v1x, v1y, v1z; ureshape]
     
