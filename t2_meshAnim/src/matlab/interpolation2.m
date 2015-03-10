@@ -90,7 +90,7 @@ H(5,5) = dot(bt(4:6,3), bt(4:6,3));
 H(6,6) = dot(bt(7:9,3), bt(7:9,3));
 
 H(1,4) = H(1,4) + (dot(bt(1:3,2), bt(1:3,3)));
-H(1,4) = H(1,4);
+H(4,1) = H(1,4);
 H(2,5) = H(2,5) + (dot(bt(4:6,2), bt(4:6,3)));
 H(5,2) = H(2,5);
 H(3,6) = H(3,6) + (dot(bt(7:9,2), bt(7:9,3)));
@@ -193,14 +193,14 @@ for t = 0:0.1:1
     G(6) = -dot(A(3,:), bt(7:9, 3)) + dot(bt(7:9,1)*v1z, bt(7:9, 3));
     
     for i = 2: size(T,1)
-        %         vertex1 = T(i,1);
-        %         vertex2 = T(i,2);
-        %         vertex3 = T(i,3);
-        %
-        %         % Add for more than one triangle.
-        %         vh1 = 3*vertex1 - 5;
-        %         vh2 = 3*vertex2 - 5;
-        %         vh3 = 3*vertex3 - 5;
+        vertex1 = T(i,1);
+        vertex2 = T(i,2);
+        vertex3 = T(i,3);
+
+        % Add for more than one triangle.
+        vh1 = 3*vertex1 - 5;
+        vh2 = 3*vertex2 - 5;
+        vh3 = 3*vertex3 - 5;
         
         A = ((1-t)*eye(3) + t*Rgamma{i}) * ((1-t)*eye(3) + t*S{i});
         
