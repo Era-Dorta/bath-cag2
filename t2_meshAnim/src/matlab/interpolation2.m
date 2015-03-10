@@ -68,7 +68,8 @@ Qtr = [q(1,:), q(2,:), q(3,:)]';
 % Doing the inverse like this yields the same result for AFulltr if we do
 % inP{1} * Qtr
 inP{1} = Ptr\eye(size(Ptr));
-inP{1} = inP{1}(:, 1:9);
+% Save only the A values of the inverse
+inP{1} = inP{1}(1:9, 1:9);
 
 Afulltr = Ptr \ Qtr;
 Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
@@ -127,7 +128,7 @@ for i = 2: size(T,1)
     
     % inP{i} = inv(Ptr);
     inP{i} = Ptr\eye(size(Ptr));
-    inP{i} = inP{i}(:, 1:9);
+    inP{i} = inP{i}(1:9, 1:9);
     
     bt(1:3, :) = [inP{i}(1:3,1), inP{i}(1:3,4), inP{i}(1:3,7)];
     bt(4:6, :) = [inP{i}(4:6,2), inP{i}(4:6,5), inP{i}(4:6,8)];
@@ -137,7 +138,6 @@ for i = 2: size(T,1)
     vh2 = 3*vertex2 - 5;
     vh3 = 3*vertex3 - 5;
     
-    H = zeros((size(p,1)-1)*3);
     H(vh1,vh1) = H(vh1,vh1) + dot(bt(1:3,1), bt(1:3,1));
     H(vh1+1,vh1+1) = H(vh1+1,vh1+1) + dot(bt(4:6,1), bt(4:6,1));
     H(vh1+2,vh1+2) = H(vh1+2,vh1+2) + dot(bt(7:9,1), bt(7:9,1));
