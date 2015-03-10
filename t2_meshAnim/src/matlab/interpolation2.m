@@ -89,11 +89,11 @@ H(4,4) = dot(bt(1:3,3), bt(1:3,3));
 H(5,5) = dot(bt(4:6,3), bt(4:6,3));
 H(6,6) = dot(bt(7:9,3), bt(7:9,3));
 
-H(1,4) = H(1,4) + (dot(bt(1:3,2), bt(1:3,3)));
+H(1,4) = dot(bt(1:3,2), bt(1:3,3));
 H(4,1) = H(1,4);
-H(2,5) = H(2,5) + (dot(bt(4:6,2), bt(4:6,3)));
+H(2,5) = dot(bt(4:6,2), bt(4:6,3));
 H(5,2) = H(2,5);
-H(3,6) = H(3,6) + (dot(bt(7:9,2), bt(7:9,3)));
+H(3,6) = dot(bt(7:9,2), bt(7:9,3));
 H(6,3) = H(3,6);
 
 %% H for the rest of the triangles
@@ -151,19 +151,27 @@ for i = 2: size(T,1)
     H(vh2,vh3) = H(vh2,vh3) + (dot(bt(1:3,2), bt(1:3,3)));
     H(vh3,vh2) = H(vh2,vh3);
     
-    H(vh1+1,vh2+1) = H(vh1+1,vh2+1) + (dot(bt(4:6,1), bt(4:6,2)));
-    H(vh2+1,vh1+1) = H(vh1+1,vh2+1);
-    H(vh1+1,vh3+1) = H(vh1+1,vh3+1) + (dot(bt(4:6,1), bt(4:6,3)));
-    H(vh3+1,vh1+1) = H(vh1+1,vh3+1);
-    H(vh2+1,vh3+1) = H(vh2+1,vh3+1) + (dot(bt(4:6,2), bt(4:6,3)));
-    H(vh3+1,vh2+1) = H(vh2+1,vh3+1);
+    vh1 = vh1 + 1;
+    vh2 = vh2 + 1;
+    vh3 = vh3 + 1;
     
-    H(vh1+2,vh2+2) = H(vh1+2,vh2+2) + (dot(bt(7:9,1), bt(7:9,2)));
-    H(vh2+2,vh1+2) = H(vh1+2,vh2+2);
-    H(vh1+2,vh3+2) = H(vh1+2,vh3+2) + (dot(bt(7:9,1), bt(7:9,3)));
-    H(vh3+2,vh1+2) = H(vh1+2,vh3+2);
-    H(vh2+2,vh3+2) = H(vh2+2,vh3+2) + (dot(bt(7:9,2), bt(7:9,3)));
-    H(vh3+2,vh2+2) = H(vh2+2,vh3+2);
+    H(vh1,vh2) = H(vh1,vh2) + (dot(bt(4:6,1), bt(4:6,2)));
+    H(vh2,vh1) = H(vh1,vh2);
+    H(vh1,vh3) = H(vh1,vh3) + (dot(bt(4:6,1), bt(4:6,3)));
+    H(vh3,vh1) = H(vh1,vh3);
+    H(vh2,vh3) = H(vh2,vh3) + (dot(bt(4:6,2), bt(4:6,3)));
+    H(vh3,vh2) = H(vh2,vh3);
+    
+    vh1 = vh1 + 1;
+    vh2 = vh2 + 1;
+    vh3 = vh3 + 1;
+    
+    H(vh1,vh2) = H(vh1,vh2) + (dot(bt(7:9,1), bt(7:9,2)));
+    H(vh2,vh1) = H(vh1,vh2);
+    H(vh1,vh3) = H(vh1,vh3) + (dot(bt(7:9,1), bt(7:9,3)));
+    H(vh3,vh1) = H(vh1,vh3);
+    H(vh2,vh3) = H(vh2,vh3) + (dot(bt(7:9,2), bt(7:9,3)));
+    H(vh3,vh2) = H(vh2,vh3);
     
 end
 
@@ -196,7 +204,7 @@ for t = 0:0.1:1
         vertex1 = T(i,1);
         vertex2 = T(i,2);
         vertex3 = T(i,3);
-
+        
         % Add for more than one triangle.
         vh1 = 3*vertex1 - 5;
         vh2 = 3*vertex2 - 5;
