@@ -33,9 +33,9 @@ close all;
 %q = [0,0; 0,2; 2,0; 2,2; 5,0; 0,4; 5,2; 1,4; 4,5];
 %q = [0,0; 0,4; 4,0; 4,3; 5,1; 0,5; 4,2; 2,4; 5,5];
 
-p = [0,0,1; 2,0,1; 2,2,1; 4,0,1];
-%q = [0,0,0; 2,0,1; 2,5,1; 5,0,1];
-q = bsxfun(@plus, p, [5, 0, 0]);
+p = [0,0,1; 2,0,1; 0,2,1; 3,0,1];
+% q = [0,0,1; 2,0,1; 0,2,2; 5,0,1];
+q = bsxfun(@plus, p, [3, 0, 0]);
 
 % Define triangles.
 % T = [1, 2, 3; 2, 3, 4; 3, 4, 5];%; 4, 5, 7; 2, 4, 6; 4, 6, 8; 7, 8, 9];
@@ -52,20 +52,21 @@ inP = cell(size(T,1),1);
 
 % First triangle. Ap + l = q.
 zero3 = [0,0,0];
-Ptr = [p(1,:), zero3, zero3; ...
-    zero3, p(1,:), zero3; ...
-    zero3, zero3, p(1,:); ...
-    p(2,:), zero3, zero3; ...
-    zero3, p(2,:), zero3; ...
-    zero3, zero3, p(2,:); ...
-    p(3,:), zero3, zero3; ...
-    zero3, p(3,:), zero3; ...
-    zero3, zero3, p(3,:)];
+Ptr = [p(1,:), zero3, zero3, 1 0 0;
+    zero3, p(1,:), zero3, 0 1 0;
+    zero3, zero3, p(1,:), 0 0 1;
+    p(2,:), zero3, zero3, 1 0 0;
+    zero3, p(2,:), zero3, 0 1 0;
+    zero3, zero3, p(2,:), 0 0 1;
+    p(3,:), zero3, zero3, 1 0 0
+    zero3, p(3,:), zero3, 0 1 0;
+    zero3, zero3, p(3,:), 0 0 1];
 
 Qtr = [q(1,:), q(2,:), q(3,:)]';
 
 % A and l.
-inP{1} = inv(Ptr);
+% inP{1} = inv(Ptr);
+inP{1} = Ptr'/(Ptr*Ptr');
 Afulltr = Ptr \ Qtr;
 Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
 
@@ -88,9 +89,12 @@ H(4,4) = dot(bt(1:3,3), bt(1:3,3));
 H(5,5) = dot(bt(4:6,3), bt(4:6,3));
 H(6,6) = dot(bt(7:9,3), bt(7:9,3));
 
-H(1,4) = 2 * (dot(bt(1:3,2), bt(1:3,3)));
-H(2,5) = 2 * (dot(bt(4:6,2), bt(4:6,3)));
-H(3,6) = 2 * (dot(bt(7:9,2), bt(7:9,3)));
+H(1,4) = H(1,4) + (dot(bt(1:3,2), bt(1:3,3)));
+H(1,4) = H(1,4);
+H(2,5) = H(2,5) + (dot(bt(4:6,2), bt(4:6,3)));
+H(5,2) = H(2,5);
+H(3,6) = H(3,6) + (dot(bt(7:9,2), bt(7:9,3)));
+H(6,3) = H(3,6);
 
 %% H for the rest of the triangles
 for i = 2: size(T,1)
@@ -98,19 +102,18 @@ for i = 2: size(T,1)
     vertex2 = T(i,2);
     vertex3 = T(i,3);
     
-    Ptr = [p(vertex1,:), zero3, zero3; ...
-        zero3, p(vertex1,:), zero3; ...
-        zero3, zero3, p(vertex1,:); ...
-        p(vertex2,:), zero3, zero3; ...
-        zero3, p(vertex2,:), zero3; ...
-        zero3, zero3, p(vertex2,:); ...
-        p(vertex3,:), zero3, zero3; ...
-        zero3, p(vertex3,:), zero3; ...
-        zero3, zero3, p(vertex3,:)];
+    Ptr = [p(vertex1,:), zero3, zero3, 1 0 0;
+        zero3, p(vertex1,:), zero3, 0 1 0;
+        zero3, zero3, p(vertex1,:), 0 0 1;
+        p(vertex2,:), zero3, zero3, 1 0 0;
+        zero3, p(vertex2,:), zero3, 0 1 0;
+        zero3, zero3, p(vertex2,:), 0 0 1;
+        p(vertex3,:), zero3, zero3, 1 0 0;
+        zero3, p(vertex3,:), zero3, 0 1 0;
+        zero3, zero3, p(vertex3,:), 0 0 1];
     
-    Qtr = [q(1,:), q(2,:), q(3,:)]';
+    Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:)]';
     
-    % A and l.
     Afulltr = Ptr \ Qtr;
     Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
     
@@ -119,9 +122,9 @@ for i = 2: size(T,1)
     Rgamma{i} = U*V';
     S{i} = V*D*V';
     
-    inP{i} = inv(Ptr);
+    % inP{i} = inv(Ptr);
+    inP{i} = Ptr'/(Ptr*Ptr');
     
-    % Base case - one triangle.
     bt(1:3, :) = [inP{i}(1:3,1), inP{i}(1:3,4), inP{i}(1:3,7)];
     bt(4:6, :) = [inP{i}(4:6,2), inP{i}(4:6,5), inP{i}(4:6,8)];
     bt(7:9, :) = [inP{i}(7:9,3), inP{i}(7:9,6), inP{i}(7:9,9)];
@@ -131,28 +134,37 @@ for i = 2: size(T,1)
     vh3 = 3*vertex3 - 5;
     
     H = zeros((size(p,1)-1)*3);
-    H(vh1,vh1) = dot(bt(1:3,1), bt(1:3,1));
-    H(vh1+1,vh1+1) = dot(bt(4:6,1), bt(4:6,1));
-    H(vh1+2,vh1+2) = dot(bt(7:9,1), bt(7:9,1));
-    H(vh2,vh2) = dot(bt(1:3,2), bt(1:3,2));
-    H(vh2+1,vh2+1) = dot(bt(4:6,2), bt(4:6,2));
-    H(vh2+2,vh2+2) = dot(bt(7:9,2), bt(7:9,2));
-    H(vh3,vh3) = dot(bt(1:3,3), bt(1:3,3));
-    H(vh3+1,vh3+1) = dot(bt(4:6,3), bt(4:6,3));
-    H(vh3+2,vh3+2) = dot(bt(7:9,3), bt(7:9,3));
+    H(vh1,vh1) = H(vh1,vh1) + dot(bt(1:3,1), bt(1:3,1));
+    H(vh1+1,vh1+1) = H(vh1+1,vh1+1) + dot(bt(4:6,1), bt(4:6,1));
+    H(vh1+2,vh1+2) = H(vh1+2,vh1+2) + dot(bt(7:9,1), bt(7:9,1));
+    H(vh2,vh2) = H(vh2,vh2) + dot(bt(1:3,2), bt(1:3,2));
+    H(vh2+1,vh2+1) = H(vh2+1,vh2+1) + dot(bt(4:6,2), bt(4:6,2));
+    H(vh2+2,vh2+2) = H(vh2+2,vh2+2) + dot(bt(7:9,2), bt(7:9,2));
+    H(vh3,vh3) = H(vh3,vh3) + dot(bt(1:3,3), bt(1:3,3));
+    H(vh3+1,vh3+1) = H(vh3+1,vh3+1) + dot(bt(4:6,3), bt(4:6,3));
+    H(vh3+2,vh3+2) = H(vh3+2,vh3+2) + dot(bt(7:9,3), bt(7:9,3));
     
-    H(vh1,vh2) = 2 * (dot(bt(1:3,1), bt(1:3,2)));
-    H(vh1,vh3) = 2 * (dot(bt(1:3,1), bt(1:3,3)));
-    H(vh2,vh3) = 2 * (dot(bt(1:3,2), bt(1:3,3)));
+    H(vh1,vh2) = H(vh1,vh2) + (dot(bt(1:3,1), bt(1:3,2)));
+    H(vh2,vh1) = H(vh1,vh2);
+    H(vh1,vh3) = H(vh1,vh3) + (dot(bt(1:3,1), bt(1:3,3)));
+    H(vh3,vh1) = H(vh1,vh3);
+    H(vh2,vh3) = H(vh2,vh3) + (dot(bt(1:3,2), bt(1:3,3)));
+    H(vh3,vh2) = H(vh2,vh3);
     
-    H(vh1+1,vh2+1) = 2 * (dot(bt(4:6,1), bt(4:6,2)));
-    H(vh1+1,vh3+1) = 2 * (dot(bt(4:6,1), bt(4:6,3)));
-    H(vh2+1,vh3+1) = 2 * (dot(bt(4:6,2), bt(4:6,3)));
-        
-    H(vh1+2,vh2+2) = 2 * (dot(bt(7:9,1), bt(7:9,2)));
-    H(vh1+2,vh3+2) = 2 * (dot(bt(7:9,1), bt(7:9,3)));
-    H(vh2+2,vh3+2) = 2 * (dot(bt(7:9,2), bt(7:9,3)));
-
+    H(vh1+1,vh2+1) = H(vh1+1,vh2+1) + (dot(bt(4:6,1), bt(4:6,2)));
+    H(vh2+1,vh1+1) = H(vh1+1,vh2+1);
+    H(vh1+1,vh3+1) = H(vh1+1,vh3+1) + (dot(bt(4:6,1), bt(4:6,3)));
+    H(vh3+1,vh1+1) = H(vh1+1,vh3+1);
+    H(vh2+1,vh3+1) = H(vh2+1,vh3+1) + (dot(bt(4:6,2), bt(4:6,3)));
+    H(vh3+1,vh2+1) = H(vh2+1,vh3+1);
+    
+    H(vh1+2,vh2+2) = H(vh1+2,vh2+2) + (dot(bt(7:9,1), bt(7:9,2)));
+    H(vh2+2,vh1+2) = H(vh1+2,vh2+2);
+    H(vh1+2,vh3+2) = H(vh1+2,vh3+2) + (dot(bt(7:9,1), bt(7:9,3)));
+    H(vh3+2,vh1+2) = H(vh1+2,vh3+2);
+    H(vh2+2,vh3+2) = H(vh2+2,vh3+2) + (dot(bt(7:9,2), bt(7:9,3)));
+    H(vh3+2,vh2+2) = H(vh2+2,vh3+2);
+    
 end
 
 %% Main loop.
@@ -163,13 +175,14 @@ for t = 0:0.1:1
     v1z = (1-t)*p(1,3) + t*q(1,3);
     
     A = ((1-t)*eye(3) + t*Rgamma{1}) * ((1-t)*eye(3) + t*S{1});
-        
+    
     bt(1:3, :) = [inP{1}(1:3,1), inP{1}(1:3,4), inP{1}(1:3,7)];
     bt(4:6, :) = [inP{1}(4:6,2), inP{1}(4:6,5), inP{1}(4:6,8)];
     bt(7:9, :) = [inP{1}(7:9,3), inP{1}(7:9,6), inP{1}(7:9,9)];
     
-    c = sum(sum(A.^2)) + sum(bt(:,1).^2) - 2*(dot(A(1,:), bt(1:3,1)) + dot(A(2,:), bt(4:6,1)) ...
-        + dot(A(3,:), bt(7:9,1)) ) ;
+    c = sum(sum(A.^2)) - 2*(dot(A(1,:), bt(1:3,1))*v1x + dot(A(2,:), bt(4:6,1))*v1y ...
+        + dot(A(3,:), bt(7:9,1))*v1z ) + sum(bt(1:3,1).^2*v1x^2) + ...
+        sum(bt(4:6,1).^2*v1y^2) + sum(bt(7:9,1).^2*v1z^2); %sum(bt(:,1).^2)
     
     G = zeros((size(p,1)-1)*3,1);
     G(1) = -dot(A(1,:), bt(1:3, 2)) + dot(bt(1:3,1)*v1x, bt(1:3, 2));
@@ -178,16 +191,16 @@ for t = 0:0.1:1
     G(4) = -dot(A(1,:), bt(1:3, 3)) + dot(bt(1:3,1)*v1x, bt(1:3, 3));
     G(5) = -dot(A(2,:), bt(4:6, 3)) + dot(bt(4:6,1)*v1y, bt(4:6, 3));
     G(6) = -dot(A(3,:), bt(7:9, 3)) + dot(bt(7:9,1)*v1z, bt(7:9, 3));
-        
+    
     for i = 2: size(T,1)
-        vertex1 = T(i,1);
-        vertex2 = T(i,2);
-        vertex3 = T(i,3);
-        
-        % Add for more than one triangle.
-        vh1 = 3*vertex1 - 5;
-        vh2 = 3*vertex2 - 5;
-        vh3 = 3*vertex3 - 5;
+        %         vertex1 = T(i,1);
+        %         vertex2 = T(i,2);
+        %         vertex3 = T(i,3);
+        %
+        %         % Add for more than one triangle.
+        %         vh1 = 3*vertex1 - 5;
+        %         vh2 = 3*vertex2 - 5;
+        %         vh3 = 3*vertex3 - 5;
         
         A = ((1-t)*eye(3) + t*Rgamma{i}) * ((1-t)*eye(3) + t*S{i});
         
@@ -205,7 +218,7 @@ for t = 0:0.1:1
         G(vh2+2) = G(vh2+2) -dot(A(3,:), bt(7:9, 2));
         G(vh3) = G(vh3) -dot(A(1,:), bt(1:3, 3));
         G(vh3+1) = G(vh3+1) -dot(A(2,:), bt(4:6, 3));
-        G(vh3+2) = G(vh3+2) -dot(A(3,:), bt(7:9, 3));        
+        G(vh3+2) = G(vh3+2) -dot(A(3,:), bt(7:9, 3));
     end
     
     
@@ -221,15 +234,18 @@ for t = 0:0.1:1
     
     % Deshape the solution for plotting.
     uno1 = u(2:end);
-    ureshape = [uno1(1:3)'; uno1(4:6)'; uno1(7:9)'];
+    % ureshape = [uno1(1:3)'; uno1(4:6)'; uno1(7:9)'];
+    for j = 1:3:size(uno1,1)
+        ureshape(j/3+2/3,:) = [uno1(j),uno1(j+1),uno1(j+2)];
+    end
     x = [v1x, v1y, v1z; ureshape]
     
     % Plot.
     figure(1);
     hold on;
-    trisurf(T, p(:, 1), p(:,2), p(:,3), [1,1,1,1]);
-    trisurf(T, q(:, 1), q(:,2), q(:,3), [2,2,2,2]);
-    trisurf(T, x(:, 1), x(:,2), x(:,3), [3,3,3,3]);
+    trisurf(T, p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
+    trisurf(T, q(:, 1), q(:,2), q(:,3), ones(1,size(p,1))+1);
+    trisurf(T, x(:, 1), x(:,2), x(:,3), ones(1,size(p,1))+2);
     waitforbuttonpress;
     clf(figure(1));
 end
