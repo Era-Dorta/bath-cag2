@@ -58,7 +58,7 @@ Ptr = [p(1,:), zero3, zero3, 1 0 0;
     p(2,:), zero3, zero3, 1 0 0;
     zero3, p(2,:), zero3, 0 1 0;
     zero3, zero3, p(2,:), 0 0 1;
-    p(3,:), zero3, zero3, 1 0 0
+    p(3,:), zero3, zero3, 1 0 0;
     zero3, p(3,:), zero3, 0 1 0;
     zero3, zero3, p(3,:), 0 0 1];
 
