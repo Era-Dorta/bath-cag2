@@ -258,7 +258,9 @@ for t = 0:0.1:1
     trisurf(T, p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
     trisurf(T, q(:, 1), q(:,2), q(:,3), ones(1,size(p,1))+1);
     trisurf(T, x(:, 1), x(:,2), x(:,3), ones(1,size(p,1))+2);
-    waitforbuttonpress;
+    view(15,35);
+    pause('on');
+    pause;
     clf(figure(1));
 end
 close(figure(1));
