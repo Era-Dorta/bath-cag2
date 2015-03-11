@@ -11,8 +11,35 @@
 #include <maya/MAnimControl.h>
 #include <assert.h>
 
-MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
-{
+MStatus ShapeIntrpltCmd::doIt(const MArgList &args) {
+
+	if(true){
+		const MString prevOptions(
+				"file -import -type \"OBJ\" -ignoreVersion \
+				-renameAll true -mergeNamespacesOnClash false -namespace \"");
+		const MString postOptions(
+				"\" -options -preserveReferences \
+						\"~/workspaces/matlab/cag2/data/interpolateResult/");
+		const MString namePrefix("interpolated_t_");
+		MString cmd, name, nameSp;
+		for (double i = 0; i <= 1; i = i + 0.1) {
+			name = namePrefix + i;
+			nameSp = name;
+			nameSp.substitute(".", "_");
+			name += ".obj\"";
+
+			cmd = MString(prevOptions + nameSp + postOptions + name);
+			MGlobal::executeCommand(cmd);
+
+			cmd = MString("setAttr \"" + nameSp + ":TRIANGLES_0.scaleX\" 0.02");
+			MGlobal::executeCommand(cmd);
+			cmd = MString("setAttr \"" + nameSp + ":TRIANGLES_0.scaleY\" 0.02");
+			MGlobal::executeCommand(cmd);
+			cmd = MString("setAttr \"" + nameSp + ":TRIANGLES_0.scaleZ\" 0.02");
+			MGlobal::executeCommand(cmd);
+		}
+		return MStatus::kSuccess;
+	}
 	// This command takes the selected mesh node, and conects its output to
 	// a new shape interpolation node, then creates a new mesh node whose 
 	// input is the output of the interpolation node
@@ -42,8 +69,7 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 	// Iterate over all the mesh nodes
 	iter.setFilter(MFn::kMesh);
-	for (iter.reset(); !iter.isDone(); iter.next())
-	{
+	for (iter.reset(); !iter.isDone(); iter.next()) {
 		MDagPath geomShapePath;
 		iter.getDagPath(geomShapePath);
 
@@ -53,21 +79,18 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 
 		MFnDagNode geomShapeFn(geomShapePath);
 
-		if (geomShapeFn.name().indexW("source") != -1){
+		if (geomShapeFn.name().indexW("source") != -1) {
 			sourceShapePath = geomShapePath;
 			count++;
-		}
-		else if (geomShapeFn.name().indexW("target") != -1){
+		} else if (geomShapeFn.name().indexW("target") != -1) {
 			targetShapePath = geomShapePath;
 			count++;
-		}
-		else if (count == 2){
+		} else if (count == 2) {
 			break;
 		}
 	}
 
-	if (count < 2)
-	{
+	if (count < 2) {
 		MGlobal::displayError("\nSelect source and target shape.");
 		return MS::kFailure;
 	}
@@ -84,35 +107,34 @@ MStatus ShapeIntrpltCmd::doIt(const MArgList &args)
 	MTime endTime = MAnimControl::maxTime();
 
 	MString cmd;
-	cmd = MString("setKeyframe -at interpolateValue -t ") + startTime.value() + " -v " + 0.0 + " " + newNodeName;
+	cmd = MString("setKeyframe -at interpolateValue -t ") + startTime.value()
+			+ " -v " + 0.0 + " " + newNodeName;
 	dgMod.commandToExecute(cmd);
 
-	cmd = MString("setKeyframe -at interpolateValue -t ") + endTime.value() + " -v " + 1.0 + " " + newNodeName;
+	cmd = MString("setKeyframe -at interpolateValue -t ") + endTime.value()
+			+ " -v " + 1.0 + " " + newNodeName;
 	dgMod.commandToExecute(cmd);
 
 	return redoIt();
 }
 
-MStatus ShapeIntrpltCmd::undoIt()
-{
+MStatus ShapeIntrpltCmd::undoIt() {
 	MStatus status;
 	status = dgMod.undoIt();
 
-	if (status == MS::kSuccess && doMeshUndo)
-	{
+	if (status == MS::kSuccess && doMeshUndo) {
 		status = MGlobal::deleteNode(newMesh);
 		doMeshUndo = false;
 	}
 	return status;
 }
 
-MStatus ShapeIntrpltCmd::redoIt()
-{
+MStatus ShapeIntrpltCmd::redoIt() {
 	return dgMod.doIt();
 }
 
-void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn, MDagPath &sourceShapePath,
-	MDagPath &targetShapePath){
+void ShapeIntrpltCmd::duplicateMesh(MFnSet &shadingGroupFn,
+		MDagPath &sourceShapePath, MDagPath &targetShapePath) {
 
 	MFnDagNode sourceShapeFn(sourceShapePath);
 
