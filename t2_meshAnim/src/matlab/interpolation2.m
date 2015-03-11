@@ -239,13 +239,15 @@ for t = 0:0.1:1
         k = k + 1;
     end
     
+    x = [v1x, v1y, v1z; x];
+    
     fprintf('Displaying t = %f',t);
     % Plot.
     figure(1);
     hold on;
-    trisurf(T, p(2:end, 1), p(2:end,2), p(2:end,3), ones(1,size(p,1)-1));
-    trisurf(T, q(2:end, 1), q(2:end,2), q(2:end,3), ones(1,size(q,1)-1)+1);
-    trisurf(T, x(:, 1), x(:,2), x(:,3), ones(1,size(x,1))+2);
+    trisurf(T(2:end,:), p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
+    trisurf(T(2:end,:), q(:, 1), q(:,2), q(:,3), ones(1,size(p,1))+1);
+    trisurf(T(2:end,:), x(:, 1), x(:,2), x(:,3), ones(1,size(x,1))+2);
     view(90,1);
     pause('on');
     pause;
