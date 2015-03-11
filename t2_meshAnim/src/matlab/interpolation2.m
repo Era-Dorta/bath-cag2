@@ -28,7 +28,7 @@
 clearvars -except sourceShapeObj targetShapeObj;
 close all; clc;
 
-save_path = '~/workspaces/matlab/cag2/data/interpolated_t_';
+save_path = '~/workspaces/matlab/cag2/data/interpolateResult/interpolated_t_';
 
 if ~(exist('sourceShapeObj', 'var') && exist('targetShapeObj', 'var'))
     sourceShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_source.obj');
