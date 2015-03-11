@@ -1,29 +1,3 @@
-% syms p1x p1y p1z p2x p2y p2z p3x p3y p3z
-% syms v1x v1y v1z v2x v2y v2z v3x v3y v3z
-% P = [p1x, p1y, p1z, 0, 0, 0, 0, 0, 0, 1, 0 ,0;
-%     0,0,0, p1x, p1y, p1z, 0, 0, 0, 0, 1 ,0;
-%     0,0,0, 0,0 0, p1x, p1y, p1z, 0, 0 ,1;
-%     p2x, p2y, p2z, 0, 0, 0, 0, 0, 0, 1, 0 ,0;
-%     0,0,0, p2x, p2y, p2z, 0, 0, 0, 0, 1 ,0;
-%     0,0,0, 0,0 0, p2x, p2y, p2z, 0, 0 ,1;
-%     p3x, p3y, p3z, 0, 0, 0, 0, 0, 0, 1, 0 ,0;
-%     0,0,0, p3x, p3y, p3z, 0, 0, 0, 0, 1 ,0;
-%     0,0,0, 0,0 0, p3x, p3y, p3z, 0, 0 ,1]
-% V = [v1x; v1y; v1z; v2x; v2y; v2z ; v3x; v3x; v3z];
-%
-% Bfull = inv(P)*V;
-%
-% B = [Bfull(1), Bfull(2); Bfull(3), Bfull(4)];
-%
-% syms alpha1 alpha2 alpha3 beta1 beta2 beta3 gamma1 gamma2 gamma3 mu1 mu2 mu3 nu1 nu2 nu3 phi1 phi2 phi3
-% Bsimple = [alpha1*v1x + gamma1*v2x + nu1*v3x, alpha2*v1x + gamma2*v2x + nu2*v3x;
-%     beta1*v1y + mu1*v2y + phi1*v3y, beta2*v1y + mu2*v2y + phi2*v3y];
-%
-% syms a1 a2 a3 a4
-%
-% A = [a1, a2; a3, a4];
-%
-% E = norm(A-Bsimple, 'fro')^2;
 %% As-rigid-as possible shape interpolation.
 clearvars -except sourceShapeObj targetShapeObj;
 close all; clc;
@@ -35,12 +9,12 @@ if ~(exist('sourceShapeObj', 'var') && exist('targetShapeObj', 'var'))
     targetShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_target.obj');
 end
 
-T = sourceShapeObj.objects(1, 5).data.vertices;
+T = sourceShapeObj.objects(1,5).data.vertices;
 p = sourceShapeObj.vertices;
 q = targetShapeObj.vertices;
 
-extraP = (p(T(1,:)) + p(T(2,:)) + p(T(3,:))) / 3;
-extraQ = (q(T(1,:)) + q(T(2,:)) + q(T(3,:))) / 3;
+extraP = (p(T(1,1),:) + p(T(1,2),:) + p(T(1,3),:)) / 3;
+extraQ = (q(T(1,1),:) + q(T(1,2),:) + q(T(1,3),:)) / 3;
 p = [extraP; p];
 q = [extraQ; q];
 
@@ -49,7 +23,7 @@ T = [1, T(1,1), T(1,2); T];
 
 
 %% Compute invariant matrix H
-
+disp('Building H')
 % Compute for first triangle
 Rgamma = cell(size(T,1),1);
 S = cell(size(T,1),1);
