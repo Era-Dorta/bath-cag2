@@ -185,6 +185,8 @@ end
 
 disp('Built H for all triangles');
 
+x = zeros(size(p,1)-1, 3);
+
 %% Main loop.
 for t = 0:0.1:1
     disp('Computing next frame');
@@ -231,17 +233,17 @@ for t = 0:0.1:1
     u = - H \ G;
     
     disp('Reshaping u');
-    x = zeros(size(p,1)-1, 3);
+    
     % Deshape the solution for plotting.
-    k = 1;
+    x(1,:) = [v1x, v1y, v1z];
+    
+    k = 2;
     for j = 1:3:size(u,1)
         x(k,:) = [u(j),u(j+1),u(j+2)];
         k = k + 1;
     end
     
-    x = [v1x, v1y, v1z; x];
-    
-    fprintf('Displaying t = %f',t);
+    fprintf('Displaying t = %f\n',t);
     % Plot.
     figure(1);
     hold on;
