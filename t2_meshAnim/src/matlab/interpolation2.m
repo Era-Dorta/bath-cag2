@@ -187,7 +187,7 @@ disp('Built H for all triangles');
 
 %% Main loop.
 for t = 0:0.1:1
-    
+    disp('Computing next frame');
     v1x = (1-t)*p(1,1) + t*q(1,1);
     v1y = (1-t)*p(1,2) + t*q(1,2);
     v1z = (1-t)*p(1,3) + t*q(1,3);
@@ -201,7 +201,8 @@ for t = 0:0.1:1
     G(4) = -dot(A(1,:), bt{1}(1:3, 3)) + dot(bt{1}(1:3,1)*v1x, bt{1}(1:3, 3));
     G(5) = -dot(A(2,:), bt{1}(4:6, 3)) + dot(bt{1}(4:6,1)*v1y, bt{1}(4:6, 3));
     G(6) = -dot(A(3,:), bt{1}(7:9, 3)) + dot(bt{1}(7:9,1)*v1z, bt{1}(7:9, 3));
-    
+
+    disp('Building G');
     for i = 2: size(T,1)
         vertex1 = T(i,1);
         vertex2 = T(i,2);
@@ -225,23 +226,26 @@ for t = 0:0.1:1
         G(vh3+2) = G(vh3+2) -dot(A(3,:), bt{i}(7:9, 3));
     end
     
-    
+    disp('Solving u');
     % Solve the system
     u = - H \ G;
     
+    disp('Reshaping u');
+    ureshape = zeros(size(p,1)-1, 3);
     % Deshape the solution for plotting.
     for j = 1:3:size(u,1)
         ureshape(j/3+2/3,:) = [u(j),u(j+1),u(j+2)];
     end
-    x = [v1x, v1y, v1z; ureshape]
+    x = [v1x, v1y, v1z; ureshape];
     
+    fprintf('Displaying t = %f',t);
     % Plot.
     figure(1);
     hold on;
     trisurf(T, p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
     trisurf(T, q(:, 1), q(:,2), q(:,3), ones(1,size(p,1))+1);
     trisurf(T, x(:, 1), x(:,2), x(:,3), ones(1,size(p,1))+2);
-    view(15,35);
+    view(90,1);
     pause('on');
     pause;
     clf(figure(1));
