@@ -28,6 +28,8 @@
 clearvars -except sourceShapeObj targetShapeObj;
 close all; clc;
 
+save_path = '~/workspaces/matlab/cag2/data/interpolated_t_';
+
 if ~(exist('sourceShapeObj', 'var') && exist('targetShapeObj', 'var'))
     sourceShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_source.obj');
     targetShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_target.obj');
@@ -230,7 +232,7 @@ for t = 0:0.1:1
     
     disp('Solving u');
     % Solve the system
-    u = - H \ G;
+    u = - sparse(H) \ G;
     
     disp('Reshaping u');
     
@@ -240,8 +242,11 @@ for t = 0:0.1:1
     k = 2;
     for j = 1:3:size(u,1)
         x(k,:) = [u(j),u(j+1),u(j+2)];
+        sourceShapeObj.vertices(k-1,:) = [u(j),u(j+1),u(j+2)];
         k = k + 1;
     end
+    
+    write_wobj(sourceShapeObj, strcat(save_path, num2str(t), '.obj'));
     
     fprintf('Displaying t = %f\n',t);
     % Plot.
