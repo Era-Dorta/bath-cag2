@@ -77,7 +77,7 @@ inP{1} = Ptr\eye(size(Ptr));
 % Save only the A values of the inverse
 inP{1} = inP{1}(1:9, 1:9);
 
-Afulltr = Ptr \ Qtr;
+Afulltr = inP{1} * Qtr;
 Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
 
 % Decompose A for interpolation.
@@ -124,17 +124,17 @@ for i = 2: size(T,1)
     
     Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:)]';
     
-    Afulltr = Ptr \ Qtr;
+    % inP{i} = inv(Ptr);
+    inP{i} = Ptr\eye(size(Ptr));
+    inP{i} = inP{i}(1:9, 1:9); 
+    
+    Afulltr = inP{i} * Qtr;
     Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
     
     % Decompose A for interpolation.
     [U, D, V] = svd(Atr);
     Rgamma{i} = U*V';
     S{i} = V*D*V';
-    
-    % inP{i} = inv(Ptr);
-    inP{i} = Ptr\eye(size(Ptr));
-    inP{i} = inP{i}(1:9, 1:9);
     
     bt(1:3, :) = [inP{i}(1:3,1), inP{i}(1:3,4), inP{i}(1:3,7)];
     bt(4:6, :) = [inP{i}(4:6,2), inP{i}(4:6,5), inP{i}(4:6,8)];
