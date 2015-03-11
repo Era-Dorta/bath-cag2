@@ -25,29 +25,26 @@
 %
 % E = norm(A-Bsimple, 'fro')^2;
 %% As-rigid-as possible shape interpolation.
-clear all;
-close all;
+clearvars -except sourceShapeObj targetShapeObj;
+close all; clc;
 
-% Comment all unused points.
-p = [0,0; 0,2; 2,0; 2,2; 4,0; 0,4; 4,2; 2,4; 4,4];
-q = [0,0; 0,2; 2,0; 2,2; 5,0; 0,4; 5,2; 1,4; 4,5];
-%q = [0,0; 0,4; 4,0; 4,3; 5,1; 0,5; 4,2; 2,4; 5,5];
-p(:,3) = 0;
-p(1,3) = 0.5;
-p(2,3) = -0.5;
-p(3,3) = -0.5;
-p(4,3) = 0.25;
-q(:,3) = 1;
+if ~(exist('sourceShapeObj', 'var') && exist('targetShapeObj', 'var'))
+    sourceShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_source.obj');
+    targetShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_target.obj');
+end
 
-%p = [0,0,1; 2,0,1; 0,2,1; 3,0,1];
-% q = [0,0,1; 2,0,1; 0,2,2; 5,0,1];
-%q = bsxfun(@plus, p, [6, 0, 0]);
+T = sourceShapeObj.objects(1, 5).data.vertices;
+p = sourceShapeObj.vertices;
+q = targetShapeObj.vertices;
 
-% Define triangles.
-% T = [1, 2, 3; 2, 3, 4; 3, 4, 5];%; 4, 5, 7; 2, 4, 6; 4, 6, 8; 7, 8, 9];
-T = [1, 2, 3; 2, 4, 3; 3, 4, 5; 6, 8, 4; 4, 7, 5; 2, 6, 4; 6, 8, 4; 8, 9, 7];
+extraP = (p(T(1,:)) + p(T(2,:)) + p(T(3,:))) / 3;
+extraQ = (q(T(1,:)) + q(T(2,:)) + q(T(3,:))) / 3;
+p = [extraP; p];
+q = [extraQ; q];
 
-%T = [1, 2, 3; 2, 3, 4];
+T = T + 1;
+T = [1, T(1,1), T(1,2); T];
+
 
 %% Compute invariant matrix H
 
