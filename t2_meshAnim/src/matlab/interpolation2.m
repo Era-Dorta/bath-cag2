@@ -5,22 +5,38 @@ close all; clc;
 save_path = '~/workspaces/matlab/cag2/data/interpolateResult/interpolated_t_';
 
 if ~(exist('sourceShapeObj', 'var') && exist('targetShapeObj', 'var'))
-    sourceShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_source.obj');
-    targetShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_target.obj');
+    sourceShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_source3.obj');
+    targetShapeObj = read_wobj('~/workspaces/matlab/cag2/data/horse_source3.obj');
+    toSaveObj = sourceShapeObj;
 end
 
 T = sourceShapeObj.objects(1,5).data.vertices;
 p = sourceShapeObj.vertices;
+pn = sourceShapeObj.vertices_normal;
 q = targetShapeObj.vertices;
+qn = sourceShapeObj.vertices_normal;
 
 extraP = (p(T(1,1),:) + p(T(1,2),:) + p(T(1,3),:)) / 3;
 extraQ = (q(T(1,1),:) + q(T(1,2),:) + q(T(1,3),:)) / 3;
 p = [extraP; p];
 q = [extraQ; q];
 
+p21 = p(1,:) - p(T(1,2),:);
+p21 = p21 / norm(p21);
+p31 = p(1,:) - p(T(1,3),:);
+p31 = p31 / norm(p31);
+pcross = cross(p21, p31);
+pn = [pn; pcross];
+
+p21 = q(1,:) - q(T(1,2),:);
+p21 = p21 / norm(p21);
+p31 = q(1,:) - q(T(1,3),:);
+p31 = p31 / norm(p31);
+pcross = cross(p21, p31);
+qn = [qn; pcross];
+
 T = T + 1;
 T = [1, T(1,1), T(1,2); T];
-
 
 %% Compute invariant matrix H
 disp('Building H')
@@ -31,6 +47,17 @@ bt = cell(size(T,1),1);
 
 % First triangle. Ap + l = q.
 zero3 = [0,0,0];
+
+vCentr = (p(1,:) + p(2,:) + p(3,:)) / 3;
+v12 = p(2,:) - p(1,:);
+v13 = p(3,:) - p(1,:);
+v23 = p(3,:) - p(2,:);
+avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
+
+vNormal = pn(1,:);
+%vNormal = vNormal / norm(vNormal);
+pnew = vCentr + vNormal * avgL;
+
 Ptr = [p(1,:), zero3, zero3, 1 0 0;
     zero3, p(1,:), zero3, 0 1 0;
     zero3, zero3, p(1,:), 0 0 1;
@@ -39,18 +66,32 @@ Ptr = [p(1,:), zero3, zero3, 1 0 0;
     zero3, zero3, p(2,:), 0 0 1;
     p(3,:), zero3, zero3, 1 0 0;
     zero3, p(3,:), zero3, 0 1 0;
-    zero3, zero3, p(3,:), 0 0 1];
+    zero3, zero3, p(3,:), 0 0 1;
+    pnew, zero3, zero3, 1 0 0;
+    zero3, pnew, zero3, 0 1 0;
+    zero3, zero3, pnew, 0 0 1];
 
-Qtr = [q(1,:), q(2,:), q(3,:)]';
+vCentr = (q(1,:) + q(2,:) + q(3,:)) / 3;
+v12 = q(2,:) - q(1,:);
+v13 = q(3,:) - q(1,:);
+v23 = q(3,:) - q(2,:);
+avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
+
+vNormal = qn(1,:);
+pnew = vCentr + vNormal*avgL;
+
+Qtr = [q(1,:), q(2,:), q(3,:), pnew]';
 
 % A and l.
 % Doing the inverse like this yields the same result for AFulltr if we do
 % inP{1} * Qtr
-inP = Ptr\eye(size(Ptr));
+%inP = Ptr\eye(size(Ptr));
 % Save only the A values of the inverse
-inP = inP(1:9, 1:9);
+inP = inv(Ptr);
 
-Afulltr = inP * Qtr;
+Afulltr = Ptr \ Qtr;
+
+inP = inP(1:9, 1:9);
 Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
 
 % Decompose A for interpolation.
@@ -85,6 +126,16 @@ for i = 2: size(T,1)
     vertex2 = T(i,2);
     vertex3 = T(i,3);
     
+    vCentr = (p(vertex1,:) + p(vertex2,:) + p(vertex3,:)) / 3;
+    v12 = p(vertex2,:) - p(vertex1,:);
+    v13 = p(vertex3,:) - p(vertex1,:);
+    v23 = p(vertex3,:) - p(vertex2,:);
+    avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
+
+    vNormal = pn(i,:);
+    
+    pnew = vCentr + vNormal*avgL;
+    
     Ptr = [p(vertex1,:), zero3, zero3, 1 0 0;
         zero3, p(vertex1,:), zero3, 0 1 0;
         zero3, zero3, p(vertex1,:), 0 0 1;
@@ -93,15 +144,29 @@ for i = 2: size(T,1)
         zero3, zero3, p(vertex2,:), 0 0 1;
         p(vertex3,:), zero3, zero3, 1 0 0;
         zero3, p(vertex3,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex3,:), 0 0 1];
+        zero3, zero3, p(vertex3,:), 0 0 1;
+        pnew, zero3, zero3, 1 0 0;
+        zero3, pnew, zero3, 0 1 0;
+        zero3, zero3, pnew, 0 0 1];
     
-    Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:)]';
+    vCentr = (q(vertex1,:) + q(vertex2,:) + q(vertex3,:)) / 3;
+    v12 = q(vertex2,:) - q(vertex1,:);
+    v13 = q(vertex3,:) - q(vertex1,:);
+    v23 = q(vertex3,:) - q(vertex2,:);
+    avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
+
+    vNormal = qn(i,:);
+    pnew = vCentr + vNormal*avgL;
     
-    % inP = inv(Ptr);
-    inP = Ptr\eye(size(Ptr));
+    Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:), pnew]';
+    
+    inP = inv(Ptr);
+    %inP = Ptr\eye(size(Ptr));
+    
+    Afulltr = Ptr \ Qtr;
+    
     inP = inP(1:9, 1:9);
     
-    Afulltr = inP * Qtr;
     Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
     
     % Decompose A for interpolation.
@@ -216,23 +281,30 @@ for t = 0:0.1:1
     k = 2;
     for j = 1:3:size(u,1)
         x(k,:) = [u(j),u(j+1),u(j+2)];
-        sourceShapeObj.vertices(k-1,:) = [u(j),u(j+1),u(j+2)];
+        %toSaveObj.vertices(k-1,:) = x(k,:);
         k = k + 1;
     end
     
-    write_wobj(sourceShapeObj, strcat(save_path, num2str(t), '.obj'));
+    %write_wobj(toSaveObj, strcat(save_path, num2str(t), '.obj'));
     
     fprintf('Displaying t = %f\n',t);
     % Plot.
     figure(1);
     hold on;
-    trisurf(T(2:end,:), p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
-    trisurf(T(2:end,:), q(:, 1), q(:,2), q(:,3), ones(1,size(p,1))+1);
-    trisurf(T(2:end,:), x(:, 1), x(:,2), x(:,3), ones(1,size(x,1))+2);
-    view(90,1);
+    trisurf(T, p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
+    scatter3(pn(:, 1), pn(:,2), pn(:,3), ones(1,size(p,1)) + 1);
+    %trisurf(T, q(:, 1) + 60, q(:,2), q(:,3), ones(1,size(p,1))+1);
+    %trisurf(T, x(:, 1) + 30, x(:,2), x(:,3), ones(1,size(x,1))+2);
+    view(33,23);
     pause('on');
     pause;
     clf(figure(1));
 end
-close(figure(1));
+
+figure(1);
+hold on;
+trisurf(T(2:end,:), p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
+trisurf(T(2:end,:), q(:, 1) + 60, q(:,2), q(:,3), ones(1,size(p,1))+1);
+trisurf(T(2:end,:), x(:, 1) + 30, x(:,2), x(:,3), ones(1,size(x,1))+2);
+view(33,23);
 disp('done');
