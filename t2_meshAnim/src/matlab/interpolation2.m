@@ -31,22 +31,27 @@ bt = cell(size(T,1),1);
 
 % First triangle. Ap + l = q.
 zero3 = [0,0,0];
-Ptr = [p(1,:), zero3, zero3, 1 0 0;
-    zero3, p(1,:), zero3, 0 1 0;
-    zero3, zero3, p(1,:), 0 0 1;
-    p(2,:), zero3, zero3, 1 0 0;
-    zero3, p(2,:), zero3, 0 1 0;
-    zero3, zero3, p(2,:), 0 0 1;
-    p(3,:), zero3, zero3, 1 0 0;
-    zero3, p(3,:), zero3, 0 1 0;
-    zero3, zero3, p(3,:), 0 0 1];
 
-Qtr = [q(1,:), q(2,:), q(3,:)]';
+pCentr = (p(1,:) + p(2,:) + p(3,:)) / 3;
+qCentr = (q(1,:) + q(2,:) + q(3,:)) / 3;
+
+Ptr = [p(1,:)-pCentr, zero3, zero3, 1, 0, 0;
+    zero3, p(1,:)-pCentr, zero3, 0 1 0;
+    zero3, zero3, p(1,:)-pCentr, 0 0 1;
+    p(2,:)-pCentr, zero3, zero3, 1, 0, 0;
+    zero3, p(2,:)-pCentr, zero3, 0 1 0;
+    zero3, zero3, p(2,:)-pCentr, 0 0 1;
+    p(3,:)-pCentr, zero3, zero3, 1, 0, 0;
+    zero3, p(3,:)-pCentr, zero3, 0 1 0;
+    zero3, zero3, p(3,:)-pCentr, 0 0 1];
+
+Qtr = [q(1,:)-qCentr, q(2,:)-qCentr, q(3,:)-qCentr]';
 
 % A and l.
 % Doing the inverse like this yields the same result for AFulltr if we do
 % inP{1} * Qtr
 inP = Ptr\eye(size(Ptr));
+%inP = inv(Ptr);
 % Save only the A values of the inverse
 inP = inP(1:9, 1:9);
 
@@ -85,20 +90,24 @@ for i = 2: size(T,1)
     vertex2 = T(i,2);
     vertex3 = T(i,3);
     
-    Ptr = [p(vertex1,:), zero3, zero3, 1 0 0;
-        zero3, p(vertex1,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex1,:), 0 0 1;
-        p(vertex2,:), zero3, zero3, 1 0 0;
-        zero3, p(vertex2,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex2,:), 0 0 1;
-        p(vertex3,:), zero3, zero3, 1 0 0;
-        zero3, p(vertex3,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex3,:), 0 0 1];
+    pCentr = (p(vertex1,:) + p(vertex2,:) + p(vertex3,:)) / 3;
+    qCentr = (q(vertex1,:) + q(vertex2,:) + q(vertex3,:)) / 3;
     
-    Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:)]';
+    Ptr = [p(vertex1,:)-pCentr, zero3, zero3, 1 0 0;
+        zero3, p(vertex1,:)-pCentr, zero3, 0 1 0;
+        zero3, zero3, p(vertex1,:)-pCentr, 0 0 1;
+        p(vertex2,:)-pCentr, zero3, zero3, 1 0 0;
+        zero3, p(vertex2,:)-pCentr, zero3, 0 1 0;
+        zero3, zero3, p(vertex2,:)-pCentr, 0 0 1;
+        p(vertex3,:)-pCentr, zero3, zero3, 1 0 0;
+        zero3, p(vertex3,:)-pCentr, zero3, 0 1 0;
+        zero3, zero3, p(vertex3,:)-pCentr, 0 0 1];
     
-    % inP = inv(Ptr);
+    Qtr = [q(vertex1,:)-qCentr, q(vertex2,:)-qCentr, q(vertex3,:)-qCentr]';
+    
     inP = Ptr\eye(size(Ptr));
+    %inP = inv(Ptr);
+    % Save only the A values of the inverse
     inP = inP(1:9, 1:9);
     
     Afulltr = inP * Qtr;
@@ -164,11 +173,15 @@ disp('Built H for all triangles');
 x = zeros(size(p,1)-1, 3);
 
 %% Main loop.
+
+pCentr = (p(1,:) + p(2,:) + p(3,:)) / 3;
+qCentr = (q(1,:) + q(2,:) + q(3,:)) / 3;
+
 for t = 0:0.1:1
     disp('Computing next frame');
-    v1x = (1-t)*p(1,1) + t*q(1,1);
-    v1y = (1-t)*p(1,2) + t*q(1,2);
-    v1z = (1-t)*p(1,3) + t*q(1,3);
+    v1x = (1-t)*(p(1,1)-pCentr(1,1)) + t*(q(1,1)-qCentr(1,1));
+    v1y = (1-t)*(p(1,2)-pCentr(1,1)) + t*(q(1,2)-qCentr(1,2));
+    v1z = (1-t)*(p(1,3)-pCentr(1,1)) + t*(q(1,3)-qCentr(1,3));
     
     A = ((1-t)*eye(3) + t*Rgamma{1}) * ((1-t)*eye(3) + t*S{1});
     
@@ -216,11 +229,11 @@ for t = 0:0.1:1
     k = 2;
     for j = 1:3:size(u,1)
         x(k,:) = [u(j),u(j+1),u(j+2)];
-        sourceShapeObj.vertices(k-1,:) = [u(j),u(j+1),u(j+2)];
+        targetShapeObj.vertices(k-1,:) = x(k,:);
         k = k + 1;
     end
     
-    write_wobj(sourceShapeObj, strcat(save_path, num2str(t), '.obj'));
+    write_wobj(targetShapeObj, strcat(save_path, num2str(t), '.obj'));
     
     fprintf('Displaying t = %f\n',t);
     % Plot.
