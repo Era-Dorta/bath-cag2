@@ -25,23 +25,14 @@ We present two approaches to solve the mesh morphing problem.
 \subsection{Linear interpolation}
 
 Linear interpolation is a simple and intuitive first approach.
-The new position of a vertex $\mathbf{v_{it}} = \left[ v_{ix}, v_{iy}, v_{iz}\right]' $ in an interval $t = \lbrace 0, \ldots, 1 \rbrace$ is given by
+The new position of a vertex $\mathbf{v_{it}} = \left[ v_{ix}, v_{iy}, v_{iz}\right]^T $ in an interval $t = \lbrace 0, \ldots, 1 \rbrace$ is given by
 
 \begin{equation*}
 \mathbf{v_{it}} = (1 - t) \mathbf{p_i} + t \mathbf{q_i} \quad i \in \lbrace 1, \ldots, n \rbrace,
 \end{equation*}
 
-where $n$ is the number of vertices, $\mathbf{p_i} = \left[ p_x, p_y, p_z\right]'$ and $\mathbf{q_i} = \left[ q_x, q_y, q_z\right]'$ are the corresponding vertices in the source and target meshes respectively.
+where $n$ is the number of vertices, $\mathbf{p_i} = \left[ p_x, p_y, p_z\right]^T$ and $\mathbf{q_i} = \left[ q_x, q_y, q_z\right]^T$ are the corresponding vertices in the source and target meshes respectively.
 Some meshes generated with this method are shown in Figure \ref{fig:linearInterpolation}.
-
-\begin{figure}
-\subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1}}
-\subfloat[fig 4]{\includegraphics[width = 3in]{images/linearInterpolation2}}\\
-\subfloat[fig 1]{\includegraphics[width = 1.8in]{images/armadillo2}}
-\subfloat[fig 2]{\includegraphics[width = 3.3in]{images/armadillo1}} 
-\caption{Horse and armadillo meshes, morphed mesh is in the middle.}
-\label{fig:linearInterpolation}
-\end{figure}
 
 \subsection{As rigid as possible interpolation}
 
@@ -64,8 +55,84 @@ A \mathbf{p_i} + \mathbf{l} = \begin{pmatrix}
  l_x \\ 
  l_y \\ 
  l_z
-\end{pmatrix} = \mathbf{q_i},
+\end{pmatrix} = \mathbf{q_i}.
 \end{align*}
+
+We have a matrix $A_{s}$ for each triangle.
+Since in a general mesh vertices a shared among different triangles, lets define $B_{j}$ as the actual transformation matrix, where:
+
+\begin{equation*}
+E(t) = \sum_{s}^S \left \| A_s(t) - B_s(t) \right \|^2_F,
+\end{equation*}
+
+where $\left \| \cdot \right \|_F$ is the matrix Frobenius norm, and the objective is to minimize $E(t)$.
+If we ignore the $l$ term and rearrange $B$ such that:
+
+\begin{equation*}
+PB_{col} = 
+\begin{pmatrix}
+ \mathbf{p}_i^T & \mathbf{0} & \mathbf{0} \\ 
+ \mathbf{0} & \mathbf{p}_i^T & \mathbf{0}\\ 
+ \mathbf{0} & \mathbf{0} & \mathbf{p}_i^T \\
+  \mathbf{p}_j^T & \mathbf{0} & \mathbf{0} \\ 
+ \mathbf{0} & \mathbf{p}_j^T & \mathbf{0}\\ 
+ \mathbf{0} & \mathbf{0} & \mathbf{p}_j^T \\
+  \mathbf{p}_k^T & \mathbf{0} & \mathbf{0} \\ 
+ \mathbf{0} & \mathbf{p}_k^T & \mathbf{0}\\ 
+ \mathbf{0} & \mathbf{0} & \mathbf{p}_k^T 
+\end{pmatrix}
+\begin{pmatrix}
+b_{11} \\
+b_{12} \\
+b_{13} \\
+b_{21} \\
+b_{22} \\
+b_{23} \\
+b_{31} \\
+b_{32} \\
+b_{33}
+\end{pmatrix} =
+\begin{pmatrix} 
+\mathbf{q}_{ix} \\
+\mathbf{q}_{iy} \\
+\mathbf{q}_{iz} \\
+\mathbf{q}_{jx} \\
+\mathbf{q}_{jy} \\
+\mathbf{q}_{jz} \\
+\mathbf{q}_{kx} \\
+\mathbf{q}_{ky} \\
+\mathbf{q}_{kz}
+\end{pmatrix} ~
+\text{and} ~
+P^{-1} = 
+\begin{pmatrix}
+\alpha_1 & 0 & 0 & \delta_1 & 0 & 0 & \lambda_1 & 0 & 0 \\
+\alpha_2 & 0 & 0 & \delta_2 & 0 & 0 & \lambda_2 & 0 & 0 \\
+\alpha_3 & 0 & 0 & \delta_3 & 0 & 0 & \lambda_3 & 0 & 0 \\
+0 & \beta_1 & 0 & 0 & \epsilon_1 & 0 & 0 & \mu_1 & 0 \\
+0 & \beta_2 & 0 & 0 & \epsilon_2 & 0 & 0 & \mu_2 & 0 \\
+0 & \beta_3 & 0 & 0 & \epsilon_3 & 0 & 0 & \mu_3 & 0 \\
+0 & 0 & \gamma_1 & 0 & 0 & \kappa_1 & 0 & 0 & \pi_1 \\
+0 & 0 & \gamma_2 & 0 & 0 & \kappa_2 & 0 & 0 & \pi_2  \\
+0 & 0 & \gamma_3 & 0 & 0 & \kappa_3 & 0 & 0 & \pi_3
+\end{pmatrix},
+\end{equation*}
+
+then we have that $B = P^{-1}Q$.
+Writing out the Frobenius terms in $E(t)$ in and expressing $B$ as a linear combination of $P^{-1}Q$, we get:
+
+\begin{equation*}
+\mathbf{v_{it}} = (1 - t) \mathbf{p_i} + t \mathbf{q_i} \quad i \in \lbrace 1, \ldots, n \rbrace,
+\end{equation*}
+
+\begin{figure}
+\subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1}}
+\subfloat[fig 4]{\includegraphics[width = 3in]{images/linearInterpolation2}}\\
+\subfloat[fig 1]{\includegraphics[width = 1.8in]{images/armadillo2}}
+\subfloat[fig 2]{\includegraphics[width = 3.3in]{images/armadillo1}} 
+\caption{Horse and armadillo meshes, morphed mesh is in the middle.}
+\label{fig:linearInterpolation}
+\end{figure}
 
 \end{document}
 
