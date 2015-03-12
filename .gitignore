@@ -1,7 +1,15 @@
 *~
 
+# Visual Studio
 *.aps
 *.rc
 *.vcxproj
 *.filters
 x64/
+
+# Latex
+*.aux
+*.log
+*.blg
+*.synctex.gz
+*.bbl
