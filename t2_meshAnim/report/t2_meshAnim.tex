@@ -37,7 +37,7 @@ Some meshes generated with this method are shown in Figure \ref{fig:linearInterp
 \subsection{As rigid as possible interpolation}
 
 The previous method produces distorted meshes due to its non-rigid nature.
-One way to produce more better results is to use a transform-based technique.
+One way to produce better results is to use a transform-based technique.
 Lets define an affine transformation from $\mathbf{p_i}$ to $\mathbf{q_i}$ such that:
 
 \begin{align*}
@@ -58,15 +58,16 @@ A \mathbf{p_i} + \mathbf{l} = \begin{pmatrix}
 \end{pmatrix} = \mathbf{q_i}.
 \end{align*}
 
-We have a matrix $A_{s}$ for each triangle.
-Since in a general mesh vertices a shared among different triangles, lets define $B_{j}$ as the actual transformation matrix, where:
+We have a matrix $A_{s}$ for each triangle, since there are 12 unknowns and each triangle only gives 9 equations, we add a extra point to be able to compute $A_i$.
+This new point is computed as $\mathbf{p_{new}} = \mathbf{c_{tr}} + w\mathbf{n_{tr}}$, where $\mathbf{c_{tr}}$ is the triangle centroid, $w$ is the average triangle edge length and $\mathbf{n_{tr}}$ is the triangle normal. 
+Since in a general mesh vertices a shared among different triangles, lets define $B_{j}$ as the actual transformation matrix, where
 
 \begin{equation*}
 E(t) = \sum_{s}^S \left \| A_s(t) - B_s(t) \right \|^2_F,
 \end{equation*}
 
 where $\left \| \cdot \right \|_F$ is the matrix Frobenius norm, and the objective is to minimize $E(t)$.
-If we ignore the $l$ term and rearrange $B$ such that:
+If we ignore the $l$ term, rename $\mathbf{q_i}$ to treat each vertex in individual vertex in the mesh as $\mathbf{v}_i$ the mesh, and rearrange $B$ such that
 
 \begin{equation*}
 PB_{col} = 
@@ -93,15 +94,15 @@ b_{32} \\
 b_{33}
 \end{pmatrix} =
 \begin{pmatrix} 
-\mathbf{q}_{ix} \\
-\mathbf{q}_{iy} \\
-\mathbf{q}_{iz} \\
-\mathbf{q}_{jx} \\
-\mathbf{q}_{jy} \\
-\mathbf{q}_{jz} \\
-\mathbf{q}_{kx} \\
-\mathbf{q}_{ky} \\
-\mathbf{q}_{kz}
+v_{ix} \\
+v_{iy} \\
+v_{iz} \\
+v_{jx} \\
+v_{jy} \\
+v_{jz} \\
+v_{kx} \\
+v_{ky} \\
+v_{kz}
 \end{pmatrix} ~
 \text{and} ~
 P^{-1} = 
@@ -118,15 +119,29 @@ P^{-1} =
 \end{pmatrix},
 \end{equation*}
 
-then we have that $B = P^{-1}Q$.
-Writing out the Frobenius terms in $E(t)$ in and expressing $B$ as a linear combination of $P^{-1}Q$, we get:
+then we have that $B = P^{-1}V$.
+We would have the above system for each triangle in the mesh, with its own $P$ and $B$ matrices.  
+Writing explicitly the Frobenius terms in $E(t)$, and expressing $B$ as a linear combination of $\mathbf{v}_i$, we get
 
 \begin{align*}
-E(t) &= \lbrace a_{11}^2 + a_{12}^2 + \ldots + a_{33}^2 + \boldsymbol{\alpha}^2 v_{1x}^2 + \ldots + \boldsymbol{\pi}^2 v_{3z}^2 - 2 a_{11} \alpha_1 v_{1x} \\
-& - 2 a_{11} \delta_1 v_{2x} - 2 a_{11} \lambda_1 v_{3x} - \ldots - 2 a_{33} \pi_3 v_{3z} \rbrace_{j = 1} + \ldots + \lbrace \cdots \rbrace_{j = J},
+E(t) &= \lbrace a_{11}^2 + a_{12}^2 + \ldots + a_{33}^2 + \alpha_1^2 v_{1x}^2 + \ldots + \pi^2 v_{3z}^2 - 2 a_{11} \alpha_1 v_{1x} \\
+& - 2 a_{11} \delta_1 v_{2x} - 2 a_{11} \lambda_1 v_{3x} - \ldots - 2 a_{33} \pi_3 v_{3z} + 2 \alpha_1 v_{1x} \delta_1 v_{2x} \\ 
+& + 2 \alpha_1 v_{1x} \lambda_1 v_{3x} + \ldots + 2 \kappa_3 v_{2z} \pi_3 v_{3z} \rbrace_{j = 1} + \ldots + \lbrace \cdots \rbrace_{j = J},
 \end{align*}
 
-where each $\lbrace $
+where we have a $\lbrace \cdots \rbrace_j$ for each triangle.
+Predetermining the transformation of $\mathbf{v_1}$, and setting 
+$\mathbf{u}^T = \begin{pmatrix} 1, v_{2x}, v_{2y}, v_{2z}, \ldots, v_{mx}, v_{my}, v_{mz} \end{pmatrix}$, where $m$ is the number of vertices, we can stack the terms in a quadratic matrix form 
+
+\begin{equation*}
+E(t) = \mathbf{u}^T  \begin{pmatrix}
+c & \mathbf{g^T} \\
+\mathbf{g} & H
+\end{pmatrix} \mathbf{u},
+\end{equation*}
+
+where $c$ are the constant coefficients, $\mathbf{g}$ is a vector with the terms linear on $a_i$ and $H$ is matrix with the quadratic and mixed terms.
+Note that the terms involving $\mathbf{v}_1$ are are treated differently since it is not an unknown.
 
 \begin{figure}
 \subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1}}
