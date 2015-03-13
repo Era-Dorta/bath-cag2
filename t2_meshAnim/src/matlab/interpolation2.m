@@ -54,6 +54,7 @@ v23 = p3 - p2;
 avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
 
 vNormal = cross(v12/norm(v12), v23/norm(v23));
+vNormal = vNormal/norm(vNormal);
 pnew = vCentr + vNormal * avgL;
 
 pNew1(i,:) = pnew;
@@ -83,6 +84,7 @@ v23 = q3 - q2;
 avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
 
 vNormal = cross(v12/norm(v12), v23/norm(v23));
+vNormal = vNormal/norm(vNormal);
 qnew = vCentr + vNormal * avgL;
 
 qNew1(i,:) = qnew;
@@ -140,6 +142,7 @@ for i = 2: size(T,1)
     avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
     
     vNormal = cross(v12/norm(v12), v23/norm(v23));
+    vNormal = vNormal/norm(vNormal);
     pnew = vCentr + vNormal * avgL;
     pNew1(i,:) = pnew;
     
@@ -168,6 +171,7 @@ for i = 2: size(T,1)
     avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
     
     vNormal = cross(v12/norm(v12), v23/norm(v23));
+    vNormal = vNormal/norm(vNormal);
     qnew = vCentr + vNormal * avgL;
     qNew1(i,:) = qnew;
     
