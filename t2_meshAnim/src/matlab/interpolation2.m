@@ -27,7 +27,6 @@ q = [extraQ; q];
 T = T + 1;
 T = [1, T(1,1), T(1,2); T];
 
-
 %% Compute invariant matrix H
 disp('Building H')
 % Compute for first triangle
@@ -44,21 +43,50 @@ vertex1 = T(i,1);
 vertex2 = T(i,2);
 vertex3 = T(i,3);
 
-Ptr = [p(vertex1,:), zero3, zero3, 1 0 0;
-    zero3, p(vertex1,:), zero3, 0 1 0;
-    zero3, zero3, p(vertex1,:), 0 0 1;
-    p(vertex2,:), zero3, zero3, 1 0 0;
-    zero3, p(vertex2,:), zero3, 0 1 0;
-    zero3, zero3, p(vertex2,:), 0 0 1;
-    p(vertex3,:), zero3, zero3, 1 0 0;
-    zero3, p(vertex3,:), zero3, 0 1 0;
-    zero3, zero3, p(vertex3,:), 0 0 1];
+p1 = p(vertex1,:);
+p2 = p(vertex2,:);
+p3 = p(vertex3,:);
 
-Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:)]';
+vCentr = (p1 + p2 + p3) / 3;
+v12 = p2 - p1;
+v13 = p3 - p1;
+v23 = p3 - p2;
+avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
 
-% inP = inv(Ptr);
-inP = Ptr\eye(size(Ptr));
-inP = inP(1:9, 1:9);
+vNormal = cross(v12/norm(v12), v23/norm(v23));
+pnew = vCentr + vNormal * avgL;
+
+Ptr = [p1, zero3, zero3, 1 0 0;
+    zero3, p1, zero3, 0 1 0;
+    zero3, zero3, p1, 0 0 1;
+    p2, zero3, zero3, 1 0 0;
+    zero3, p2, zero3, 0 1 0;
+    zero3, zero3, p2, 0 0 1;
+    p3, zero3, zero3, 1 0 0;
+    zero3, p3, zero3, 0 1 0;
+    zero3, zero3, p3, 0 0 1;
+    pnew, zero3, zero3, 1 0 0;
+    zero3, pnew, zero3, 0 1 0;
+    zero3, zero3, pnew, 0 0 1];
+
+
+q1 = q(vertex1,:);
+q2 = q(vertex2,:);
+q3 = q(vertex3,:);
+
+vCentr = (q1 + q2 + q3) / 3;
+v12 = q2 - q1;
+v13 = q3 - q1;
+v23 = q3 - q2;
+avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
+
+vNormal = cross(v12/norm(v12), v23/norm(v23));
+qnew = vCentr + vNormal * avgL;
+Qtr = [q1, q2, q3, qnew]';
+
+inP = inv(Ptr);
+%inP = Ptr\eye(size(Ptr));
+%inP = inP(1:9, 1:9);
 
 Afulltr = inP * Qtr;
 Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
@@ -91,25 +119,54 @@ H(6,3) = H(3,6);
 
 %% H for the rest of the triangles
 for i = 2: size(T,1)
+    
     vertex1 = T(i,1);
     vertex2 = T(i,2);
     vertex3 = T(i,3);
     
-    Ptr = [p(vertex1,:), zero3, zero3, 1 0 0;
-        zero3, p(vertex1,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex1,:), 0 0 1;
-        p(vertex2,:), zero3, zero3, 1 0 0;
-        zero3, p(vertex2,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex2,:), 0 0 1;
-        p(vertex3,:), zero3, zero3, 1 0 0;
-        zero3, p(vertex3,:), zero3, 0 1 0;
-        zero3, zero3, p(vertex3,:), 0 0 1];
+    p1 = p(vertex1,:);
+    p2 = p(vertex2,:);
+    p3 = p(vertex3,:);
     
-    Qtr = [q(vertex1,:), q(vertex2,:), q(vertex3,:)]';
+    vCentr = (p1 + p2 + p3) / 3;
+    v12 = p2 - p1;
+    v13 = p3 - p1;
+    v23 = p3 - p2;
+    avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
     
-    % inP = inv(Ptr);
-    inP = Ptr\eye(size(Ptr));
-    inP = inP(1:9, 1:9);
+    vNormal = cross(v12/norm(v12), v23/norm(v23));
+    pnew = vCentr + vNormal * avgL;
+    Ptr = [p1, zero3, zero3, 1 0 0;
+        zero3, p1, zero3, 0 1 0;
+        zero3, zero3, p1, 0 0 1;
+        p2, zero3, zero3, 1 0 0;
+        zero3, p2, zero3, 0 1 0;
+        zero3, zero3, p2, 0 0 1;
+        p3, zero3, zero3, 1 0 0;
+        zero3, p3, zero3, 0 1 0;
+        zero3, zero3, p3, 0 0 1;
+        pnew, zero3, zero3, 1 0 0;
+        zero3, pnew, zero3, 0 1 0;
+        zero3, zero3, pnew, 0 0 1];
+    
+    
+    q1 = q(vertex1,:);
+    q2 = q(vertex2,:);
+    q3 = q(vertex3,:);
+    
+    vCentr = (q1 + q2 + q3) / 3;
+    v12 = q2 - q1;
+    v13 = q3 - q1;
+    v23 = q3 - q2;
+    avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
+    
+    vNormal = cross(v12/norm(v12), v23/norm(v23));
+    qnew = vCentr + vNormal * avgL;
+    Qtr = [q1, q2, q3, qnew]';
+    
+    inP = inv(Ptr);
+    %inP = Ptr\eye(size(Ptr));
+    %inP = inP(1:9, 1:9);
     
     Afulltr = inP * Qtr;
     Atr = [Afulltr(1:3)'; Afulltr(4:6)'; Afulltr(7:9)'];
