@@ -56,6 +56,8 @@ avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
 vNormal = cross(v12/norm(v12), v23/norm(v23));
 pnew = vCentr + vNormal * avgL;
 
+pNew1(i,:) = pnew;
+
 Ptr = [p1, zero3, zero3, 1 0 0;
     zero3, p1, zero3, 0 1 0;
     zero3, zero3, p1, 0 0 1;
@@ -82,6 +84,9 @@ avgL = (norm(v12) + norm(v13) + norm(v23)) / 3;
 
 vNormal = cross(v12/norm(v12), v23/norm(v23));
 qnew = vCentr + vNormal * avgL;
+
+qNew1(i,:) = qnew;
+
 Qtr = [q1, q2, q3, qnew]';
 
 inP = inv(Ptr);
@@ -136,6 +141,8 @@ for i = 2: size(T,1)
     
     vNormal = cross(v12/norm(v12), v23/norm(v23));
     pnew = vCentr + vNormal * avgL;
+    pNew1(i,:) = pnew;
+    
     Ptr = [p1, zero3, zero3, 1 0 0;
         zero3, p1, zero3, 0 1 0;
         zero3, zero3, p1, 0 0 1;
@@ -162,6 +169,8 @@ for i = 2: size(T,1)
     
     vNormal = cross(v12/norm(v12), v23/norm(v23));
     qnew = vCentr + vNormal * avgL;
+    qNew1(i,:) = qnew;
+    
     Qtr = [q1, q2, q3, qnew]';
     
     inP = inv(Ptr);
@@ -283,19 +292,25 @@ for t = 0:0.1:1
     k = 2;
     for j = 1:3:size(u,1)
         x(k,:) = [u(j),u(j+1),u(j+2)];
-        toSaveObj.vertices(k-1,:) = x(k,:);
+        %toSaveObj.vertices(k-1,:) = x(k,:);
         k = k + 1;
     end
     
-    write_wobj(toSaveObj, strcat(save_path, num2str(t), '.obj'));
+    %write_wobj(toSaveObj, strcat(save_path, num2str(t), '.obj'));
     
     fprintf('Displaying t = %f\n',t);
     % Plot.
     figure(1);
     hold on;
-    trisurf(T(2:end,:), p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
-    trisurf(T(2:end,:), x(:, 1) + 30, x(:,2), x(:,3), ones(1,size(x,1))+2);
-    trisurf(T(2:end,:), q(:, 1) + 60, q(:,2), q(:,3), ones(1,size(p,1))+1);
+    %trisurf(T(2:end,:), p(:, 1), p(:,2), p(:,3), ones(1,size(p,1)));
+    %trisurf(T(2:end,:), x(:, 1) + 30, x(:,2), x(:,3), ones(1,size(x,1))+2);
+    %trisurf(T(2:end,:), q(:, 1) + 60, q(:,2), q(:,3), ones(1,size(p,1))+1);
+    
+    f1 = trisurf(T(2:end,:), p(:, 1), p(:,2), p(:,3), ones(1,size(p,1))+1);
+    set(f1, 'FaceColor', 'r');
+    set(f1, 'FaceAlpha', 0.55);
+    plot3(pNew1(:,1), pNew1(:,2), pNew1(:,3), 'g*');
+    %plot3(qNew1(:,1) + 60, qNew1(:,2), qNew1(:,3), 'r*');
     view(50,30);
     pause('on');
     pause;
