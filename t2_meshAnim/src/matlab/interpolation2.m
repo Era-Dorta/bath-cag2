@@ -172,6 +172,7 @@ end
 disp('Built H for all triangles');
 
 x = zeros(size(p,1)-1, 3);
+H = sparse(H); 
 
 %% Main loop.
 for t = 0:0.1:1
@@ -216,7 +217,7 @@ for t = 0:0.1:1
     
     disp('Solving u');
     % Solve the system
-    u = - sparse(H) \ G;
+    u = - H \ G;
     
     disp('Reshaping u');
     
