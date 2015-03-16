@@ -25,7 +25,7 @@ public:
 
 	SiblingIt getNextMove(char turn, float epsilon, const SiblingIt& startNode);
 
-	void updateV(float alpha);
+	void updateV(double alpha);
 
 private:
 	void buildNode(tree<State>& tr, NodeIt nodeIt, char turn,

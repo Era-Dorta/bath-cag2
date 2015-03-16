@@ -55,7 +55,7 @@ SiblingIt TreeHandler::getNextMove(char turn, float epsilon,
 	}
 }
 
-void TreeHandler::updateV(float alpha) {
+void TreeHandler::updateV(double alpha) {
 	NodeIt parentNode, currentNode;
 
 	while (!optimalMoveStack.empty()) {
@@ -63,7 +63,8 @@ void TreeHandler::updateV(float alpha) {
 		parentNode = optimalMoveParentStack.top();
 		parentNode->setV(
 				parentNode->getV()
-						+ alpha * (currentNode->getV() - parentNode->getV()));
+						+ (float) alpha
+								* (currentNode->getV() - parentNode->getV()));
 		optimalMoveStack.pop();
 		optimalMoveParentStack.pop();
 	}
