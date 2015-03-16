@@ -16,13 +16,10 @@ CM50245: Computer Animation and Games II}
  
 \section{Introduction}
 
-Generating a plausible mesh which is a morphing of two given meshes ...
+Generating a realistic mesh which is a morphing of two given meshes can be a challenging task.
+We present two approaches to produce a intermediate 3D mesh from conforming source and target 3D meshes. 
 
-\section{Implemented techniques}
-
-We present two approaches to solve the mesh morphing problem. 
-
-\subsection{Linear interpolation}
+\section{Linear interpolation}
 
 Linear interpolation is a simple and intuitive first approach.
 The new position of a vertex $\mathbf{v_{it}} = \left[ v_{ix}, v_{iy}, v_{iz}\right]^T $ in an interval $t = \lbrace 0, \ldots, 1 \rbrace$ is given by
@@ -34,10 +31,10 @@ The new position of a vertex $\mathbf{v_{it}} = \left[ v_{ix}, v_{iy}, v_{iz}\ri
 where $n$ is the number of vertices, $\mathbf{p_i} = \left[ p_x, p_y, p_z\right]^T$ and $\mathbf{q_i} = \left[ q_x, q_y, q_z\right]^T$ are the corresponding vertices in the source and target meshes respectively.
 Some meshes generated with this method are shown in Figure \ref{fig:linearInterpolation}.
 
-\subsection{As rigid as possible interpolation}
+\section{As rigid as possible interpolation}
 
 The previous method produces distorted meshes due to its non-rigid nature.
-One way to produce better results is to use a transform-based technique.
+One way to produce better results is to use transform-based techniques \cite{Alexa2000}.
 Lets define an affine transformation from $\mathbf{p_i}$ to $\mathbf{q_i}$ such that:
 
 \begin{align*}
@@ -150,14 +147,23 @@ H \mathbf{u}(t) = -\mathbf{g}(t) ~ \rightarrow ~ \mathbf{u}(t) = - H ^{-1} \math
 
 Since $H$ is independent on $t$, for each iteration we only need to compute the linear interpolation of $\mathbf{v}_1$ and the new $\mathbf{g}(t)$ to solve the system.
 
+\section{Results and conclusions}
+
+Figure \ref{fig:linearInterpolation} shows that applying a vertex based linear interpolation, rescales the interpolated mesh in unnatural positions.
+For example, the horse head and tail shapes in Figure \ref{fig:linearHorse1} are smaller than their counterparts in the source and target shape.
+Applying the as-rigid-as-possible interpolation produces better results, because it interpolates the transformation matrices instead of the vertex positions.
+
 \begin{figure}
-\subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1}}
+\subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1} \label{fig:linearHorse1}}
 \subfloat[fig 4]{\includegraphics[width = 3in]{images/linearInterpolation2}}\\
 \subfloat[fig 1]{\includegraphics[width = 1.8in]{images/armadillo2}}
 \subfloat[fig 2]{\includegraphics[width = 3.3in]{images/armadillo1}} 
 \caption{Horse and armadillo meshes, morphed mesh is in the middle.}
 \label{fig:linearInterpolation}
 \end{figure}
+
+\bibliographystyle{plain}
+\bibliography{t2_meshAnim}
 
 \end{document}
 
