@@ -131,17 +131,24 @@ E(t) &= \lbrace a_{11}^2 + a_{12}^2 + \ldots + a_{33}^2 + \alpha_1^2 v_{1x}^2 + 
 
 where we have a $\lbrace \cdots \rbrace_j$ for each triangle.
 Predetermining the transformation of $\mathbf{v_1}$, and setting 
-$\mathbf{u}^T = \begin{pmatrix} 1, v_{2x}, v_{2y}, v_{2z}, \ldots, v_{mx}, v_{my}, v_{mz} \end{pmatrix}$, where $m$ is the number of vertices, we can stack the terms in a quadratic matrix form 
+$\mathbf{u}(t)^T = \begin{pmatrix} 1, v_{2x}, v_{2y}, v_{2z}, \ldots, v_{mx}, v_{my}, v_{mz} \end{pmatrix}$, where $m$ is the number of vertices, we can stack the terms in a quadratic matrix form 
 
 \begin{equation*}
 E(t) = \mathbf{u}^T  \begin{pmatrix}
-c & \mathbf{g^T} \\
-\mathbf{g} & H
+c & \mathbf{g}(t)^T \\
+\mathbf{g}(t) & H
 \end{pmatrix} \mathbf{u},
 \end{equation*}
 
-where $c$ are the constant coefficients, $\mathbf{g}$ is a vector with the terms linear on $a_i$ and $H$ is matrix with the quadratic and mixed terms.
-Note that the terms involving $\mathbf{v}_1$ are are treated differently since it is not an unknown.
+where $c$ are the constant coefficients, $\mathbf{g}$ is a vector with the linear terms and $H$ is matrix with the quadratic and mixed terms.
+Note that, since $\mathbf{v}_1$ is known, the terms were it appears, become constants or linear in $\mathbf{v}_j$ for $j \neq 1$.
+Setting the gradient to zero,
+
+\begin{equation*}
+H \mathbf{u}(t) = -\mathbf{g}(t) ~ \rightarrow ~ \mathbf{u}(t) = - H ^{-1} \mathbf{g}(t).
+\end{equation*}
+
+Since $H$ is independent on $t$, for each iteration we only need to compute the linear interpolation of $\mathbf{v}_1$ and the new $\mathbf{g}(t)$ to solve the system.
 
 \begin{figure}
 \subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1}}
