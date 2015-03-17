@@ -3,6 +3,7 @@
 \usepackage[margin=1in]{geometry} 
 \usepackage{amsmath,amsthm,amssymb,bm}
 \usepackage{graphicx}
+\usepackage[ruled]{algorithm2e} % Algorithms 
  
 \begin{document}
   
@@ -14,9 +15,50 @@ CM50245: Computer Animation and Games II}
  
 \section{Introduction}
 
-\section{Q learning in noughts and crosses}
-
 \section{A* path finding}
+
+The A* algorithm can find paths optimally in a graph based on a heuristic.
+It works under the assumption that the distance heuristic will never overestimate the cost of the path and the path cost will not decrease as we travel through it.
+In a maze world, where the movement possibilities are north, south, east and west, with fixed positive costs.
+Using a Manhattan distance for the actual path cost and a euclidean distance to compute the heuristic will fit the assumptions.
+
+In Algorithm \ref{alg:A_start} an overview of a general implementation of the A* in pseudocode is given.
+As stated in the previous paragraph, in our case, graph.cost() and heuristic() returns respectively, the Manhattan and the euclidean distance between two nodes.
+
+\begin{algorithm}[htbp!] \label{alg:A_start}
+	\caption{A*}
+	\KwData{$goal$ goal position, $start$ start position, $graph$ graph with the tiles in the map.}
+	\KwResult{$path$ path from $start$ to $goal$, $cost$ total cost of the path.}
+	
+	frontier = PriorityQueue()\;
+	frontier.put(start, 0)\;
+	came\_from = \{\}\;
+	cost\_so\_far = \{\}\;
+	came\_from[start] = None\;
+	cost\_so\_far[start] = 0\;
+
+	\While{not frontier.empty()}{
+		current = frontier.get()\;
+
+		\If{current == goal}{
+		  break\;
+		}
+		\For{next in graph.neighbors(current)}{
+		  new\_cost = cost\_so\_far[current] + graph.cost(current, next)\;
+		  \If{next not in cost\_so\_far or \text{new}\_cost \textless cost\_so\_far[next]}{
+			 cost\_so\_far[next] = new\_cost\;
+			 priority = new\_cost + heuristic(goal, next)\;
+			 frontier.put(next, priority)\;
+			 came\_from[next] = current\;
+			 }
+		}
+	}
+	$path$ = getPath(came\_from)\;
+	$goal$ = cost\_so\_far[current]\;
+\end{algorithm}
+ 
+
+\section{Q learning in noughts and crosses}
 
 \section{Q learning in BlackJack}
 
