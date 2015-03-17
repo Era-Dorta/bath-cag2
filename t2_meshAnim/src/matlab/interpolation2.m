@@ -171,8 +171,8 @@ end
 
 disp('Built H for all triangles');
 
+H = sparse(H);
 x = zeros(size(p,1)-1, 3);
-H = sparse(H); 
 
 %% Main loop.
 for t = 0:0.1:1

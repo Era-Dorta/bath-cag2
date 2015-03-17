@@ -13,7 +13,7 @@
 
 MStatus ShapeIntrpltCmd::doIt(const MArgList &args) {
 
-	if(true){
+	if(false){
 		const MString prevOptions(
 				"file -import -type \"OBJ\" -ignoreVersion \
 				-renameAll true -mergeNamespacesOnClash false -namespace \"");
