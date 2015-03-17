@@ -152,14 +152,16 @@ Since $H$ is independent on $t$, for each iteration we only need to compute the 
 \section{Results and conclusions}
 
 Figure \ref{fig:linearInterpolation} shows that applying a vertex based linear interpolation, rescales the interpolated mesh in unnatural positions.
-For example, the horse head and tail shapes in Figure \ref{fig:linearHorse1} are smaller than their counterparts in the source and target shape.
+For example, the interpolated horse head in Figure \ref{fig:linearHorse1} is smaller than in the source and target shape.
 Applying the as-rigid-as-possible interpolation produces better results, because it interpolates the transformation matrices instead of the vertex positions.
 
 \begin{figure}
-\subfloat[fig 3]{\includegraphics[width = 3in]{images/linearInterpolation1} \label{fig:linearHorse1}}
-\subfloat[fig 4]{\includegraphics[width = 3in]{images/linearInterpolation2}}\\
-\subfloat[fig 1]{\includegraphics[width = 1.8in]{images/armadillo2}}
-\subfloat[fig 2]{\includegraphics[width = 3.3in]{images/armadillo1}} 
+\subfloat[Linear interpolation]{\includegraphics[width = 3in]{images/linearInterpolation2} \label{fig:linearHorse1}}
+\thinspace
+\subfloat[Linear interpolation]{\includegraphics[width = 3.5in]{images/linearArmadillo}} \\
+\subfloat[Rigid interpolation]{\includegraphics[width = 3in]{images/transformInterpolation2}}
+~
+\subfloat[Rigid interpolation]{\includegraphics[width = 3.5in]{images/rigidArmadillo}} 
 \caption{Horse and armadillo meshes, morphed mesh is in the middle.}
 \label{fig:linearInterpolation}
 \end{figure}
