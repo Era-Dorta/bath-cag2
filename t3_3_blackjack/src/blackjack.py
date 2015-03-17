@@ -233,6 +233,20 @@ def print_policy(Q):
                     print ' ',
             print '| %d' % val
         print '1 2 3 4 5 6 7 8 9 10 -> Dealer seen card\n'
+        
+# Compute the expected value of the game using the learned Q-values.
+def expected_gain(Q, n_iter):
+    gain = 0.0
+    for _ in range(n_iter):
+        reset_deck()
+        player_hand = deal_player_hand()
+        _, dealer_card = deal_dealer_hand()
+        state = state_from_hands(dealer_card, player_hand)
+        v = Q[(state, False)]
+        if (Q[(state, True)] > v):
+            v = Q[(state, True)]
+        gain = gain + v
+    print 'Expected gain: %6.3f\n' % (gain / float(n_iter))    
 
 # Initialise Q-values so that they produce the initial policy of sticking
 # only on 20 or 21.
@@ -317,13 +331,19 @@ if __name__ == '__main__':
     random.seed(0)
     n_games = 100000
     alpha = 1
-    epsilon = 0.1
-    print 'Q-LEARNING, playing %d games with %d%% explore rate\n' % (n_games, epsilon * 100)
+
+    epsilon = 0.0
+    while epsilon <= 1.0:
+        random.seed(0)
+        print 'Q-LEARNING, playing %d games with %d%% explore rate\n' % (n_games, epsilon * 100)
     
-    Q = q_learning(n_games, alpha, epsilon)
+        Q = q_learning(n_games, alpha, epsilon)
+        
+        expected_gain(Q, n_games)
+        # print_Q(Q)
+        # print_V(Q)
+        print_policy(Q)
+        
+        epsilon += 0.1
     
-    # print_Q(Q)
-    # print_V(Q)
-    print_policy(Q)
-    
-    exit(0)    
+    exit(0) 
