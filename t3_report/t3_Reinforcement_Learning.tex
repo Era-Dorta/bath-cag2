@@ -79,18 +79,25 @@ As stated in the previous paragraph, in our case, graph.cost() and heuristic() r
 \end{minipage}
 \end{figure}
 
-\section{Q learning in noughts and crosses}
+\section{Q-learning in noughts and crosses}
 
 Q-learning is a reinforcement learning technique used when a problem can be modelled as a Markov decision process, where the world is modelled as a chain of \emph{states}, where an agent can take \emph{actions}, which is associated with a new state and a \emph{reward}.
 The objective is to maximize the rewards that the agents gets, and by doing so taking the optimal actions in that given world.
 However, since the system is an online learner, there is a trade-off between \emph{exploitation}, where the agent takes the actions that lead to the highest expected reward, and \emph{exploration}, where the agent takes different actions to gain more information of unexplored states.
 
-Nought and crosses can be modelled as a Markov decision process as a given board state characterizes the sum of the moves that lead to the current state.
+Each state $s$ has a value $V(s)$ associated to it; the agent will choose either, a greedy \emph{exploitation} action by performing an action $a$ such that the next state $s'$  will be $\max V(s_{t + 1})$, or a \emph{exploration} action $a$ such that the next state $s'$  will chosen randomly.
+When an end state is reached, the values for each state where a greedy action was taken will be updated by a backtracking mechanism as $V(s) = V(s) + \alpha \left[ V(s') - V(s) \right]$, where $\alpha$ is the learning rate.
+In order to have a policy update which asymptotically guarantees converge, it is a necessary condition for $\alpha$ to decrease its value over time.
+
+Nought and crosses can be modelled as a Markov decision process given that a board state characterizes the sum of the moves that lead to such state.
 The \emph{agent} is one of the players, a \emph{state} is a given configuration of a board and the \emph{reward} is given when a game ends.
 The agent will receive a high positive reward when it wins, a negative reward when it looses and a small positive reward when drawing.
 
 In the implementation the state space will be modelled in a tree as shown in Figure \ref{fig:ttt_tree}.
-On the root of the tree, we have empty board, the children are the 9 possible plays for the crosses player, who will always be the first to play. 
+On the root of the tree, we have empty board, the children are the 9 possible plays for the crosses player, who will always be the first to play.
+
+To test our system, the agent would play a fixed number of games against an AI with fixed moves initialized at random.
+In Figures \ref{fig:ttt_eps_0_2}, \ref{fig:ttt_eps_0_4}, \ref{fig:ttt_eps_0_6} and \ref{fig:tttExpectedGain} the behaviour of the system under variations of the exploration rate are shown.
 
 \begin{figure}[htbp!]
 \centering
@@ -99,7 +106,34 @@ On the root of the tree, we have empty board, the children are the 9 possible pl
 	\label{fig:ttt_tree}
 \end{figure}
 
-\section{Q learning in BlackJack}
+\begin{figure}[htbp!]
+\centering
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.25]{images/ttt_eps_0_2}
+	\caption{Values for the first movement for noughts and crosses with 20\% exploration rate after 100000 games.}
+	\label{fig:ttt_eps_0_2}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.23]{images/ttt_eps_0_4}
+	\caption{Values for the first movement for noughts and crosses with 40\% exploration rate after 100000 games.}
+	\label{fig:ttt_eps_0_4}
+\end{minipage}
+\\
+\begin{minipage}[t]{0.5\linewidth}
+	\includegraphics[scale=0.23]{images/ttt_eps_0_6}
+	\caption{Values for the first movement for noughts and crosses with 60\% exploration rate after 100000 games.}
+	\label{fig:ttt_eps_0_6}
+\end{minipage} 
+\quad
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.40]{images/tttExpectedGain}
+	\caption{Mean gain after playing 100000 games of for noughts and crosses with the given exploration rates.}
+	\label{fig:tttExpectedGain}
+\end{minipage}
+\end{figure}
+
+\section{Q-learning in BlackJack}
 
 \section{Results and conclusions}
 
