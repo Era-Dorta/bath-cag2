@@ -4,6 +4,7 @@
 \usepackage{amsmath,amsthm,amssymb,bm}
 \usepackage{graphicx}
 \usepackage[ruled]{algorithm2e} % Algorithms 
+\usepackage[caption = false]{subfig}
  
 \begin{document}
   
@@ -23,7 +24,7 @@ In a maze world, where the movement possibilities are north, south, east and wes
 Using a Manhattan distance for the actual path cost and a euclidean distance to compute the heuristic will fit the assumptions.
 
 In Algorithm \ref{alg:A_start} an overview of a general implementation of the A* in pseudocode is given.
-As stated in the previous paragraph, in our case, graph.cost() and heuristic() returns respectively, the Manhattan and the euclidean distance between two nodes.
+As stated in the previous paragraph, in our case, graph.cost() and heuristic() returns respectively, the Manhattan and the euclidean distance between two nodes. An example output with a small labyrinth where a path is successfully found is shown in Figure \ref{fig:A_start}.
 
 \begin{algorithm}[htbp!] \label{alg:A_start}
 	\caption{A*}
@@ -56,9 +57,36 @@ As stated in the previous paragraph, in our case, graph.cost() and heuristic() r
 	$path$ = getPath(came\_from)\;
 	$goal$ = cost\_so\_far[current]\;
 \end{algorithm}
- 
+
+\begin{figure}[htbp!]
+\centering
+\begin{minipage}[t]{0.3\linewidth}
+	\includegraphics[scale=0.6]{images/a_star_res1}
+	\caption{Path finding example, $S$ is the start position, $G$ is the goal position, $*$ are the path points, $.$ are empty spaces and \# are walls.}
+	\label{fig:A_start}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.3\linewidth}
+	\includegraphics[scale=0.35]{images/blackjack_0_2_Q}
+	\caption{Blackjack policy example, with 20\% exploration rate after 100000 games.}
+	\label{fig:blackjack_0_2_Q}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.3\linewidth}
+	\includegraphics[scale=0.35]{images/blackjack_0_4_Q}
+	\caption{Blackjack policy example, with 40\% exploration rate after 100000 games.}
+	\label{fig:blackjack_0_4_Q}
+\end{minipage}
+\end{figure}
 
 \section{Q learning in noughts and crosses}
+
+\begin{figure}[htbp!]
+\centering
+	\includegraphics[scale=0.4]{images/ttt_tree}
+	\caption{Path finding example, $S$ is the start position, $G$ is the goal position, $*$ are the path points, $.$ are empty spaces and \# are walls.}
+	\label{fig:A_start}
+\end{figure}
 
 \section{Q learning in BlackJack}
 
