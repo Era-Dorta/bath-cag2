@@ -87,7 +87,10 @@ However, since the system is an online learner, there is a trade-off between \em
 
 Nought and crosses can be modelled as a Markov decision process as a given board state characterizes the sum of the moves that lead to the current state.
 The \emph{agent} is one of the players, a \emph{state} is a given configuration of a board and the \emph{reward} is given when a game ends.
-The agent will receive a high positive reward when it wins, a negative reward when it looses and a small positive reward when drawing. 
+The agent will receive a high positive reward when it wins, a negative reward when it looses and a small positive reward when drawing.
+
+In the implementation the state space will be modelled in a tree as shown in Figure \ref{fig:ttt_tree}.
+On the root of the tree, we have empty board, the children are the 9 possible plays for the crosses player, who will always be the first to play. 
 
 \begin{figure}[htbp!]
 \centering
