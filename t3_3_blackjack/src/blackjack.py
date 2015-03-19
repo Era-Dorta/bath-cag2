@@ -328,13 +328,12 @@ def q_learning(n_iter, alpha, epsilon):
 # Main program
 if __name__ == '__main__':
     # set parameters
-    random.seed(0)
     n_games = 100000
     alpha = 1
 
     epsilon = 0.0
     while epsilon <= 1.0:
-        random.seed(0)
+        random.seed(1)
         print 'Q-LEARNING, playing %d games with %d%% explore rate\n' % (n_games, epsilon * 100)
     
         Q = q_learning(n_games, alpha, epsilon)
