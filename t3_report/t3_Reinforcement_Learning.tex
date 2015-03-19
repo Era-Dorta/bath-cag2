@@ -109,9 +109,9 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 \end{minipage}
 \quad
 \begin{minipage}[t]{0.45\linewidth}
-	\includegraphics[scale=0.4]{images/blackjackExpectedGain}
-	\caption{Mean gain after playing 100000 games of for blackjack with the given exploration rates.}
-	\label{fig:blackjackExpectedGain}
+	\includegraphics[scale=0.40]{images/tttExpectedGain}
+	\caption{Mean gain after playing 100000 games of noughts and crosses with the given exploration rates.}
+	\label{fig:tttExpectedGain}
 \end{minipage}
 \end{figure}
 
@@ -136,9 +136,9 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 \end{minipage} 
 \quad
 \begin{minipage}[t]{0.45\linewidth}
-	\includegraphics[scale=0.40]{images/tttExpectedGain}
-	\caption{Mean gain after playing 100000 games of for noughts and crosses with the given exploration rates.}
-	\label{fig:tttExpectedGain}
+	\includegraphics[scale=0.4]{images/blackjackExpectedGain2}
+	\caption{Expected gain after playing 100000 games of blackjack with the given exploration rates.}
+	\label{fig:blackjackExpectedGain}
 \end{minipage}
 \end{figure}
 
@@ -148,6 +148,27 @@ For Q-learning we retain the assumptions made in Section \ref{sec:td_ttt}.
 However, the state structure will be a lookup table $Q$ instead of a tree.
 $Q$ is a matrix of size $m \times n$, where $m$ is the number of states and $n$ are the number of actions.
 Every time the agent takes an action $a$, the $Q$ value of the pair $\lbrace s, a \rbrace$ is updated as follows $Q(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ r_{t+1} + \gamma \max\limits_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$, where $\alpha$ is the learning rate, $r_{t+1}$ is the reward for being in $s_{t+1}$ and $\gamma$ is a discounting factor.
+An important advantage of using the aforementioned update mechanism is its off-policy nature, since the $Q(s_t,a_t)$ will be updated with $\max\limits_a Q(s_{t+1},a)$, even if the policy chooses an action which is suboptimal, the update will be computed with the optimal $Q(s_{t+1},a)$ value.
+
+Our blackjack implementation adopts the following rules:
+
+\begin{itemize}
+  \item A 52 french card deck is used.
+  \item The player is dealt an initial two cards hand.
+  \item The player may count one ace as 1 or 11 points.
+  \item The dealer must hit cards until they have 17 or more points.
+  \item If the dealer and the player have the same number of points, the dealer wins.
+\end{itemize}
+
+With a reward of 10 for winning and -1 for loosing the mean gain for different exploration rates is shown in  Figure \ref{fig:blackjackExpectedGain}.
+Since the dealer has an slight advantage, using equal rewards for winning and loosing produces a negative expected gains, as shown in Figure \ref{fig:blackjackExpectedGain1}.
+
+\begin{figure}[btph!]
+\centering
+	\includegraphics[scale=0.4]{images/blackjackExpectedGain1}
+	\caption{Expected gain after playing 100000 games of blackjack with the given exploration rates.}
+	\label{fig:blackjackExpectedGain1}
+\end{figure}
 
 \section{Results and conclusions}
 
@@ -155,9 +176,6 @@ Every time the agent takes an action $a$, the $Q$ value of the pair $\lbrace s, 
 %\bibliography{t2_meshAnim}
 
 \end{document}
-
-
-
 
 \end{document}
 
