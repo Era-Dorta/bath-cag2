@@ -63,16 +63,10 @@ As stated in the previous paragraph, in our case, graph.cost() and heuristic() r
 	\label{fig:A_start}
 \end{minipage}
 \quad
-\begin{minipage}[t]{0.3\linewidth}
-	\includegraphics[scale=0.35]{images/blackjack_0_2_Q}
-	\caption{Blackjack policy example, with 20\% exploration rate after 100000 games.}
-	\label{fig:blackjack_0_2_Q}
-\end{minipage}
-\quad
-\begin{minipage}[t]{0.3\linewidth}
-	\includegraphics[scale=0.35]{images/blackjack_0_4_Q}
-	\caption{Blackjack policy example, with 40\% exploration rate after 100000 games.}
-	\label{fig:blackjack_0_4_Q}
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.4]{images/ttt_tree}
+	\caption{Noughts and crosses tree state.}
+	\label{fig:ttt_tree}
 \end{minipage}
 \end{figure}
 
@@ -103,21 +97,6 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 \begin{figure}[htbp!]
 \centering
 \begin{minipage}[t]{0.45\linewidth}
-	\includegraphics[scale=0.4]{images/ttt_tree}
-	\caption{Noughts and crosses tree state.}
-	\label{fig:ttt_tree}
-\end{minipage}
-\quad
-\begin{minipage}[t]{0.45\linewidth}
-	\includegraphics[scale=0.40]{images/tttExpectedGain}
-	\caption{Mean gain after playing 100000 games of noughts and crosses with the given exploration rates.}
-	\label{fig:tttExpectedGain}
-\end{minipage}
-\end{figure}
-
-\begin{figure}[htbp!]
-\centering
-\begin{minipage}[t]{0.45\linewidth}
 	\includegraphics[scale=0.25]{images/ttt_eps_0_2}
 	\caption{Values for the first movement for noughts and crosses with 20\% exploration rate after 100000 games.}
 	\label{fig:ttt_eps_0_2}
@@ -136,9 +115,9 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 \end{minipage} 
 \quad
 \begin{minipage}[t]{0.45\linewidth}
-	\includegraphics[scale=0.4]{images/blackjackExpectedGain2}
-	\caption{Expected gain after playing 100000 games of blackjack with the given exploration rates.}
-	\label{fig:blackjackExpectedGain}
+	\includegraphics[scale=0.40]{images/tttExpectedGain}
+	\caption{Mean gain after playing 100000 games of noughts and crosses with the given exploration rates.}
+	\label{fig:tttExpectedGain}
 \end{minipage}
 \end{figure}
 
@@ -170,9 +149,33 @@ Comparing both policies, we can see that with a higher exploration rate, the age
 
 \begin{figure}[btph!]
 \centering
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.45]{images/blackjack_0_2_Q}
+	\caption{Blackjack policy example, with 20\% exploration rate after 100000 games.}
+	\label{fig:blackjack_0_2_Q}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.45]{images/blackjack_0_4_Q}
+	\caption{Blackjack policy example, with 40\% exploration rate after 100000 games.}
+	\label{fig:blackjack_0_4_Q}
+\end{minipage}	
+
+\end{figure}
+
+\begin{figure}[htbp!]
+\centering
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.4]{images/blackjackExpectedGain2}
+	\caption{Expected gain after playing 100000 games of blackjack with the given exploration rates.}
+	\label{fig:blackjackExpectedGain}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.45\linewidth}
 	\includegraphics[scale=0.4]{images/blackjackExpectedGain1}
 	\caption{Expected gain after playing 100000 games of blackjack with the given exploration rates.}
 	\label{fig:blackjackExpectedGain1}
+\end{minipage}	
 \end{figure}
 
 \section{Results and conclusions}
