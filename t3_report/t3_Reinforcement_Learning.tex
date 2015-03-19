@@ -79,9 +79,9 @@ As stated in the previous paragraph, in our case, graph.cost() and heuristic() r
 \end{minipage}
 \end{figure}
 
-\section{Q-learning in noughts and crosses}
+\section{TD learning in noughts and crosses}
 
-Q-learning is a reinforcement learning technique used when a problem can be modelled as a Markov decision process, where the world is modelled as a chain of \emph{states}, where an agent can take \emph{actions}, which is associated with a new state and a \emph{reward}.
+Temporal-difference is a reinforcement learning technique used when a problem can be modelled as a Markov decision process, where the world is modelled as a chain of \emph{states}, where an agent can take \emph{actions}, which is associated with a new state and a \emph{reward}.
 The objective is to maximize the rewards that the agents gets, and by doing so taking the optimal actions in that given world.
 However, since the system is an online learner, there is a trade-off between \emph{exploitation}, where the agent takes the actions that lead to the highest expected reward, and \emph{exploration}, where the agent takes different actions to gain more information of unexplored states.
 
@@ -97,7 +97,10 @@ In the implementation the state space will be modelled in a tree as shown in Fig
 On the root of the tree, we have empty board, the children are the 9 possible plays for the crosses player, who will always be the first to play.
 
 To test our system, the agent would play a fixed number of games against an AI with fixed moves initialized at random.
-In Figures \ref{fig:ttt_eps_0_2}, \ref{fig:ttt_eps_0_4}, \ref{fig:ttt_eps_0_6} and \ref{fig:tttExpectedGain} the behaviour of the system under variations of the exploration rate are shown.
+In Figures \ref{fig:ttt_eps_0_2}, \ref{fig:ttt_eps_0_4} and \ref{fig:ttt_eps_0_6} each curve represents the value for placing a cross in each of the 9 available positions as the first move of a new game.
+The reward for winning, drawing and loosing a game was set to 10, 1 and -1 respectively.
+Since the adversary of the agent is deterministic, a first move that leads to a winning combination is quickly discovered and its value increased. 
+In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a fixed number of games is shown; higher \emph{exploitation} rates entail increased mean rewards, as expected in a simple game with a deterministic opponent.
 
 \begin{figure}[htbp!]
 \centering
