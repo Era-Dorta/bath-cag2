@@ -102,9 +102,17 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 
 \begin{figure}[htbp!]
 \centering
+\begin{minipage}[t]{0.45\linewidth}
 	\includegraphics[scale=0.4]{images/ttt_tree}
 	\caption{Noughts and crosses tree state.}
 	\label{fig:ttt_tree}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.45\linewidth}
+	\includegraphics[scale=0.4]{images/blackjackExpectedGain}
+	\caption{Mean gain after playing 100000 games of for blackjack with the given exploration rates.}
+	\label{fig:blackjackExpectedGain}
+\end{minipage}
 \end{figure}
 
 \begin{figure}[htbp!]
@@ -136,7 +144,7 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 
 \section{Q-learning in BlackJack}
 
-For Q-learning we continue with the assumptions made in Section \ref{sec:td_ttt}.
+For Q-learning we retain the assumptions made in Section \ref{sec:td_ttt}.
 However, the state structure will be a lookup table $Q$ instead of a tree.
 $Q$ is a matrix of size $m \times n$, where $m$ is the number of states and $n$ are the number of actions.
 Every time the agent takes an action $a$, the $Q$ value of the pair $\lbrace s, a \rbrace$ is updated as follows $Q(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ r_{t+1} + \gamma \max\limits_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$, where $\alpha$ is the learning rate, $r_{t+1}$ is the reward for being in $s_{t+1}$ and $\gamma$ is a discounting factor.
