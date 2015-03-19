@@ -18,7 +18,7 @@ CM50245: Computer Animation and Games II}
 
 \section{A* path finding}
 
-The A* algorithm can find paths optimally in a graph based on a heuristic.
+The A*\cite{Hart1968} algorithm can find paths optimally in a graph based on a heuristic.
 It works under the assumption that the distance heuristic will never overestimate the cost of the path and the path cost will not decrease as we travel through it.
 In a maze world, where the movement possibilities are north, south, east and west, with fixed positive costs.
 Using a Manhattan distance for the actual path cost and a euclidean distance to compute the heuristic will fit the assumptions.
@@ -79,7 +79,7 @@ As stated in the previous paragraph, in our case, graph.cost() and heuristic() r
 \section{TD learning in noughts and crosses}
 \label{sec:td_ttt}
 
-Temporal-difference is a reinforcement learning technique used when a problem can be modelled as a Markov decision process, the world is modelled as a chain of \emph{states}, where an agent can take \emph{actions}, each of which are associated with a new state and a \emph{reward}.
+Temporal-difference learning\cite{Sutton1998} is a reinforcement learning technique used when a problem can be modelled as a Markov decision process, the world is modelled as a chain of \emph{states}, where an agent can take \emph{actions}, each of which are associated with a new state and a \emph{reward}.
 The objective is to maximize the rewards that the agents gets, and by doing so taking the optimal actions in that given world.
 However, since the system is an online learner, there is a trade-off between \emph{exploitation}, where the agent takes the actions that lead to the highest expected reward, and \emph{exploration}, where the agent takes different actions to gain more information of unexplored states.
 
@@ -144,7 +144,7 @@ In Figure \ref{fig:tttExpectedGain} a comparison of mean gains after playing a f
 
 \section{Q-learning in BlackJack}
 
-For Q-learning we retain the assumptions made in Section \ref{sec:td_ttt}.
+For Q-learning\cite{Sutton1998} we retain the assumptions made in Section \ref{sec:td_ttt}.
 However, the state structure will be a lookup table $Q$ instead of a tree.
 $Q$ is a matrix of size $m \times n$, where $m$ is the number of states and $n$ are the number of actions.
 Every time the agent takes an action $a$, the $Q$ value of the pair $\lbrace s, a \rbrace$ is updated as follows $Q(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ r_{t+1} + \gamma \max\limits_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$, where $\alpha$ is the learning rate, $r_{t+1}$ is the reward for being in $s_{t+1}$ and $\gamma$ is a discounting factor.
@@ -180,11 +180,11 @@ Comparing both policies, we can see that with a higher exploration rate, the age
 We have presented basic algorithms for path finding and reinforcement learning that are commonly uses in games.
 With A* we have an method to will output the optimal path with a minimal node evaluation.
 The heuristic distance could be overestimated in order to have a suboptimal path with early termination.
-More advance path finding methods include D* for incremental maps or Theta* for a continuous space map.
+More advance path finding methods include D*\cite{Stentz1993} for incremental maps or Theta*\cite{Nash2007} for a continuous space map.
 A substantial advantage of Q-learning is its online learning component, therefore if implement as the AI of the game, it can adapt to changes in the player strategy trough its continuous learning process.
 
-%\bibliographystyle{plain}
-%\bibliography{t2_meshAnim}
+\bibliographystyle{plain}
+\bibliography{t3_report}
 
 \end{document}
 
