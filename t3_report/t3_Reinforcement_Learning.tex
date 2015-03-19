@@ -162,6 +162,11 @@ Our blackjack implementation adopts the following rules:
 
 With a reward of 10 for winning and -1 for loosing the mean gain for different exploration rates is shown in  Figure \ref{fig:blackjackExpectedGain}.
 Since the dealer has an slight advantage, using equal rewards for winning and loosing produces a negative expected gains, as shown in Figure \ref{fig:blackjackExpectedGain1}.
+Policies learned after playing 100000 games are shown in Figures \ref{fig:blackjack_0_2_Q} and \ref{fig:blackjack_0_4_Q}.
+In both policies the agent stops hitting cards after their value is close to 18, if it has an ace.
+The agent plays more cautiously if it does not have any ace.
+This policy makes sense since an ace is by default counted as with 11 points, so it can be recounted as having 1 point if the agent goes over 21.
+Comparing both policies, we can see that with a higher exploration rate, the agent learnt that it should play even more prudently without an ace.
 
 \begin{figure}[btph!]
 \centering
