@@ -126,28 +126,29 @@ In Figure \ref{fig:tttExpectedGain}, a comparison of mean gains after playing a 
 
 \section{Q-learning in BlackJack}
 
-For Q-learning\cite{Sutton1998} we retain the assumptions made in Section \ref{sec:td_ttt}.
-However, the state structure will be a lookup table $Q$ instead of a tree.
-$Q$ is a matrix of size $m \times n$, where $m$ is the number of states and $n$ are the number of actions.
-Every time the agent takes an action $a$, the $Q$ value of the pair $\lbrace s, a \rbrace$ is updated as follows $Q(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ r_{t+1} + \gamma \max\limits_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$, where $\alpha$ is the learning rate, $r_{t+1}$ is the reward for being in $s_{t+1}$ and $\gamma$ is a discounting factor.
-An important advantage of using the aforementioned update mechanism is its off-policy nature, since the $Q(s_t,a_t)$ will be updated with $\max\limits_a Q(s_{t+1},a)$, even if the policy chooses an action which is suboptimal, the update will be computed with the optimal $Q(s_{t+1},a)$ value.
+For Q-learning\cite{Sutton1998}, we retain the assumptions made in Section \ref{sec:td_ttt}.
+However, the state structure will be a lookup table $Q$, instead of a tree.
+$Q$ is a matrix of size $m \times n$, where $m$ is the number of states and $n$ is the number of actions.
+Every time the agent takes an action $a_t$, the $Q$ value of the pair $\lbrace s_t, a_t \rbrace$ is updated as follows, $Q(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ r_{t+1} + \gamma \max\limits_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$, where $\alpha$ is the learning rate, $r_{t+1}$ is the reward for being in the state $s_{t+1}$ and $\gamma$ is a discounting factor.
+An important advantage of using the aforementioned update mechanism, is its off-policy nature, since the $Q(s_t,a_t)$ will be updated with $\max\limits_a Q(s_{t+1},a)$, even if the policy chooses an action which is suboptimal, the update will be computed with the optimal $Q(s_{t+1},a)$ value.
 
-Our blackjack implementation adopts the following rules:
+Lets define the rules used for our blackjack implementation:
 
 \begin{itemize}
-  \item A 52 french card deck is used.
+  \item Cards are drawn from a 52 cards french deck.
+  \item Cards points are the numeric value shown on the card, however kings, queens and jacks value is 10.
+  \item The player may count one ace with 1 or 11 points.
   \item The player is dealt an initial two cards hand.
-  \item The player may count one ace as 1 or 11 points.
   \item The dealer must hit cards until they have 17 or more points.
   \item If the dealer and the player have the same number of points, the dealer wins.
 \end{itemize}
 
 With a reward of 10 for winning and -1 for loosing the mean gain for different exploration rates is shown in  Figure \ref{fig:blackjackExpectedGain}.
-Since the dealer has an slight advantage, using equal rewards for winning and loosing produces a negative expected gains, as shown in Figure \ref{fig:blackjackExpectedGain1}.
+Since the dealer has an slight advantage, using equal rewards for winning and loosing produces negative expected gains, as shown in Figure \ref{fig:blackjackExpectedGain1}.
 Policies learned after playing 100000 games are shown in Figures \ref{fig:blackjack_0_2_Q} and \ref{fig:blackjack_0_4_Q}.
-In both policies the agent stops hitting cards after their value is close to 18, if it has an ace.
+With an ace in the hand, in both policies the agent stops hitting cards after their value is close to 18.
 The agent plays more cautiously if it does not have any ace.
-This policy makes sense since an ace is by default counted as with 11 points, so it can be recounted as having 1 point if the agent goes over 21.
+This policy makes sense since an ace can be counted as 11 points, so if the agent goes over 21 it can be recounted as 1 point.
 Comparing both policies, we can see that with a higher exploration rate, the agent learnt that it should play even more prudently without an ace.
 
 \begin{figure}[btph!]
@@ -183,11 +184,11 @@ Comparing both policies, we can see that with a higher exploration rate, the age
 
 \section{Results and conclusions}
 
-We have presented basic algorithms for path finding and reinforcement learning that are commonly uses in games.
-With A* we have an method to will output the optimal path with a minimal node evaluation.
+We have presented basic algorithms for path finding and reinforcement learning, which can be applied in games.
+With A* we have a method that will output the optimal path, with minimal node evaluation for a given heuristic.
 The heuristic distance could be overestimated in order to have a suboptimal path with early termination.
 More advance path finding methods include D*\cite{Stentz1993} for incremental maps or Theta*\cite{Nash2007} for a continuous space map.
-A substantial advantage of Q-learning is its online learning component, therefore if implement as the AI of the game, it can adapt to changes in the player strategy trough its continuous learning process.
+A substantial advantage of Q-learning, is its online learning component, therefore if implemented as the AI of the game, it can adapt to changes in the player strategy trough its continuous learning process.
 
 \bibliographystyle{plain}
 \bibliography{t3_report}
