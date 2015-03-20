@@ -38,7 +38,7 @@ One way to produce better results is to use transform-based techniques \cite{Ale
 Lets define an affine transformation from $\mathbf{p}_i$ to $\mathbf{q}_i$ such that
 
 \begin{align*}
-A \mathbf{p}_i + \mathbf{l} = \begin{pmatrix}
+A_j \mathbf{p}_i + \mathbf{l}_j = \begin{pmatrix}
  a_{11} & a_{12} & a_{13} \\ 
  a_{21} & a_{22} & a_{23} \\ 
  a_{31} & a_{32}  & a_{33} 
@@ -57,15 +57,16 @@ A \mathbf{p}_i + \mathbf{l} = \begin{pmatrix}
 
 We have a matrix $A_{j}$ and a translation vector $\mathbf{l}_j$ for each triangle, since there are 12 unknowns and only 9 equations can be built with each triangle, an extra vertex has to be added to be able to compute $A_j$.
 This extra vertex position is calculated as $\mathbf{p}_{new} = \mathbf{c}_{tr} + w\mathbf{n}_{tr}$, where $\mathbf{c}_{tr}$ is the triangle centroid, $w$ is the average triangle edge length and $\mathbf{n}_{tr}$ is the triangle normal. 
-In a mesh, vertices are shared among different triangles, so we cannot transform each triangle independently with its $A_j$.
+In a mesh vertices are shared among different triangles, so we cannot transform each triangle independently with its $A_j$.
 Instead lets define $B_{j}$ as the matrix that would transform the vertices in the triangle consistently.
-Where $A_j$ and $B_j$ are related by
+$A_j$ and $B_j$ are related by
 
 \begin{equation*}
 E(t) = \sum_{j}^J \left \| A_j(t) - B_j(t) \right \|^2_F,
 \end{equation*}
 
 where $\left \| \cdot \right \|_F$ is the matrix Frobenius norm, and the objective is to minimize $E(t)$.
+The underlying logic of this minimization is to compute a $B_j$ that is as similar as possible to $A_j$, subject to the vertex constraints.
 In order to treat each vertex in the mesh consistently, instead of having $\mathbf{q}_i$ for each triangle, lets rename them into $\mathbf{v}_i$ in the mesh.
 For each triangle, we can stack all its vertices in a matrix such as
 
@@ -132,7 +133,7 @@ P^{-1} =
 
 where $\mathbf{p_e}$ is the extra vertex in the source triangle and $\mathbf{v_e}$ is the extra vertex in the target triangle.
 The $\mathbf{l}_j$ terms can be ignored as they only represent triangle position in the scene, and we are interested in its shape and rotation.
-Extracting the matrices of interest to us, we have $B = P^{-1}V$, so we can write the $B$ terms as linear combination of $V$.
+Extracting the matrices of interest to us, we have $B = P^{-1}V$, so $B$ can be expressed as linear combination of $V$.
 We would have the above system for each triangle in the mesh, with its own $P$ and $B$ matrices.  
 Writing explicitly the Frobenius terms in $E(t)$, and using the above expression to substitute each $B$ term for $\mathbf{v}_i$ terms, we get
 
