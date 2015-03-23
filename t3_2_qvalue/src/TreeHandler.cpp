@@ -55,17 +55,16 @@ SiblingIt TreeHandler::getNextMove(char turn, float epsilon,
 	}
 }
 
-void TreeHandler::updateV(float alpha, float gamma) {
-	NodeIt qsa, qsaNext;
+void TreeHandler::updateV(double alpha) {
+	NodeIt parentNode, currentNode;
 
 	while (!optimalMoveStack.empty()) {
-		qsaNext = optimalMoveStack.top();
-		qsa = optimalMoveParentStack.top();
-		qsa->setV(
-				qsa->getV()
-						+ alpha
-								* (qsaNext->getR() + gamma * qsaNext->getV()
-										- qsa->getV()));
+		currentNode = optimalMoveStack.top();
+		parentNode = optimalMoveParentStack.top();
+		parentNode->setV(
+				parentNode->getV()
+						+ (float) alpha
+								* (currentNode->getV() - parentNode->getV()));
 		optimalMoveStack.pop();
 		optimalMoveParentStack.pop();
 	}
@@ -140,10 +139,6 @@ SiblingIt TreeHandler::getNextExploreNode(const SiblingIt& startNode) {
 	nextNode += numSibling;
 
 	return nextNode;
-}
-
-void TreeHandler::updateQ(float alpha, float gamma) {
-	updateV(alpha, gamma);
 }
 
 float TreeHandler::randf() {
