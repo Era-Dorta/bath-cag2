@@ -1,4 +1,7 @@
 %% As-rigid-as possible shape interpolation.
+% Load and save obj functions use this library
+% http://uk.mathworks.com/matlabcentral/fileexchange/27982-wavefront-obj-toolbox
+
 clearvars -except sourceShapeObj targetShapeObj;
 close all; clc;
 
