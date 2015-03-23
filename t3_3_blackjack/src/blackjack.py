@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 import random
 
+# This code is based on the Q-Learning implementation in
+# https://github.com/justinhj/astar-algorithm-cpp
+
 # A hand is represented as a pair (total, ace) where:
 #  - total is the point total of cards in the hand (counting aces as 1)
 #  - ace is true if the hand contains an ace

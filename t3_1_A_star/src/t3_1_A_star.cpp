@@ -1,3 +1,6 @@
+// This code is based on the A* implementation in
+// https://github.com/justinhj/astar-algorithm-cpp
+
 #include <iostream>
 #include <stdio.h>
 #include <math.h>
