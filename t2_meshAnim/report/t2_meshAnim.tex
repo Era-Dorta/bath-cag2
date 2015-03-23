@@ -35,7 +35,7 @@ Meshes generated with this method are shown in Figure \ref{fig:linearInterpolati
 
 The previous method produces distorted meshes due to its non-rigid nature.
 One way to produce better results is to use transform-based techniques \cite{Alexa2000}.
-Lets define an affine transformation from $\mathbf{p}_i$ to $\mathbf{q}_i$ such that
+Let us define an affine transformation from $\mathbf{p}_i$ to $\mathbf{q}_i$ such that
 
 \begin{align*}
 A_j \mathbf{p}_i + \mathbf{l}_j = \begin{pmatrix}
@@ -55,10 +55,11 @@ A_j \mathbf{p}_i + \mathbf{l}_j = \begin{pmatrix}
 \end{pmatrix} = \mathbf{q}_i.
 \end{align*}
 
-We have a matrix $A_{j}$ and a translation vector $\mathbf{l}_j$ for each triangle, since there are 12 unknowns and only 9 equations can be built with each triangle, an extra vertex has to be added to be able to compute $A_j$.
+We have a matrix $A_{j}$ and a translation vector $\mathbf{l}_j$ for each triangle.
+An extra vertex is added to every triangle, to be able to compute $A_j$, since with the three points in a triangle, we can only built an underconstrained system, with 12 unknowns and 9 equations.
 This extra vertex position is calculated as $\mathbf{p}_{new} = \mathbf{c}_{tr} + w\mathbf{n}_{tr}$, where $\mathbf{c}_{tr}$ is the triangle centroid, $w$ is the average triangle edge length and $\mathbf{n}_{tr}$ is the triangle normal. 
 In a mesh vertices are shared among different triangles, so we cannot transform each triangle independently with its $A_j$.
-Instead lets define $B_{j}$ as the matrix that would transform the vertices in the triangle consistently.
+Instead let us define $B_{j}$ as the matrix that would transform the vertices in the triangle consistently.
 $A_j$ and $B_j$ are related by
 
 \begin{equation*}
@@ -67,7 +68,7 @@ E(t) = \sum_{j}^J \left \| A_j(t) - B_j(t) \right \|^2_F,
 
 where $\left \| \cdot \right \|_F$ is the matrix Frobenius norm, and the objective is to minimize $E(t)$.
 The underlying logic of this minimization is to compute a $B_j$ that is as similar as possible to $A_j$, subject to the vertex constraints.
-In order to treat each vertex in the mesh consistently, instead of having $\mathbf{q}_i$ for each triangle, lets rename them into $\mathbf{v}_i$ in the mesh.
+In order to treat each vertex in the mesh consistently, instead of having $\mathbf{q}_i$ for each triangle, let us consider them into a vertex $\mathbf{v}_i$ in the mesh.
 For each triangle, we can stack all its vertices in a matrix such as
 
 \begin{equation*}
@@ -133,7 +134,7 @@ P^{-1} =
 
 where $\mathbf{p_e}$ is the extra vertex in the source triangle and $\mathbf{v_e}$ is the extra vertex in the target triangle.
 The $\mathbf{l}_j$ terms can be ignored as they only represent triangle position in the scene, and we are interested in its shape and rotation.
-Extracting the matrices of interest to us, we have $B = P^{-1}V$, so $B$ can be expressed as linear combination of $V$.
+Extracting the matrices of interest to us, we have $B = P^{-1}V$, so $B$ can be expressed as a linear combination of matrix $V$.
 We would have the above system for each triangle in the mesh, with its own $P$ and $B$ matrices.  
 Writing explicitly the Frobenius terms in $E(t)$, and using the above expression to substitute each $B$ term for $\mathbf{v}_i$ terms, we get
 
@@ -145,7 +146,7 @@ E(t) &= \lbrace a_{11}^2 - 2 a_{11} b_{11} + b_{11}^2 + \cdots +  b_{33}^2 \rbra
 \end{align*}
 
 where we have a $\lbrace \cdots \rbrace_j$ term for each triangle.
-If we set the transformation of $\mathbf{v_1}$ by a linear interpolation, and defining 
+If we set the transformation of $\mathbf{v_1}$ to linear interpolation, and defining 
 $\mathbf{u}(t)^T = \begin{pmatrix} 1, v_{2x}, v_{2y}, v_{2z}, \ldots, v_{mx}, v_{my}, v_{mz} \end{pmatrix}$, where $m$ is the number of vertices, we can stack the terms in a quadratic matrix form 
 
 \begin{equation*}
