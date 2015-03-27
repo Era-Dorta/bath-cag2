@@ -9,6 +9,7 @@
 #define SRC_CLOTHNODE_H_
 
 #include <maya/MPxNode.h>
+#include <maya/MFnNumericAttribute.h>
 
 class ClothNode: public MPxNode {
 public:
@@ -24,6 +25,8 @@ public:
 private:
 	static void setAttributeAffects();
 	static void addAttributes();
+	static void makeInput(MFnNumericAttribute &attr);
+	static void makeOutput(MFnNumericAttribute &attr);
 
 public:
 	static MTypeId id;

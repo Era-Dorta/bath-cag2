@@ -7,7 +7,6 @@
 
 #include "ClothNode.h"
 
-#include <maya/MFnNumericAttribute.h>
 #include <maya/MFnLightDataAttribute.h>
 #include <maya/MFloatVector.h>
 
@@ -48,18 +47,6 @@ MObject ClothNode::aReflectGain;
 
 MObject ClothNode::aTriangleNormalCamera;
 
-#define MAKE_INPUT(attr)						\
-    CHECK_MSTATUS ( attr.setKeyable(true) );  	\
-	CHECK_MSTATUS ( attr.setStorable(true) );	\
-    CHECK_MSTATUS ( attr.setReadable(true) );  \
-	CHECK_MSTATUS ( attr.setWritable(true) );
-
-#define MAKE_OUTPUT(attr)							\
-    CHECK_MSTATUS ( attr.setKeyable(false) ) ;  	\
-	CHECK_MSTATUS ( attr.setStorable(false) );		\
-    CHECK_MSTATUS ( attr.setReadable(true) ) ;  	\
-	CHECK_MSTATUS ( attr.setWritable(false) );
-
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
@@ -95,53 +82,53 @@ MStatus ClothNode::initialize() {
 
 	aTranslucenceCoeff = nAttr.create("translucenceCoeff", "tc",
 			MFnNumericData::kFloat);
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 
 	aDiffuseReflectivity = nAttr.create("diffuseReflectivity", "drfl",
 			MFnNumericData::kFloat);
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setDefault(0.8f));
 
 	aColor = nAttr.createColor("color", "c");
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setDefault(0.0f, 0.58824f, 0.644f));
 
 	aIncandescence = nAttr.createColor("incandescence", "ic");
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 
 	aOutColor = nAttr.createColor("outColor", "oc");
-	MAKE_OUTPUT(nAttr);
+	makeOutput(nAttr);
 
 	aPointCamera = nAttr.createPoint("pointCamera", "pc");
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setDefault(1.0f, 1.0f, 1.0f));
 	CHECK_MSTATUS(nAttr.setHidden(true));
 
 	aPower = nAttr.create("power", "pow", MFnNumericData::kFloat);
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setMin(0.0f));
 	CHECK_MSTATUS(nAttr.setMax(200.0f));
 	CHECK_MSTATUS(nAttr.setDefault(10.0f));
 
 	aSpecularity = nAttr.create("specularity", "spc", MFnNumericData::kFloat);
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setMin(0.0f));
 	CHECK_MSTATUS(nAttr.setMax(1.0f));
 	CHECK_MSTATUS(nAttr.setDefault(0.5f));
 
 	aReflectGain = nAttr.create("reflectionGain", "rg", MFnNumericData::kFloat);
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setMin(0.0f));
 	CHECK_MSTATUS(nAttr.setMax(1.0f));
 	CHECK_MSTATUS(nAttr.setDefault(0.5f));
 
 	aNormalCamera = nAttr.createPoint("normalCamera", "n");
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setDefault(1.0f, 1.0f, 1.0f));
 	CHECK_MSTATUS(nAttr.setHidden(true));
 
 	aTriangleNormalCamera = nAttr.createPoint("triangleNormalCamera", "tn");
-	MAKE_INPUT(nAttr);
+	makeInput(nAttr);
 	CHECK_MSTATUS(nAttr.setDefault(1.0f, 1.0f, 1.0f));
 	CHECK_MSTATUS(nAttr.setHidden(true));
 
@@ -298,6 +285,19 @@ void ClothNode::addAttributes() {
 	CHECK_MSTATUS(addAttribute(aReflectGain));
 }
 
+void ClothNode::makeInput(MFnNumericAttribute &attr) {
+	CHECK_MSTATUS(attr.setKeyable(false));
+	CHECK_MSTATUS(attr.setStorable(false));
+	CHECK_MSTATUS(attr.setReadable(true));
+	CHECK_MSTATUS(attr.setWritable(false));
+}
+
+void ClothNode::makeOutput(MFnNumericAttribute &attr) {
+	CHECK_MSTATUS(attr.setKeyable(false));
+	CHECK_MSTATUS(attr.setStorable(false));
+	CHECK_MSTATUS(attr.setReadable(true));
+	CHECK_MSTATUS(attr.setWritable(false));
+}
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
