@@ -1,5 +1,5 @@
-#ifndef _phongShaderOverride
-#define _phongShaderOverride
+#ifndef SRC_CLOTHSHADEROVERRIDE_H_
+#define SRC_CLOTHSHADEROVERRIDE_H_
 
 //-
 // ===========================================================================
@@ -20,12 +20,12 @@
 
 #include <maya/MPxSurfaceShadingNodeOverride.h>
 
-class phongShaderOverride : public MHWRender::MPxSurfaceShadingNodeOverride
+class ClothShaderOverride : public MHWRender::MPxSurfaceShadingNodeOverride
 {
 public:
 	static MHWRender::MPxSurfaceShadingNodeOverride* creator(const MObject& obj);
 
-	virtual ~phongShaderOverride();
+	virtual ~ClothShaderOverride();
 
 	virtual MHWRender::DrawAPI supportedDrawAPIs() const;
 
@@ -42,11 +42,11 @@ public:
 		const MHWRender::MAttributeParameterMappingList& mappings);
 
 private:
-	phongShaderOverride(const MObject& obj);
+	ClothShaderOverride(const MObject& obj);
 
 	MObject fObject;
 	float fSpecularColor[3];
 	mutable MString fResolvedSpecularColorName;
 };
 
-#endif // _phongShaderOverride
+#endif /* SRC_CLOTHSHADEROVERRIDE_H_ */

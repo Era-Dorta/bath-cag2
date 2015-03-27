@@ -27,16 +27,16 @@
 // add for raytracing api enhancement
 #include <maya/MRenderUtil.h>
 
-#include "phongShaderOverride.h"
+#include "ClothShaderOverride.h"
 
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-class PhongNode : public MPxNode
+class ClothNode : public MPxNode
 {
 	public:
-                      PhongNode();
-    virtual           ~PhongNode();
+                      ClothNode();
+    virtual           ~ClothNode();
 
     virtual MStatus   compute( const MPlug&, MDataBlock& );
 	virtual void      postConstructor();
@@ -80,37 +80,37 @@ class PhongNode : public MPxNode
 };
 
 // Static data
-MTypeId PhongNode::id( 0x81001 );
+MTypeId ClothNode::id( 0x81001 );
 
 // Attributes
-MObject PhongNode::aColor;
-MObject PhongNode::aTranslucenceCoeff;
-MObject PhongNode::aDiffuseReflectivity;
-MObject PhongNode::aIncandescence;
-MObject PhongNode::aOutColor;
-MObject PhongNode::aPointCamera;
-MObject PhongNode::aNormalCamera;
-MObject PhongNode::aLightData;
-MObject PhongNode::aLightDirection;
-MObject PhongNode::aLightIntensity;
-MObject PhongNode::aLightAmbient;
-MObject PhongNode::aLightDiffuse;
-MObject PhongNode::aLightSpecular;
-MObject PhongNode::aLightShadowFraction;
-MObject PhongNode::aPreShadowIntensity;
-MObject PhongNode::aLightBlindData;
-MObject PhongNode::aPower;
-MObject PhongNode::aSpecularity;
+MObject ClothNode::aColor;
+MObject ClothNode::aTranslucenceCoeff;
+MObject ClothNode::aDiffuseReflectivity;
+MObject ClothNode::aIncandescence;
+MObject ClothNode::aOutColor;
+MObject ClothNode::aPointCamera;
+MObject ClothNode::aNormalCamera;
+MObject ClothNode::aLightData;
+MObject ClothNode::aLightDirection;
+MObject ClothNode::aLightIntensity;
+MObject ClothNode::aLightAmbient;
+MObject ClothNode::aLightDiffuse;
+MObject ClothNode::aLightSpecular;
+MObject ClothNode::aLightShadowFraction;
+MObject ClothNode::aPreShadowIntensity;
+MObject ClothNode::aLightBlindData;
+MObject ClothNode::aPower;
+MObject ClothNode::aSpecularity;
 
-MObject PhongNode::aRayOrigin;
-MObject PhongNode::aRayDirection;
-MObject PhongNode::aObjectId;
-MObject PhongNode::aRaySampler;
-MObject PhongNode::aRayDepth;
+MObject ClothNode::aRayOrigin;
+MObject ClothNode::aRayDirection;
+MObject ClothNode::aObjectId;
+MObject ClothNode::aRaySampler;
+MObject ClothNode::aRayDepth;
 
-MObject PhongNode::aReflectGain;
+MObject ClothNode::aReflectGain;
 
-MObject PhongNode::aTriangleNormalCamera;
+MObject ClothNode::aTriangleNormalCamera;
 
 #define MAKE_INPUT(attr)						\
     CHECK_MSTATUS ( attr.setKeyable(true) );  	\
@@ -127,7 +127,7 @@ MObject PhongNode::aTriangleNormalCamera;
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-void PhongNode::postConstructor( )
+void ClothNode::postConstructor( )
 {
 	setMPSafe(true);
 }
@@ -135,29 +135,29 @@ void PhongNode::postConstructor( )
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-PhongNode::PhongNode()
+ClothNode::ClothNode()
 {
 }
 
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-PhongNode::~PhongNode()
+ClothNode::~ClothNode()
 {
 }
 
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-void * PhongNode::creator()
+void * ClothNode::creator()
 {
-    return new PhongNode();
+    return new ClothNode();
 }
 
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-MStatus PhongNode::initialize()
+MStatus ClothNode::initialize()
 {
     MFnNumericAttribute nAttr;
     MFnLightDataAttribute lAttr;
@@ -372,7 +372,7 @@ MStatus PhongNode::initialize()
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-MStatus PhongNode::compute(
+MStatus ClothNode::compute(
 const MPlug&      plug,
       MDataBlock& block )
 {
@@ -396,7 +396,7 @@ const MPlug&      plug,
 	// User-defined Reflection Color Gain
 	float reflectGain = block.inputValue( aReflectGain ).asFloat();
 
-    // Phong shading attributes
+    // Cloth shading attributes
     float power = block.inputValue( aPower ).asFloat();
     float spec = block.inputValue( aSpecularity ).asFloat();
 
@@ -568,25 +568,25 @@ const MPlug&      plug,
     return MS::kSuccess;
 }
 
-static const MString sRegistrantId("phongShaderPlugin");
+static const MString sRegistrantId("ClothShaderPlugin");
 
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
 MStatus initializePlugin( MObject obj )
 {
-   const MString UserClassify( "shader/surface:drawdb/shader/surface/phongNode" );
+   const MString UserClassify( "shader/surface:drawdb/shader/surface/clothNode" );
 
    MFnPlugin plugin( obj, PLUGIN_COMPANY, "4.5", "Any");
-   CHECK_MSTATUS ( plugin.registerNode( "phongNode", PhongNode::id,
-                         PhongNode::creator, PhongNode::initialize,
+   CHECK_MSTATUS ( plugin.registerNode( "clothNode", ClothNode::id,
+                         ClothNode::creator, ClothNode::initialize,
                          MPxNode::kDependNode, &UserClassify ) );
 
 	CHECK_MSTATUS(
 		MHWRender::MDrawRegistry::registerSurfaceShadingNodeOverrideCreator(
-			"drawdb/shader/surface/phongNode",
+			"drawdb/shader/surface/clothNode",
 			sRegistrantId,
-			phongShaderOverride::creator));
+			ClothShaderOverride::creator));
 
    return MS::kSuccess;
 }
@@ -597,10 +597,10 @@ MStatus initializePlugin( MObject obj )
 MStatus uninitializePlugin( MObject obj )
 {
    MFnPlugin plugin( obj );
-   CHECK_MSTATUS ( plugin.deregisterNode( PhongNode::id ) );
+   CHECK_MSTATUS ( plugin.deregisterNode( ClothNode::id ) );
 
 	CHECK_MSTATUS(MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(
-		"drawdb/shader/surface/phongNode", sRegistrantId));
+		"drawdb/shader/surface/clothNode", sRegistrantId));
 
    return MS::kSuccess;
 }

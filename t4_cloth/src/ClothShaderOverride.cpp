@@ -8,16 +8,16 @@
 // ===========================================================================
 //+
 
-#include "phongShaderOverride.h"
 #include <maya/MFnDependencyNode.h>
 #include <maya/MShaderManager.h>
+#include "ClothShaderOverride.h"
 
-MHWRender::MPxSurfaceShadingNodeOverride* phongShaderOverride::creator(const MObject& obj)
+MHWRender::MPxSurfaceShadingNodeOverride* ClothShaderOverride::creator(const MObject& obj)
 {
-	return new phongShaderOverride(obj);
+	return new ClothShaderOverride(obj);
 }
 
-phongShaderOverride::phongShaderOverride(const MObject& obj)
+ClothShaderOverride::ClothShaderOverride(const MObject& obj)
 : MPxSurfaceShadingNodeOverride(obj)
 , fObject(obj)
 , fResolvedSpecularColorName("")
@@ -27,17 +27,17 @@ phongShaderOverride::phongShaderOverride(const MObject& obj)
 	fSpecularColor[2] = 0.5f;
 }
 
-phongShaderOverride::~phongShaderOverride()
+ClothShaderOverride::~ClothShaderOverride()
 {
 }
 
-MHWRender::DrawAPI phongShaderOverride::supportedDrawAPIs() const
+MHWRender::DrawAPI ClothShaderOverride::supportedDrawAPIs() const
 {
 	// works in both gl and dx
 	return MHWRender::kOpenGL | MHWRender::kDirectX11;
 }
 
-MString phongShaderOverride::fragmentName() const
+MString ClothShaderOverride::fragmentName() const
 {
 	// clear fResolvedSpecularColorName since we've rebuilt
 	fResolvedSpecularColorName = "";
@@ -46,7 +46,7 @@ MString phongShaderOverride::fragmentName() const
 	return "mayaPhongSurface";
 }
 
-void phongShaderOverride::getCustomMappings(
+void ClothShaderOverride::getCustomMappings(
 	MHWRender::MAttributeParameterMappingList& mappings)
 {
 	// The "color" and "incandescence" attributes are all named the same as
@@ -69,8 +69,8 @@ void phongShaderOverride::getCustomMappings(
 		"cosinePower", "power", true, true);
 	mappings.append(powerMapping);
 
-	// Our phong only uses a single float for specularity, while the Maya
-	// phong fragment uses a full 3-float color. We could add a remap fragment
+	// Our cloth only uses a single float for specularity, while the Maya
+	// cloth fragment uses a full 3-float color. We could add a remap fragment
 	// in front to expand the float to a 3-float, but it is simpler here to
 	// just set the parameter manually in updateShader(). So add an empty
 	// mapping to ensure the parameter gets renamed.
@@ -80,19 +80,19 @@ void phongShaderOverride::getCustomMappings(
 
 }
 
-MString phongShaderOverride::primaryColorParameter() const
+MString ClothShaderOverride::primaryColorParameter() const
 {
-	// Use the color parameter from the phong fragment as the primary color
+	// Use the color parameter from the cloth fragment as the primary color
 	return "color";
 }
 
-MString phongShaderOverride::bumpAttribute() const
+MString ClothShaderOverride::bumpAttribute() const
 {
 	// Use the "normalCamera" attribute to recognize bump connections
 	return "normalCamera";
 }
 
-void phongShaderOverride::updateDG()
+void ClothShaderOverride::updateDG()
 {
 	MStatus status;
 	MFnDependencyNode node(fObject, &status);
@@ -108,7 +108,7 @@ void phongShaderOverride::updateDG()
 	}
 }
 
-void phongShaderOverride::updateShader(
+void ClothShaderOverride::updateShader(
 	MHWRender::MShaderInstance& shader,
 	const MHWRender::MAttributeParameterMappingList& mappings)
 {
