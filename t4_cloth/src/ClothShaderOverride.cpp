@@ -1,44 +1,36 @@
-//-
-// ===========================================================================
-// Copyright 2012 Autodesk, Inc. All rights reserved.
-//
-// Use of this software is subject to the terms of the Autodesk license
-// agreement provided at the time of installation or download, or which
-// otherwise accompanies this software in either electronic or hard copy form.
-// ===========================================================================
-//+
+/*
+ * ClothShaderOverride.h
+ *
+ *  Created on: 27 Mar 2015
+ *      Author: gdp24
+ */
 
 #include <maya/MFnDependencyNode.h>
 #include <maya/MShaderManager.h>
 #include "ClothShaderOverride.h"
 
-MHWRender::MPxSurfaceShadingNodeOverride* ClothShaderOverride::creator(const MObject& obj)
-{
+MHWRender::MPxSurfaceShadingNodeOverride* ClothShaderOverride::creator(
+		const MObject& obj) {
 	return new ClothShaderOverride(obj);
 }
 
-ClothShaderOverride::ClothShaderOverride(const MObject& obj)
-: MPxSurfaceShadingNodeOverride(obj)
-, fObject(obj)
-, fResolvedSpecularColorName("")
-{
+ClothShaderOverride::ClothShaderOverride(const MObject& obj) :
+		MPxSurfaceShadingNodeOverride(obj), fObject(obj), fResolvedSpecularColorName(
+				"") {
 	fSpecularColor[0] = 0.5f;
 	fSpecularColor[1] = 0.5f;
 	fSpecularColor[2] = 0.5f;
 }
 
-ClothShaderOverride::~ClothShaderOverride()
-{
+ClothShaderOverride::~ClothShaderOverride() {
 }
 
-MHWRender::DrawAPI ClothShaderOverride::supportedDrawAPIs() const
-{
+MHWRender::DrawAPI ClothShaderOverride::supportedDrawAPIs() const {
 	// works in both gl and dx
 	return MHWRender::kOpenGL | MHWRender::kDirectX11;
 }
 
-MString ClothShaderOverride::fragmentName() const
-{
+MString ClothShaderOverride::fragmentName() const {
 	// clear fResolvedSpecularColorName since we've rebuilt
 	fResolvedSpecularColorName = "";
 
@@ -47,26 +39,25 @@ MString ClothShaderOverride::fragmentName() const
 }
 
 void ClothShaderOverride::getCustomMappings(
-	MHWRender::MAttributeParameterMappingList& mappings)
-{
+		MHWRender::MAttributeParameterMappingList& mappings) {
 	// The "color" and "incandescence" attributes are all named the same as
 	// the corresponding parameters on the fragment so they will map
 	// automatically. Need to remap "diffuseReflectivity", "translucenceCoeff",
 	// "reflectionGain" and "power" though.
-	MHWRender::MAttributeParameterMapping diffuseMapping(
-		"diffuse", "diffuseReflectivity", true, true);
+	MHWRender::MAttributeParameterMapping diffuseMapping("diffuse",
+			"diffuseReflectivity", true, true);
 	mappings.append(diffuseMapping);
 
-	MHWRender::MAttributeParameterMapping translucenceMapping(
-		"translucence", "translucenceCoeff", true, true);
+	MHWRender::MAttributeParameterMapping translucenceMapping("translucence",
+			"translucenceCoeff", true, true);
 	mappings.append(translucenceMapping);
 
-	MHWRender::MAttributeParameterMapping reflectivityMapping(
-		"reflectivity", "reflectionGain", true, true);
+	MHWRender::MAttributeParameterMapping reflectivityMapping("reflectivity",
+			"reflectionGain", true, true);
 	mappings.append(reflectivityMapping);
 
-	MHWRender::MAttributeParameterMapping powerMapping(
-		"cosinePower", "power", true, true);
+	MHWRender::MAttributeParameterMapping powerMapping("cosinePower", "power",
+			true, true);
 	mappings.append(powerMapping);
 
 	// Our cloth only uses a single float for specularity, while the Maya
@@ -74,30 +65,26 @@ void ClothShaderOverride::getCustomMappings(
 	// in front to expand the float to a 3-float, but it is simpler here to
 	// just set the parameter manually in updateShader(). So add an empty
 	// mapping to ensure the parameter gets renamed.
-	MHWRender::MAttributeParameterMapping specColMapping(
-		"specularColor", "", true, true);
+	MHWRender::MAttributeParameterMapping specColMapping("specularColor", "",
+			true, true);
 	mappings.append(specColMapping);
 
 }
 
-MString ClothShaderOverride::primaryColorParameter() const
-{
+MString ClothShaderOverride::primaryColorParameter() const {
 	// Use the color parameter from the cloth fragment as the primary color
 	return "color";
 }
 
-MString ClothShaderOverride::bumpAttribute() const
-{
+MString ClothShaderOverride::bumpAttribute() const {
 	// Use the "normalCamera" attribute to recognize bump connections
 	return "normalCamera";
 }
 
-void ClothShaderOverride::updateDG()
-{
+void ClothShaderOverride::updateDG() {
 	MStatus status;
 	MFnDependencyNode node(fObject, &status);
-	if (status)
-	{
+	if (status) {
 		float specularity = 0.5f;
 		node.findPlug("specularity").getValue(specularity);
 
@@ -108,24 +95,19 @@ void ClothShaderOverride::updateDG()
 	}
 }
 
-void ClothShaderOverride::updateShader(
-	MHWRender::MShaderInstance& shader,
-	const MHWRender::MAttributeParameterMappingList& mappings)
-{
+void ClothShaderOverride::updateShader(MHWRender::MShaderInstance& shader,
+		const MHWRender::MAttributeParameterMappingList& mappings) {
 	// Cache resolved name if found to avoid lookup on every update
-	if (fResolvedSpecularColorName.length() == 0)
-	{
+	if (fResolvedSpecularColorName.length() == 0) {
 		const MHWRender::MAttributeParameterMapping* mapping =
-			mappings.findByParameterName("specularColor");
-		if (mapping)
-		{
+				mappings.findByParameterName("specularColor");
+		if (mapping) {
 			fResolvedSpecularColorName = mapping->resolvedParameterName();
 		}
 	}
 
 	// Set parameter
-	if (fResolvedSpecularColorName.length() > 0)
-	{
+	if (fResolvedSpecularColorName.length() > 0) {
 		shader.setParameter(fResolvedSpecularColorName, fSpecularColor);
 	}
 }
