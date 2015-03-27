@@ -16,6 +16,7 @@
 
 // Static data
 MTypeId ClothNode::id(0x81001);
+const MString ClothNode::m_TypeName("ClothNode");
 
 // Attributes
 MObject ClothNode::aColor;
@@ -161,7 +162,6 @@ MStatus ClothNode::initialize() {
 	aLightAmbient = nAttr.create("lightAmbient", "la",
 			MFnNumericData::kBoolean);
 	CHECK_MSTATUS(nAttr.setStorable(false));
-	CHECK_MSTATUS(nAttr.setHidden(true));
 	CHECK_MSTATUS(nAttr.setReadable(true));
 	CHECK_MSTATUS(nAttr.setWritable(false));
 	CHECK_MSTATUS(nAttr.setHidden(true));
@@ -245,27 +245,13 @@ MStatus ClothNode::initialize() {
 	CHECK_MSTATUS(nAttr.setHidden(true));
 	CHECK_MSTATUS(nAttr.setReadable(false));
 
-	CHECK_MSTATUS(addAttribute(aTranslucenceCoeff));
-	CHECK_MSTATUS(addAttribute(aDiffuseReflectivity));
-	CHECK_MSTATUS(addAttribute(aColor));
-	CHECK_MSTATUS(addAttribute(aIncandescence));
-	CHECK_MSTATUS(addAttribute(aPointCamera));
-	CHECK_MSTATUS(addAttribute(aNormalCamera));
-	CHECK_MSTATUS(addAttribute(aTriangleNormalCamera));
+	addAttributes();
+	setAttributeAffects();
 
-	CHECK_MSTATUS(addAttribute(aLightData));
+	return MS::kSuccess;
+}
 
-	CHECK_MSTATUS(addAttribute(aPower));
-	CHECK_MSTATUS(addAttribute(aSpecularity));
-	CHECK_MSTATUS(addAttribute(aOutColor));
-
-	CHECK_MSTATUS(addAttribute(aRayOrigin));
-	CHECK_MSTATUS(addAttribute(aRayDirection));
-	CHECK_MSTATUS(addAttribute(aObjectId));
-	CHECK_MSTATUS(addAttribute(aRaySampler));
-	CHECK_MSTATUS(addAttribute(aRayDepth));
-	CHECK_MSTATUS(addAttribute(aReflectGain));
-
+void ClothNode::setAttributeAffects() {
 	CHECK_MSTATUS(attributeAffects(aTranslucenceCoeff, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aDiffuseReflectivity, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aLightIntensity, aOutColor));
@@ -284,15 +270,32 @@ MStatus ClothNode::initialize() {
 	CHECK_MSTATUS(attributeAffects(aPower, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aSpecularity, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aColor, aOutColor));
-
 	CHECK_MSTATUS(attributeAffects(aRayOrigin, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aRayDirection, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aObjectId, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aRaySampler, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aRayDepth, aOutColor));
 	CHECK_MSTATUS(attributeAffects(aReflectGain, aOutColor));
+}
 
-	return MS::kSuccess;
+void ClothNode::addAttributes() {
+	CHECK_MSTATUS(addAttribute(aTranslucenceCoeff));
+	CHECK_MSTATUS(addAttribute(aDiffuseReflectivity));
+	CHECK_MSTATUS(addAttribute(aColor));
+	CHECK_MSTATUS(addAttribute(aIncandescence));
+	CHECK_MSTATUS(addAttribute(aPointCamera));
+	CHECK_MSTATUS(addAttribute(aNormalCamera));
+	CHECK_MSTATUS(addAttribute(aTriangleNormalCamera));
+	CHECK_MSTATUS(addAttribute(aLightData));
+	CHECK_MSTATUS(addAttribute(aPower));
+	CHECK_MSTATUS(addAttribute(aSpecularity));
+	CHECK_MSTATUS(addAttribute(aOutColor));
+	CHECK_MSTATUS(addAttribute(aRayOrigin));
+	CHECK_MSTATUS(addAttribute(aRayDirection));
+	CHECK_MSTATUS(addAttribute(aObjectId));
+	CHECK_MSTATUS(addAttribute(aRaySampler));
+	CHECK_MSTATUS(addAttribute(aRayDepth));
+	CHECK_MSTATUS(addAttribute(aReflectGain));
 }
 
 //

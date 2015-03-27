@@ -20,7 +20,14 @@ public:
 
 	static void * creator();
 	static MStatus initialize();
+
+private:
+	static void setAttributeAffects();
+	static void addAttributes();
+
+public:
 	static MTypeId id;
+	const static  MString m_TypeName;
 
 private:
 	static MObject aColor;

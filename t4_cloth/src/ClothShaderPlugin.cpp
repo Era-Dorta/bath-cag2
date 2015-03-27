@@ -20,16 +20,16 @@ static const MString sRegistrantId("ClothShaderPlugin");
 ///////////////////////////////////////////////////////
 MStatus initializePlugin(MObject obj) {
 	const MString UserClassify(
-			"shader/surface:drawdb/shader/surface/clothNode");
+			"shader/surface:drawdb/shader/surface/" + ClothNode::m_TypeName);
 
 	MFnPlugin plugin(obj, PLUGIN_COMPANY, "4.5", "Any");
 	CHECK_MSTATUS(
-			plugin.registerNode("clothNode", ClothNode::id, ClothNode::creator,
+			plugin.registerNode(ClothNode::m_TypeName, ClothNode::id, ClothNode::creator,
 					ClothNode::initialize, MPxNode::kDependNode, &UserClassify));
 
 	CHECK_MSTATUS(
 			MHWRender::MDrawRegistry::registerSurfaceShadingNodeOverrideCreator(
-					"drawdb/shader/surface/clothNode", sRegistrantId,
+					"drawdb/shader/surface/" + ClothNode::m_TypeName, sRegistrantId,
 					ClothShaderOverride::creator));
 
 	return MS::kSuccess;
@@ -44,7 +44,7 @@ MStatus uninitializePlugin(MObject obj) {
 
 	CHECK_MSTATUS(
 			MHWRender::MDrawRegistry::deregisterSurfaceShadingNodeOverrideCreator(
-					"drawdb/shader/surface/clothNode", sRegistrantId));
+					"drawdb/shader/surface/" + ClothNode::m_TypeName, sRegistrantId));
 
 	return MS::kSuccess;
 }
