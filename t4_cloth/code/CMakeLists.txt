@@ -15,7 +15,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_REENTRANT -fPIC -pthread -ansi -share
 
 ADD_LIBRARY(t4_cloth_mentalray
 	SHARED
-   src/maya_illum_lambert.cpp
+   src/cloth_node.cpp
 )
 
 SET_TARGET_PROPERTIES(t4_cloth_mentalray PROPERTIES PREFIX "")
