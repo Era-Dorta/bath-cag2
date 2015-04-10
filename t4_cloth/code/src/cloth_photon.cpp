@@ -25,7 +25,7 @@ extern "C" DLLEXPORT int cloth_photon_version(void) {
 	return (1);
 }
 
-static bool do_print = true;
+static int do_print = 0;
 
 extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		struct cloth_photon *paras) {
@@ -53,17 +53,6 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 
 	type = mi_choose_scatter_type(state, 1, &m.diffuse_color, &other,
 			&m.specular_color);
-
-	miScalar theta_i = 1.5;
-	miScalar theta_r = 1.1;
-	miScalar g_lobe = 0.1;
-	miScalar F = 1;
-	miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
-			/ (cos(theta_i) + cos(theta_r));
-
-	color.r = energy->r * vol_scatter * A.x * m.diffuse_color.r;
-	color.g = energy->r * vol_scatter * A.y * m.diffuse_color.g;
-	color.b = energy->r * vol_scatter * A.z * m.diffuse_color.b;
 
 	/*
 	 * Shoot new photon: Compute new photon color
@@ -105,10 +94,27 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 	}
 		/* diffuse transm. (translucency), so far only this one gets executed */
 	case miPHOTON_TRANSMIT_DIFFUSE: {
-		color.r = energy->r * m.diffuse_color.r;
-		color.g = energy->g * m.diffuse_color.g;
-		color.b = energy->b * m.diffuse_color.b;
+
+		miScalar cos_theta_i = mi_vector_dot(&(state->normal_geom),&(state->dir));
+		miScalar theta_i = acos(cos_theta_i);
+
 		mi_transmission_dir_diffuse(&dir, state);
+
+		miScalar cos_theta_r = mi_vector_dot(&(state->normal_geom),&dir);
+		miScalar theta_r = acos(cos_theta_r);
+
+		miScalar theta_h = (theta_i + theta_r) * 0.5;
+		miScalar theta_d = (theta_i - theta_r) * 0.5;
+
+		miScalar g_lobe = 1;
+		miScalar F = 1;
+		miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
+				/ (cos_theta_i + cos_theta_r);
+
+		color.r = energy->r * vol_scatter * A.x * m.diffuse_color.r;
+		color.g = energy->r * vol_scatter * A.y * m.diffuse_color.g;
+		color.b = energy->r * vol_scatter * A.z * m.diffuse_color.b;
+
 		return (mi_photon_transmission_diffuse(&color, state, &dir));
 	}
 	default: { /* Unknown scatter type */
