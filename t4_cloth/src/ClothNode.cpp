@@ -361,7 +361,7 @@ MStatus ClothNode::compute(const MPlug& plug, MDataBlock& block) {
 			// find diffuse and specular component
 			if (currentLight.child(aLightDiffuse).asBool()) {
 				float cosln = lightDirection * surfaceNormal;
-				;
+
 				if (cosln > 0.0f)  // calculate only if facing light
 						{
 					diffuseR += lightIntensity[0]
