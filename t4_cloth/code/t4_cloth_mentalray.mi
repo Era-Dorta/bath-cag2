@@ -1,6 +1,6 @@
 # ******************************************************************************
 #
-#	maya_illum_lambert		use Maya light linker
+#	cloth_node		a cloth shading node
 #
 # ******************************************************************************
 
@@ -8,11 +8,11 @@ min version "3.0.0"
 max version "3.12.2"
 
 #
-#	mib_illum_lambert
+#	cloth_node
 #	with lightLink
 #
 declare shader
-	color "maya_illum_lambert" (
+	color "cloth_node" (
 		color		"ambience",  #: default .2, .2, .2, 1.
 		color		"ambient",   #: default .5, .5, .5, 1.
 		color 		"diffuse",   #: default .7, .7, .7, 1.
@@ -26,7 +26,7 @@ declare shader
 		#shader		"lightLink",
 		#boolean		"miLightLink"	#: default 0
 	)
-	#: nodeid 6894 # This is the node ID for binary Maya files.
-	version 4
+	#: nodeid 6899 # This is the node ID for binary Maya files.
+	version 1
 	apply material
 end declare

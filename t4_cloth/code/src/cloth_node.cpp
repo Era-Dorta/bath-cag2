@@ -11,7 +11,7 @@
  *****************************************************************************/
 #include "mayaapi.h"
 
-struct maya_illum_lambert {
+struct cloth_node {
 	miColor     ambience;   /* ambient color multiplier */
 	miColor     ambient;    /* ambient color */
 	miColor     diffuse;    /* diffuse color */
@@ -30,12 +30,12 @@ struct maya_illum_lambert {
 };
 
 
-extern "C" DLLEXPORT int maya_illum_lambert_version(void) {return(4);}
+extern "C" DLLEXPORT int cloth_node_version(void) {return(1);}
 
-extern "C" DLLEXPORT miBoolean maya_illum_lambert(
+extern "C" DLLEXPORT miBoolean cloth_node(
 	miColor		*result,
 	miState		*state,
-	struct maya_illum_lambert *paras)
+	struct cloth_node *paras)
 {
 	miColor		*ambi, *diff;
 	miTag		*light;		/* tag of light instance */
