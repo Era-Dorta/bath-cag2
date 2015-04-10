@@ -158,7 +158,7 @@ createNode directionalLight -n "directionalLightShape1" -p "directionalLight1";
 	setAttr ".phot" yes;
 	setAttr ".eng" -type "float3" 2000 2000 2000 ;
 	setAttr ".phi" 2000;
-	setAttr ".gph" 1000;
+	setAttr ".gph" 10000; //Number of photons been shot
 createNode lightLinker -s -n "lightLinker1";
 	setAttr -s 5 ".lnk";
 	setAttr -s 5 ".slnk";
