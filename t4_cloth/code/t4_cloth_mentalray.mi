@@ -30,3 +30,9 @@ declare shader
 	version 1
 	apply material
 end declare
+declare shader
+	color "cloth_photon" (
+		color "diffuse_color" default 1 1 1 )
+	#: nodeid 6799 # This is the node ID for binary Maya files.
+	version 1
+end declare

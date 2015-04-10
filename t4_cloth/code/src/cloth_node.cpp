@@ -92,7 +92,8 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		}
 	}
 	/* add contribution from indirect illumination (caustics) */
-	mi_compute_irradiance(&color, state);
+	mi_compute_avg_radiance(&color, state, 'f', NULL);
+	//mi_compute_irradiance(&color, state);
 	result->r += color.r * diff->r;
 	result->g += color.g * diff->g;
 	result->b += color.b * diff->b;

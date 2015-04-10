@@ -1,10 +1,11 @@
 //Maya ASCII 2015 scene
 //Name: shaderTestGlobalIlum.ma
-//Last modified: Fri, Apr 10, 2015 10:48:25 AM
+//Last modified: Fri, Apr 10, 2015 01:45:56 PM
 //Codeset: UTF-8
 requires maya "2015";
 requires -nodeType "mentalrayFramebuffer" -nodeType "mentalrayOptions" -nodeType "mentalrayGlobals"
-		 -nodeType "mentalrayItemsList" -nodeType "cloth_node" -dataType "byteArray" "Mayatomr" "2015.0 - 3.12.1.18 ";
+		 -nodeType "mentalrayItemsList" -nodeType "cloth_node" -nodeType "cloth_photon" -dataType "byteArray"
+		 "Mayatomr" "2015.0 - 3.12.1.18 ";
 currentUnit -l centimeter -a degree -t film;
 fileInfo "application" "maya";
 fileInfo "product" "Maya 2015";
@@ -437,6 +438,9 @@ createNode shadingEngine -n "cloth_node3SG";
 	setAttr ".ihi" 0;
 	setAttr ".ro" yes;
 createNode materialInfo -n "materialInfo6";
+createNode cloth_photon -n "cloth_photon1";
+createNode cloth_photon -n "cloth_photon2";
+createNode cloth_photon -n "cloth_photon3";
 select -ne :time1;
 	setAttr ".o" 1;
 	setAttr ".unw" 1;
@@ -447,6 +451,8 @@ select -ne :defaultShaderList1;
 	setAttr -s 5 ".s";
 select -ne :postProcessList1;
 	setAttr -s 2 ".p";
+select -ne :defaultRenderUtilityList1;
+	setAttr -s 3 ".u";
 select -ne :defaultRenderingList1;
 select -ne :lightList1;
 select -ne :initialShadingGroup;
@@ -500,22 +506,31 @@ connectAttr ":miDefaultOptions.msg" ":mentalrayGlobals.opt";
 connectAttr ":miDefaultFramebuffer.msg" ":mentalrayGlobals.fb";
 connectAttr "cloth_node1.S05" "cloth_node1SG.mims";
 connectAttr "pSphereShape2.iog" "cloth_node1SG.dsm" -na;
+connectAttr "cloth_photon1.S01" "cloth_node1SG.mips";
 connectAttr "cloth_node1SG.msg" "materialInfo4.sg";
 connectAttr "cloth_node1.msg" "materialInfo4.m";
 connectAttr "cloth_node2.S05" "cloth_node2SG.mims";
 connectAttr "pSphereShape1.iog" "cloth_node2SG.dsm" -na;
+connectAttr "cloth_photon2.S01" "cloth_node2SG.mips";
 connectAttr "cloth_node2SG.msg" "materialInfo5.sg";
 connectAttr "cloth_node2.msg" "materialInfo5.m";
 connectAttr "cloth_node3.S05" "cloth_node3SG.mims";
 connectAttr "pSphereShape3.iog" "cloth_node3SG.dsm" -na;
+connectAttr "cloth_photon3.S01" "cloth_node3SG.mips";
 connectAttr "cloth_node3SG.msg" "materialInfo6.sg";
 connectAttr "cloth_node3.msg" "materialInfo6.m";
+connectAttr "cloth_node1.S02" "cloth_photon1.S00";
+connectAttr "cloth_node2.S02" "cloth_photon2.S00";
+connectAttr "cloth_node3.S02" "cloth_photon3.S00";
 connectAttr "cloth_node1SG.pa" ":renderPartition.st" -na;
 connectAttr "cloth_node2SG.pa" ":renderPartition.st" -na;
 connectAttr "cloth_node3SG.pa" ":renderPartition.st" -na;
 connectAttr "cloth_node1.msg" ":defaultShaderList1.s" -na;
 connectAttr "cloth_node2.msg" ":defaultShaderList1.s" -na;
 connectAttr "cloth_node3.msg" ":defaultShaderList1.s" -na;
+connectAttr "cloth_photon1.msg" ":defaultRenderUtilityList1.u" -na;
+connectAttr "cloth_photon2.msg" ":defaultRenderUtilityList1.u" -na;
+connectAttr "cloth_photon3.msg" ":defaultRenderUtilityList1.u" -na;
 connectAttr "defaultRenderLayer.msg" ":defaultRenderingList1.r" -na;
 connectAttr "directionalLightShape1.ltd" ":lightList1.l" -na;
 connectAttr "pPlaneShape1.iog" ":initialShadingGroup.dsm" -na;
