@@ -1,6 +1,6 @@
 //Maya ASCII 2015 scene
 //Name: shaderTestGlobalIlum.ma
-//Last modified: Fri, Apr 10, 2015 01:45:56 PM
+//Last modified: Fri, Apr 10, 2015 03:04:01 PM
 //Codeset: UTF-8
 requires maya "2015";
 requires -nodeType "mentalrayFramebuffer" -nodeType "mentalrayOptions" -nodeType "mentalrayGlobals"
@@ -158,6 +158,7 @@ createNode directionalLight -n "directionalLightShape1" -p "directionalLight1";
 	setAttr ".phot" yes;
 	setAttr ".eng" -type "float3" 2000 2000 2000 ;
 	setAttr ".phi" 2000;
+	setAttr ".gph" 1000;
 createNode lightLinker -s -n "lightLinker1";
 	setAttr -s 5 ".lnk";
 	setAttr -s 5 ".slnk";
