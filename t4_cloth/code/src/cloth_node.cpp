@@ -49,19 +49,31 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	i_l = *mi_eval_integer(&paras->i_light);
 	light = mi_eval_tag(paras->light) + i_l;
 
-	if (m == 1) /* modify light list (inclusive mode) */
+	switch (m) {
+	case 1: {
+		// modify light list (inclusive mode)
 		mi_inclusive_lightlist(&n_l, &light, state);
-	else if (m == 2) /* modify light list (exclusive mode) */
+		break;
+	}
+	case 2: {
+		// modify light list (exclusive mode)
 		mi_exclusive_lightlist(&n_l, &light, state);
-	else if (m == 4) {
+		break;
+	}
+	case 4: {
 		n_l = 0;
 		light = 0;
+		break;
+	}
+	default: {
+		break;
+	}
 	}
 
 	/* Loop over all light sources */
-	if (m == 4 || n_l)
-		for (mi::shader::LightIterator iter(state, light, n_l); !iter.at_end();
-				++iter) {
+	if (m == 4 || n_l) {
+		mi::shader::LightIterator iter(state, light, n_l);
+		for (; !iter.at_end(); ++iter) {
 			sum.r = sum.g = sum.b = 0;
 
 			while (iter->sample()) {
@@ -78,7 +90,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 				result->b += sum.b / samples;
 			}
 		}
-
+	}
 	/* add contribution from indirect illumination (caustics) */
 	mi_compute_irradiance(&color, state);
 	result->r += color.r * diff->r;
