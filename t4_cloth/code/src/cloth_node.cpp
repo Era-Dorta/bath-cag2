@@ -1,14 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>		/* for abs */
-#include <float.h>		/* for FLT_MAX */
-#include <math.h>
-#include <string.h>
-#include <assert.h>
-#include "shader.h"
+#include <iostream>
+using std::cout;
+using std::endl;
 
-/******************************************************************************
- * MAYA LIGHT LINKING
- *****************************************************************************/
+#include "shader.h"
 #include "mayaapi.h"
 
 struct cloth_node {
