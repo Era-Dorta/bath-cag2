@@ -31,16 +31,10 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 
 	/* Compute indirect illumination */
 	miColor irrad;
-	mi_compute_avg_radiance(&irrad, state, 'f', NULL);
+	mi_compute_avg_radiance(result, state, 'f', NULL);
 	//mi_compute_irradiance(&irrad, state);
 	// If the surface got hit by any photon, the final color is the surface
 	// color plus the received color
-	if (irrad.r != 0 || irrad.g != 0 || irrad.b != 0) {
-		result->r = irrad.r + diffuse->r;
-		result->g = irrad.g + diffuse->g;
-		result->b = irrad.b + diffuse->b;
-	}
-	result->a = 1;
 	return (miTRUE);
 }
 
