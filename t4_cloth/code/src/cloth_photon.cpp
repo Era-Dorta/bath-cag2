@@ -25,34 +25,30 @@ extern "C" DLLEXPORT int cloth_photon_version(void) {
 	return (1);
 }
 
-static int do_print = 0;
-
 extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		struct cloth_photon *paras) {
 	struct cloth_photon m;
-	miColor color, other = { 0, 0, 0, 0 };
+	miColor color;
 	miVector dir;
 	miScalar ior_in = 0.9, ior_out = 0.1;
 	miRay_type type;
-	miBoolean ok;
-
-	/*
-	 * Make a local copy of the parameters (light
-	 * sources are not used here)
-	 */
 
 	m.diffuse_color = *mi_eval_color(&paras->diffuse_color);
 	m.specular_color = *mi_eval_color(&paras->specular_color);
 	m.ior = *mi_eval_scalar(&paras->ior);
 
+	// Save the current photon with its color in this intersection
 	mi_store_photon(energy, state);
 
 	/*
 	 * Choose scatter type for new photon
 	 */
 
-	type = mi_choose_scatter_type(state, 1, &m.diffuse_color, &other,
-			&m.specular_color);
+	/* We are only interested in reflection and transmission of specular and
+	 * Diffuse components */
+	//type = mi_choose_scatter_type(state, 1, &m.diffuse_color, &other,
+	//	&m.specular_color);
+	type = miPHOTON_TRANSMIT_DIFFUSE;
 
 	/*
 	 * Shoot new photon: Compute new photon color
@@ -95,12 +91,13 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		/* diffuse transm. (translucency), so far only this one gets executed */
 	case miPHOTON_TRANSMIT_DIFFUSE: {
 
-		miScalar cos_theta_i = mi_vector_dot(&(state->normal_geom),&(state->dir));
+		miScalar cos_theta_i = mi_vector_dot(&(state->normal_geom),
+				&(state->dir));
 		miScalar theta_i = acos(cos_theta_i);
 
 		mi_transmission_dir_diffuse(&dir, state);
 
-		miScalar cos_theta_r = mi_vector_dot(&(state->normal_geom),&dir);
+		miScalar cos_theta_r = mi_vector_dot(&(state->normal_geom), &dir);
 		miScalar theta_r = acos(cos_theta_r);
 
 		miScalar theta_h = (theta_i + theta_r) * 0.5;
@@ -112,8 +109,12 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 				/ (cos_theta_i + cos_theta_r);
 
 		color.r = energy->r * vol_scatter * A.x * m.diffuse_color.r;
-		color.g = energy->r * vol_scatter * A.y * m.diffuse_color.g;
-		color.b = energy->r * vol_scatter * A.z * m.diffuse_color.b;
+		color.g = energy->g * vol_scatter * A.y * m.diffuse_color.g;
+		color.b = energy->b * vol_scatter * A.z * m.diffuse_color.b;
+
+		color.r = energy->r * m.diffuse_color.r;
+		color.g = energy->g * m.diffuse_color.g;
+		color.b = energy->b * m.diffuse_color.b;
 
 		return (mi_photon_transmission_diffuse(&color, state, &dir));
 	}
