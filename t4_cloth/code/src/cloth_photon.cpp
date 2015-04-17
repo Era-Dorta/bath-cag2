@@ -105,13 +105,13 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		miScalar t_r = acos(cos_t_r);
 
 
-		// TODO Other doubts are how to compute the Fresnel terms and the
-		// Gaussian terms
 		miScalar t_h = (t_i + t_r) * 0.5;
 		miScalar t_d = (t_i - t_r) * 0.5;
 
+		// TODO How to compute the Gaussian lobe
 		miScalar g_lobe = 1;
-		miScalar F = 1;
+		miScalar F_r = mi_fresnel(1, eta, cos_t_i, cos_t_r);
+		miScalar F = 1 - F_r;
 		miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
 				/ (cos_t_i + cos_t_r);
 
