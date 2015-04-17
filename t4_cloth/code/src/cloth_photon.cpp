@@ -14,6 +14,8 @@ static const miScalar gamma_s = 12;
 static const miScalar gamma_v = 24;
 static const miScalar a = 0.33;
 static const miVector A = { 0.2 * 0.3, 0.8 * 0.3, 0.3 };
+static const miScalar a1 = 0.5;
+static const miScalar a2 = 0.5;
 
 struct cloth_photon {
 	miColor diffuse_color; /* diffuse color */
@@ -91,11 +93,14 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		/* diffuse transm. (translucency), so far only this one gets executed */
 	case miPHOTON_TRANSMIT_DIFFUSE: {
 
+		miVector omega_i = dir;
 		miScalar cos_theta_i = mi_vector_dot(&(state->normal_geom),
 				&(state->dir));
 		miScalar theta_i = acos(cos_theta_i);
 
 		mi_transmission_dir_diffuse(&dir, state);
+
+		miVector omega_r = dir;
 
 		miScalar cos_theta_r = mi_vector_dot(&(state->normal_geom), &dir);
 		miScalar theta_r = acos(cos_theta_r);
@@ -103,6 +108,8 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		miScalar theta_h = (theta_i + theta_r) * 0.5;
 		miScalar theta_d = (theta_i - theta_r) * 0.5;
 
+		// TODO Other doubts are how to compute the Fresnel terms and the
+		// Gaussian terms
 		miScalar g_lobe = 1;
 		miScalar F = 1;
 		miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
