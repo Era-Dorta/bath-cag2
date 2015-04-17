@@ -16,6 +16,7 @@ static const miScalar a = 0.33;
 static const miVector A = { 0.2 * 0.3, 0.8 * 0.3, 0.3 };
 static const miScalar a1 = 0.5;
 static const miScalar a2 = 0.5;
+static const miScalar air_eta = 1;
 
 struct cloth_photon {
 	miColor diffuse_color; /* diffuse color */
@@ -110,7 +111,7 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 
 		// TODO How to compute the Gaussian lobe
 		miScalar g_lobe = 1;
-		miScalar F_r = mi_fresnel(1, eta, cos_t_i, cos_t_r);
+		miScalar F_r = mi_fresnel(air_eta, eta, cos_t_i, cos_t_r);
 		miScalar F = 1 - F_r;
 		miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
 				/ (cos_t_i + cos_t_r);
