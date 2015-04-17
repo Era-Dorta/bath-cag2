@@ -93,27 +93,27 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		/* diffuse transm. (translucency), so far only this one gets executed */
 	case miPHOTON_TRANSMIT_DIFFUSE: {
 
-		miVector omega_i = dir;
-		miScalar cos_theta_i = mi_vector_dot(&(state->normal_geom),
-				&(state->dir));
-		miScalar theta_i = acos(cos_theta_i);
+		miVector w_i = dir;
+		miScalar cos_t_i = mi_vector_dot(&(state->normal_geom), &(state->dir));
+		miScalar t_i = acos(cos_t_i);
 
 		mi_transmission_dir_diffuse(&dir, state);
 
-		miVector omega_r = dir;
+		miVector w_r = dir;
 
-		miScalar cos_theta_r = mi_vector_dot(&(state->normal_geom), &dir);
-		miScalar theta_r = acos(cos_theta_r);
+		miScalar cos_t_r = mi_vector_dot(&(state->normal_geom), &dir);
+		miScalar t_r = acos(cos_t_r);
 
-		miScalar theta_h = (theta_i + theta_r) * 0.5;
-		miScalar theta_d = (theta_i - theta_r) * 0.5;
 
 		// TODO Other doubts are how to compute the Fresnel terms and the
 		// Gaussian terms
+		miScalar t_h = (t_i + t_r) * 0.5;
+		miScalar t_d = (t_i - t_r) * 0.5;
+
 		miScalar g_lobe = 1;
 		miScalar F = 1;
 		miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
-				/ (cos_theta_i + cos_theta_r);
+				/ (cos_t_i + cos_t_r);
 
 		color.r = energy->r * vol_scatter * A.x * m.diffuse_color.r;
 		color.g = energy->g * vol_scatter * A.y * m.diffuse_color.g;
