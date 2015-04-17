@@ -120,9 +120,9 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 		color.g = energy->g * vol_scatter * A.y * m.diffuse_color.g;
 		color.b = energy->b * vol_scatter * A.z * m.diffuse_color.b;
 
-		color.r = energy->r * m.diffuse_color.r;
-		color.g = energy->g * m.diffuse_color.g;
-		color.b = energy->b * m.diffuse_color.b;
+		//color.r = energy->r * m.diffuse_color.r;
+		//color.g = energy->g * m.diffuse_color.g;
+		//color.b = energy->b * m.diffuse_color.b;
 
 		return (mi_photon_transmission_diffuse(&color, state, &dir));
 	}
