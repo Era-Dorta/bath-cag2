@@ -13,6 +13,10 @@ x64/
 *.blg
 *.synctex.gz
 *.bbl
+*.snm
+*.toc
+*.nav
+*.out
 
 # Maya
 *.swatches
