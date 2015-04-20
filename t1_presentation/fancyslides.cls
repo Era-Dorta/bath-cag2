@@ -142,7 +142,8 @@
 \pgfsetfillopacity{0.60}
 \begin{mybox2}
 \pgfsetfillopacity{0.80}
-\name \ $\bullet$ \  \affil \ $\bullet$ \ \email
+\name \\ 
+\affil
 \end{mybox2}
 \end{frame}
 }
