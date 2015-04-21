@@ -141,6 +141,7 @@
 \pgfsetfillopacity{0.60}
 \begin{mybox2}
 \pgfsetfillopacity{0.80}
+\authorname \\ 
 \name \\ 
 \affil
 \end{mybox2}
