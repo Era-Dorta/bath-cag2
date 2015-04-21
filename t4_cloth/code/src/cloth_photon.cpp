@@ -6,7 +6,9 @@ using std::endl;
 #include "mayaapi.h"
 
 // To initialize the diffuse color, for each node in maya execute
+// createNode cloth_photon
 // connectAttr cloth_node1.diffuse cloth_photon1.diffuse_color;
+// connectAttr cloth_photon1.outValue cloth_node1SG.miPhotonShader;
 
 static const miScalar eta = 1.46; // From the first measurements in the paper
 static const miScalar k_d = 0.3;
