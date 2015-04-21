@@ -1,8 +1,7 @@
-\documentclass{fancyslides} 
+\documentclass[mathserif ]{fancyslides} 
 \usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage{multicol}
-
 
 %%% Beamer settings (do not change)
 \usetheme{default} 
@@ -40,7 +39,7 @@
 \begin{frame}
 \itemized{
 \item Solve the rendering equation
-\item $L_o (x, \omega_o) = L_e(x, \omega_o) + \int f(x, \omega_o, \omega_i) L_i(x, \omega_i) |cos \theta_i| d \omega_i$
+\item $L_o (x, \omega_o) = L_e(x, \omega_o) + \int_\Omega f(x, \omega_o, \omega_i) L_i(x, \omega_i) |cos \theta_i| d \omega_i$
 }
 \end{frame}
 
@@ -61,12 +60,34 @@
 \fbckg{img/blank}
 \begin{frame}
 \itemized{
-\item Ray tracing pass
+\item Ray tracing pass 1
 	\begin{multicols}{2}
 	\itemized{
 	\item Ray tracing to find visible surfaces
 	\item Each ray includes all specular bounces
 	\item Stop when non-specular surface is found
+	}
+	\begin{figure}[b!]
+	\includegraphics[scale=0.35]{img/ray_tracing}
+	\end{figure}
+	\end{multicols}
+}
+\end{frame}
+
+\fbckg{img/blank}
+\begin{frame}
+\itemized{
+\item Ray tracing pass 2
+	\begin{multicols}{2}
+	\itemized{
+	\item Struct hitPoint
+	\begin{enumerate}
+		\item[$x$] hit position
+		\item[i,j] pixel location
+		\item[$R$] current radius
+		\item[$N$] acum photon count
+		\item[$\tau$] acum reflected flux
+	\end{enumerate}
 	}
 	\begin{figure}[b!]
 	\includegraphics[scale=0.35]{img/ray_tracing}
@@ -98,7 +119,8 @@
 \item Radius reduction
 	\itemized{
 		\item Radius reduces with each pass to increase quality
-		\item New density is computed as $\hat{d} = \frac{N(x) + M(x)}{\pi R(x)^2}$
+		\item Compute new photons $\hat{N}(x) = N(x) + \alpha M(x)$
+		\item New radius $\hat{R}(x) = R(x) \left(\frac{N(x) + \alpha M(x)}{N(x) + M(x)}  \right)^{\frac{1}{2}}$
 		\item There has to be a gain in total number of photons
 	}
 }
@@ -110,8 +132,8 @@
 \item Flux correction
 	\itemized{
 		\item Flux from new pass has to be normalized
-		\item $\tau_N(x, \omega_o) = \sum_{p=1}^{N(x)} f(x, \omega_o, \omega_i) \phi'(x_p, \omega_i), ~ \tau_M(x, \omega_o) = \ldots $
-		\item $\tau_{\hat{N}}(x, \omega_o) = \tau_{N + M}(x, \omega_o) \frac{N(x) + \alpha M(x)}{N(x) + M(x)}$
+		\item $\tau_N(x, \omega_o) = \sum_{p=1}^{N(x)} f(x, \omega_o, \omega_i) \phi'_p(x_p, \omega_i) $
+		\item $\tau_{\hat{N}}(x, \omega_o) = \left( \tau_{N}(x, \omega_o) + \tau_{M}(x, \omega_o) \right) \frac{N(x) + \alpha M(x)}{N(x) + M(x)}$
 	}
 }
 \end{frame}

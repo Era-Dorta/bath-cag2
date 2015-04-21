@@ -3,7 +3,6 @@
 \LoadClassWithOptions{beamer}
 
 
-
 %%%% this is a custom class for preparing presentations
 %%%% contact me if anything goes wrong
 %%%% or you want to contribute to the work
