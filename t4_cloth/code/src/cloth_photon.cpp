@@ -95,16 +95,27 @@ extern "C" DLLEXPORT miBoolean cloth_photon(miColor *energy, miState *state,
 	}
 		/* diffuse transm. (translucency), so far only this one gets executed */
 	case miPHOTON_TRANSMIT_DIFFUSE: {
-
+		// w -> omega, t -> theta
 		miVector w_i = dir;
-		miScalar cos_t_i = mi_vector_dot(&(state->normal_geom), &(state->dir));
+		mi_transmission_dir_diffuse(&dir, state);
+		miVector w_r = dir;
+		const miVector &n = state->normal_geom;
+
+		/* Vectors are in columnwise
+		 * Matrices in mental ray are a row of 16 values, using the convention
+		 * r = v * M, where the translation component in the matrix in the last
+		 * column, and they are store columnwise
+		 * 0 4  8 12
+		 * 1 5  9 13
+		 * 2 6 10 14
+		 * 3 7 11 15
+		 * Rotations are counterclockwise, and the functions angles are in
+		 * radians */
+		miScalar cos_t_i = fabs(
+				mi_vector_dot(&(state->normal_geom), &(state->dir)));
 		miScalar t_i = acos(cos_t_i);
 
-		mi_transmission_dir_diffuse(&dir, state);
-
-		miVector w_r = dir;
-
-		miScalar cos_t_r = mi_vector_dot(&(state->normal_geom), &dir);
+		miScalar cos_t_r = fabs(mi_vector_dot(&(state->normal_geom), &dir));
 		miScalar t_r = acos(cos_t_r);
 
 
