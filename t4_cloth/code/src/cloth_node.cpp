@@ -19,6 +19,24 @@ extern "C" DLLEXPORT int cloth_node_version(void) {
 	return (1);
 }
 
+std::ostream& operator<<(std::ostream& os, const miVector& v) {
+	os << v.x << ", " << v.y << ", " << v.z;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const miGeoVector& v) {
+	os << v.x << ", " << v.y << ", " << v.z;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const miMatrix& m) {
+	for (unsigned int i = 0; i < 15; i++) {
+		os << m[i] << ", ";
+	}
+	os << m[15];
+	return os;
+}
+
 extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		struct cloth_node *paras) {
 
