@@ -1,6 +1,4 @@
 #include <iostream>
-using std::cout;
-using std::endl;
 
 #include "shader.h"
 #include "mayaapi.h"
@@ -29,22 +27,21 @@ const static miScalar a1 = 0.5;
 const static miScalar a2 = 0.5;
 const static miScalar air_eta = 1;
 const static miScalar ior_in = 1;
-std::ostream& operator<<(std::ostream& os, const miVector& v) {
-	os << v.x << ", " << v.y << ", " << v.z;
-	return os;
+
+static int do_print = 0;
+
+void mi_vector_info(const char* s, const miVector& v) {
+	mi_warning("%s %f, %f, %f", s, v.x, v.y, v.z);
 }
 
-std::ostream& operator<<(std::ostream& os, const miGeoVector& v) {
-	os << v.x << ", " << v.y << ", " << v.z;
-	return os;
+void mi_vector_info(const char* s, const miGeoVector& v) {
+	mi_warning("%s %f, %f, %f", s, v.x, v.y, v.z);
 }
 
-std::ostream& operator<<(std::ostream& os, const miMatrix& m) {
-	for (unsigned int i = 0; i < 15; i++) {
-		os << m[i] << ", ";
-	}
-	os << m[15];
-	return os;
+void mi_matrix_info(const char* s, const miMatrix& v) {
+	mi_warning("%s %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, "
+				"%f", s, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8],
+				 v[9], v[10], v[11], v[12], v[13], v[14],  v[15]);
 }
 
 extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
