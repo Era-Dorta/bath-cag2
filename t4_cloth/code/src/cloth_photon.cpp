@@ -8,6 +8,7 @@ using std::endl;
 // To initialize the diffuse color, for each node in maya execute
 // createNode cloth_photon
 // connectAttr cloth_node1.diffuse cloth_photon1.diffuse_color;
+// connectAttr cloth_node1.specular cloth_photon1.specular_color;
 // connectAttr cloth_photon1.outValue cloth_node1SG.miPhotonShader;
 
 static const miScalar eta = 1.46; // From the first measurements in the paper
@@ -22,7 +23,7 @@ static const miScalar air_eta = 1;
 
 struct cloth_photon {
 	miColor diffuse_color; /* diffuse color */
-	miColor specular_color; /* diffuse color */
+	miColor specular_color; /* specular color */
 	miScalar ior; /* diffuse color */
 };
 

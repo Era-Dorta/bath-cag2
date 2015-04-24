@@ -7,8 +7,8 @@ using std::endl;
 
 struct cloth_node {
 	miColor ambience; /* ambient color multiplier */
-	miColor ambient; /* ambient color */
 	miColor diffuse; /* diffuse color */
+	miColor specular;
 	int mode; /* light mode: 0..2, 4 */
 	int i_light; /* index of first light */
 	int n_light; /* number of lights */
@@ -26,7 +26,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	 * ilumination here and the indirect one will be computed in the photon
 	 * shader and added in mi_compute_avg_radiance*/
 
-	miColor *ambi, *diff;
+	miColor *diff;
 	miTag *light; /* tag of light instance */
 	int n_l; /* number of light sources */
 	int i_l; /* offset of light sources */
@@ -41,14 +41,10 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		return (miFALSE);
 	}
 
-	ambi = mi_eval_color(&paras->ambient);
 	diff = mi_eval_color(&paras->diffuse);
 	m = *mi_eval_integer(&paras->mode);
 
 	*result = *mi_eval_color(&paras->ambience); /* ambient term */
-	result->r *= ambi->r;
-	result->g *= ambi->g;
-	result->b *= ambi->b;
 
 	n_l = *mi_eval_integer(&paras->n_light);
 	i_l = *mi_eval_integer(&paras->i_light);
