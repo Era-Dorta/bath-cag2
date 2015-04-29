@@ -106,11 +106,20 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		}
 
 	// w -> omega, t -> theta
-	const miVector &w_i = state->dir;
-	miVector w_r;
-	mi_reflection_dir_diffuse(&w_r, state);
-	const miVector &n = state->normal;
-	const miVector &p = state->point;
+	miVector aux, aux1;
+	mi_vector_to_world(state, &aux, &(state->dir));
+	const miVector w_i = aux;
+
+	mi_reflection_dir_diffuse(&aux, state);
+	mi_vector_to_world(state, &aux1, &aux);
+	const miVector w_r = aux1;
+
+	// n and p do not match the mi_query result
+	//mi_vector_to_world(state, &aux, &(state->normal));
+	//const miVector n = aux;
+
+	//mi_point_to_world(state, &aux, &(state->point));
+	//const miVector p = aux;
 
 	// Get number of vertices in the primitive
 	miUint num = 0;
@@ -125,12 +134,55 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	}
 
 	// Get vertex positions in the triangle
-	miVector tri[3];
-	miVector *q[] = { &tri[0], &tri[1], &tri[2] };
+	miVector vert_p[3];
+	miVector *q[] = { &vert_p[0], &vert_p[1], &vert_p[2] };
 	if (!mi_query(miQ_PRI_VERTICES_POINTS, state, miNULLTAG, q)) {
 		mi_error("Could not recover vertices points in cloth shader");
 		return miFALSE;
 	}
+
+	mi_point_to_world(state, &aux, &vert_p[0]);
+	vert_p[0] = aux;
+
+	mi_point_to_world(state, &aux, &vert_p[1]);
+	vert_p[1] = aux;
+
+	mi_point_to_world(state, &aux, &vert_p[2]);
+	vert_p[2] = aux;
+
+	// Get vertex normals
+	miVector vert_n[3];
+	miVector *q2[] = { &vert_n[0], &vert_n[1], &vert_n[2] };
+	if (!mi_query(miQ_PRI_VERTICES_NORMALS, state, miNULLTAG, q2)) {
+		mi_error("Could not recover vertices points in cloth shader");
+		return miFALSE;
+	}
+
+	mi_point_to_world(state, &aux, &vert_n[0]);
+	vert_n[0] = aux;
+
+	mi_point_to_world(state, &aux, &vert_n[1]);
+	vert_n[1] = aux;
+
+	mi_point_to_world(state, &aux, &vert_n[2]);
+	vert_n[2] = aux;
+
+	// Compute hit point and normal of the hit using barycentric coordinates
+	aux.x = state->bary[0] * vert_p[0].x + state->bary[1] * vert_p[1].x
+			+ state->bary[2] * vert_p[2].x;
+	aux.y = state->bary[0] * vert_p[0].y + state->bary[1] * vert_p[1].y
+			+ state->bary[2] * vert_p[2].y;
+	aux.z = state->bary[0] * vert_p[0].z + state->bary[1] * vert_p[1].z
+			+ state->bary[2] * vert_p[2].z;
+	const miVector p = aux;
+
+	aux.x = state->bary[0] * vert_n[0].x + state->bary[1] * vert_n[1].x
+			+ state->bary[2] * vert_n[2].x;
+	aux.y = state->bary[0] * vert_n[0].y + state->bary[1] * vert_n[1].y
+			+ state->bary[2] * vert_n[2].y;
+	aux.z = state->bary[0] * vert_n[0].z + state->bary[1] * vert_n[1].z
+			+ state->bary[2] * vert_n[2].z;
+	const miVector n = aux;
 
 	/* Vectors are in columnwise
 	 * Matrices in mental ray are a row of 16 values, using the convention
@@ -144,10 +196,9 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	 * radians */
 
 	// Build a coordinate system, n, t, s as in the paper
-
 	// Get a vector t that lies on the triangle
 	miVector t;
-	mi_vector_sub(&t, &tri[0], &tri[1]);
+	mi_vector_sub(&t, &vert_p[0], &vert_p[1]);
 	mi_vector_normalize(&t);
 
 	// s has to be orthogonal to n and t
