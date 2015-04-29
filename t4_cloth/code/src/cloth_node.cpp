@@ -133,6 +133,15 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		return miFALSE;
 	}
 
+	// Get intersection point, for some reason to world gives a wrong point and
+	// to object gives a good one
+	mi_point_to_object(state, &aux, &(state->point));
+	const miVector p = aux;
+
+	// Get intersection normal
+	mi_point_to_world(state, &aux, &(state->normal));
+	const miVector n = aux;
+
 	// Get vertex positions in the triangle
 	miVector vert_p[3];
 	miVector *q[] = { &vert_p[0], &vert_p[1], &vert_p[2] };
@@ -149,40 +158,6 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 
 	mi_point_to_world(state, &aux, &vert_p[2]);
 	vert_p[2] = aux;
-
-	// Get vertex normals
-	miVector vert_n[3];
-	miVector *q2[] = { &vert_n[0], &vert_n[1], &vert_n[2] };
-	if (!mi_query(miQ_PRI_VERTICES_NORMALS, state, miNULLTAG, q2)) {
-		mi_error("Could not recover vertices points in cloth shader");
-		return miFALSE;
-	}
-
-	mi_point_to_world(state, &aux, &vert_n[0]);
-	vert_n[0] = aux;
-
-	mi_point_to_world(state, &aux, &vert_n[1]);
-	vert_n[1] = aux;
-
-	mi_point_to_world(state, &aux, &vert_n[2]);
-	vert_n[2] = aux;
-
-	// Compute hit point and normal of the hit using barycentric coordinates
-	aux.x = state->bary[0] * vert_p[0].x + state->bary[1] * vert_p[1].x
-			+ state->bary[2] * vert_p[2].x;
-	aux.y = state->bary[0] * vert_p[0].y + state->bary[1] * vert_p[1].y
-			+ state->bary[2] * vert_p[2].y;
-	aux.z = state->bary[0] * vert_p[0].z + state->bary[1] * vert_p[1].z
-			+ state->bary[2] * vert_p[2].z;
-	const miVector p = aux;
-
-	aux.x = state->bary[0] * vert_n[0].x + state->bary[1] * vert_n[1].x
-			+ state->bary[2] * vert_n[2].x;
-	aux.y = state->bary[0] * vert_n[0].y + state->bary[1] * vert_n[1].y
-			+ state->bary[2] * vert_n[2].y;
-	aux.z = state->bary[0] * vert_n[0].z + state->bary[1] * vert_n[1].z
-			+ state->bary[2] * vert_n[2].z;
-	const miVector n = aux;
 
 	/* Vectors are in columnwise
 	 * Matrices in mental ray are a row of 16 values, using the convention
