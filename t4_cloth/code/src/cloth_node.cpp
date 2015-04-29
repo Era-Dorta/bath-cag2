@@ -40,8 +40,8 @@ void mi_vector_info(const char* s, const miGeoVector& v) {
 
 void mi_matrix_info(const char* s, const miMatrix& v) {
 	mi_warning("%s %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, "
-				"%f", s, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8],
-				 v[9], v[10], v[11], v[12], v[13], v[14],  v[15]);
+			"%f", s, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9],
+			v[10], v[11], v[12], v[13], v[14], v[15]);
 }
 
 extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
@@ -112,6 +112,25 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	const miVector &n = state->normal;
 	const miVector &p = state->point;
 
+	// Get number of vertices in the primitive
+	miUint num = 0;
+	if (!mi_query(miQ_PRI_NUM_VERTICES, state, miNULLTAG, &num)) {
+		mi_error("Cloth shader could not get number of vertices");
+		return miFALSE;
+	}
+
+	if (num != 3) {
+		mi_error("Cloth shader can not handle non triangular primitives");
+		return miFALSE;
+	}
+
+	// Get vertex positions in the triangle
+	miVector tri[3];
+	miVector *q[] = { &tri[0], &tri[1], &tri[2] };
+	if (!mi_query(miQ_PRI_VERTICES_POINTS, state, miNULLTAG, q)) {
+		mi_error("Could not recover vertices points in cloth shader");
+		return miFALSE;
+	}
 	// Get a new point in the triangle
 	miVector new_p = { 1, 0, 0 };
 	new_p.z = (-n.x * (new_p.x - p.x) - n.y * (new_p.y - p.y)) / n.z + p.z;
