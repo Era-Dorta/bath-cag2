@@ -111,6 +111,7 @@
 \begin{center}
 \begin{Large}
 \begin{itemize}
+\setlength\itemsep{1em}
 \pgfsetfillopacity{1}
 #1
 \end{itemize}
