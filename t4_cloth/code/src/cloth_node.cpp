@@ -132,6 +132,17 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		return miFALSE;
 	}
 
+	/* Vectors are in columnwise
+	 * Matrices in mental ray are a row of 16 values, using the convention
+	 * r = v * M, where the translation component in the matrix in the last
+	 * column, and they are store columnwise
+	 * 0 4  8 12
+	 * 1 5  9 13
+	 * 2 6 10 14
+	 * 3 7 11 15
+	 * Rotations are counterclockwise, and the functions angles are in
+	 * radians */
+
 	// Build a coordinate system, n, t, s as in the paper
 
 	// Get a vector t that lies on the triangle
@@ -147,34 +158,24 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	// one, where t is [1,0,0], n is [0,1,0] and s is [0,0,1]
 	miMatrix trans_to_p, rot_to_axis, trans_to_axis;
 
-	mi_matrix_ident(rot_to_axis);
-	rot_to_axis[0] = t.x;
-	rot_to_axis[1] = t.y;
-	rot_to_axis[2] = t.z;
-	rot_to_axis[4] = n.x;
-	rot_to_axis[5] = n.y;
-	rot_to_axis[6] = n.z;
-	rot_to_axis[8] = s.x;
-	rot_to_axis[9] = s.y;
-	rot_to_axis[10] = s.z;
-
 	mi_matrix_ident(trans_to_p);
 	trans_to_p[12] = -p.x;
 	trans_to_p[13] = -p.y;
 	trans_to_p[14] = -p.z;
 
+	mi_matrix_ident(rot_to_axis);
+	rot_to_axis[0] = t.x;
+	rot_to_axis[4] = t.y;
+	rot_to_axis[8] = t.z;
+	rot_to_axis[1] = n.x;
+	rot_to_axis[5] = n.y;
+	rot_to_axis[9] = n.z;
+	rot_to_axis[2] = s.x;
+	rot_to_axis[6] = s.y;
+	rot_to_axis[10] = s.z;
+
 	mi_matrix_prod(trans_to_axis, trans_to_p, rot_to_axis);
 
-	/* Vectors are in columnwise
-	 * Matrices in mental ray are a row of 16 values, using the convention
-	 * r = v * M, where the translation component in the matrix in the last
-	 * column, and they are store columnwise
-	 * 0 4  8 12
-	 * 1 5  9 13
-	 * 2 6 10 14
-	 * 3 7 11 15
-	 * Rotations are counterclockwise, and the functions angles are in
-	 * radians */
 
 	miScalar cos_t_i = fabs(mi_vector_dot(&n, &w_i));
 	miScalar t_i = acos(cos_t_i);
