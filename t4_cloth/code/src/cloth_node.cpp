@@ -131,13 +131,15 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		mi_error("Could not recover vertices points in cloth shader");
 		return miFALSE;
 	}
-	// Get a new point in the triangle
-	miVector new_p = { 1, 0, 0 };
-	new_p.z = (-n.x * (new_p.x - p.x) - n.y * (new_p.y - p.y)) / n.z + p.z;
-	// Get vector from intersection to new point and normalize
+
+	// Build a coordinate system, n, t, s as in the paper
+
+	// Get a vector t that lies on the triangle
 	miVector t;
-	mi_vector_sub(&t, &new_p, &p);
-	mi_vector_normalize_d(&t);
+	mi_vector_sub(&t, &tri[0], &tri[1]);
+	mi_vector_normalize(&t);
+
+	// s has to be orthogonal to n and t
 	miVector s;
 	mi_vector_prod(&s, &n, &t);
 
