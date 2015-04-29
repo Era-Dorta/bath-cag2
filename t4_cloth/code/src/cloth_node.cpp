@@ -173,15 +173,6 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	 * 3 7 11 15
 	 * Rotations are counterclockwise, and the functions angles are in
 	 * radians */
-	miMatrix rot_m;
-	//mi_matrix_rotate(rot_m, 0, M_PI / 5, 0);
-	mi_matrix_ident(rot_m);
-	rot_m[12] = 1;
-	rot_m[13] = 2;
-	rot_m[14] = 3;
-	miVector resv, tv = { 1, 1, 1 };
-	mi_point_transform(&resv, &tv, rot_m);
-	//rotation[1] =
 
 	miScalar cos_t_i = fabs(mi_vector_dot(&n, &w_i));
 	miScalar t_i = acos(cos_t_i);
