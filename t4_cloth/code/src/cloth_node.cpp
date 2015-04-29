@@ -105,22 +105,6 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 			}
 		}
 
-	// w -> omega, t -> theta
-	miVector aux, aux1;
-	mi_vector_to_world(state, &aux, &(state->dir));
-	const miVector w_i = aux;
-
-	mi_reflection_dir_diffuse(&aux, state);
-	mi_vector_to_world(state, &aux1, &aux);
-	const miVector w_r = aux1;
-
-	// n and p do not match the mi_query result
-	//mi_vector_to_world(state, &aux, &(state->normal));
-	//const miVector n = aux;
-
-	//mi_point_to_world(state, &aux, &(state->point));
-	//const miVector p = aux;
-
 	// Get number of vertices in the primitive
 	miUint num = 0;
 	if (!mi_query(miQ_PRI_NUM_VERTICES, state, miNULLTAG, &num)) {
@@ -133,6 +117,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		return miFALSE;
 	}
 
+	miVector aux, aux1;
 	// Get intersection point, for some reason to world gives a wrong point and
 	// to object gives a good one
 	mi_point_to_object(state, &aux, &(state->point));
@@ -202,6 +187,15 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 
 	mi_matrix_prod(trans_to_axis, trans_to_p, rot_to_axis);
 
+	// w -> omega, t -> theta
+	mi_vector_to_world(state, &aux, &(state->dir));
+	mi_vector_transform(&aux1, &aux, trans_to_axis);
+	const miVector w_i = aux1;
+
+	mi_reflection_dir_diffuse(&aux, state);
+	mi_vector_to_world(state, &aux1, &aux);
+	mi_vector_transform(&aux, &aux1, trans_to_axis);
+	const miVector w_r = aux;
 
 	miScalar cos_t_i = fabs(mi_vector_dot(&n, &w_i));
 	miScalar t_i = acos(cos_t_i);
