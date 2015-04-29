@@ -84,27 +84,6 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 		light = 0;
 	}
 
-	/* Loop over all light sources */
-	if (m == 4 || n_l)
-		for (mi::shader::LightIterator iter(state, light, n_l); !iter.at_end();
-				++iter) {
-			sum.r = sum.g = sum.b = 0;
-
-			while (iter->sample()) {
-				dot_nl = iter->get_dot_nl();
-				iter->get_contribution(&color);
-				sum.r += dot_nl * diff->r * color.r;
-				sum.g += dot_nl * diff->g * color.g;
-				sum.b += dot_nl * diff->b * color.b;
-			}
-			samples = iter->get_number_of_samples();
-			if (samples > 0) {
-				result->r += sum.r / samples;
-				result->g += sum.g / samples;
-				result->b += sum.b / samples;
-			}
-		}
-
 	// Get number of vertices in the primitive
 	miUint num = 0;
 	if (!mi_query(miQ_PRI_NUM_VERTICES, state, miNULLTAG, &num)) {
@@ -197,20 +176,70 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	mi_vector_transform(&aux, &aux1, trans_to_axis);
 	const miVector w_r = aux;
 
-	miScalar cos_t_i = fabs(mi_vector_dot(&n, &w_i));
-	miScalar t_i = acos(cos_t_i);
+	// Because the vectors are normalized and we set the cordinate system for
+	// t,n,s, we can easyly compute cos and sin of theta and phi, see page
+	// 456 in PBRT book
+	miScalar cos_t_i = fabs(w_i.z);
+	miScalar cos_p_i = fabs(w_i.y);
+	//miScalar t_i = acos(cos_t_i);
 
-	miScalar cos_t_r = fabs(mi_vector_dot(&n, &w_r));
-	miScalar t_r = acos(cos_t_r);
+	miScalar cos_t_r = fabs(w_r.z);
+	miScalar cos_p_r = fabs(w_r.y);
+	//miScalar t_r = acos(cos_t_r);
+
+
+	//miScalar t_h = (t_i + t_r) * 0.5;
+	//miScalar t_d = (t_i - t_r) * 0.5;
+
+	/* Loop over all light sources */
+	if (m == 4 || n_l) {
+		for (mi::shader::LightIterator iter(state, light, n_l); !iter.at_end();
+				++iter) {
+			sum.r = sum.g = sum.b = 0;
+
+			while (iter->sample()) {
+				//dot_nl = iter->get_dot_nl();
+				iter->get_contribution(&color);
+				miScalar g_lobe = gamma_v * exp(1);
+				miScalar F_r = mi_fresnel(air_eta, eta, cos_t_i, cos_t_r);
+				miScalar F = 1 - F_r;
+
+				miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
+						/ (cos_t_i + cos_t_r);
+				vol_scatter = vol_scatter * 0.02;
+
+				sum.r += vol_scatter * A.x * diff->r;
+				sum.g += vol_scatter * A.y * diff->g;
+				sum.b += vol_scatter * A.z * diff->b;
+			}
+			samples = iter->get_number_of_samples();
+			if (samples > 0) {
+				result->r += sum.r / samples;
+				result->g += sum.g / samples;
+				result->b += sum.b / samples;
+			}
+		}
+	}
+
+	// TODO How to compute the Gaussian lobe
+
+	/*color.r = energy->r * vol_scatter * A.x * m.diffuse_color.r;
+	 color.g = energy->g * vol_scatter * A.y * m.diffuse_color.g;
+	 color.b = energy->b * vol_scatter * A.z * m.diffuse_color.b;
+
+	 color.r = energy->r * m.diffuse_color.r;
+	 color.g = energy->g * m.diffuse_color.g;
+	 color.b = energy->b * m.diffuse_color.b;*/
+
 	/* Compute indirect illumination */
 	miColor irrad;
 	mi_compute_avg_radiance(&color, state, 'f', NULL);
 
 	/* add contribution from indirect illumination (caustics) */
 	//mi_compute_irradiance(&color, state);
-	result->r += color.r * diff->r;
-	result->g += color.g * diff->g;
-	result->b += color.b * diff->b;
+	//result->r += color.r * diff->r;
+	//result->g += color.g * diff->g;
+	//result->b += color.b * diff->b;
 	result->a = 1;
 
 	//mi_compute_irradiance(&irrad, state);
