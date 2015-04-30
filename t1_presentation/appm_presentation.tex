@@ -38,9 +38,16 @@
 
 \fbckg{img/blank}
 \begin{frame}
-\itemized{
-\item Solve the rendering equation
-\item $L_o (x, \omega_o) = L_e(x, \omega_o) + \int_\Omega f(x, \omega_o, \omega_i) L_i(x, \omega_i) |cos \theta_i| d \omega_i$
+\misc{
+	\begin{multicols}{2}
+	\itemized{
+	\item Rendering equation
+	\item $L_o (x, \omega_o) = L_e(x, \omega_o) + \int_\Omega f(x, \omega_o, \omega_i) L_i(x, \omega_i) |cos \theta_i| d \omega_i$
+	}
+	\begin{figure}[b!]
+	\includegraphics[scale=0.32]{img/Rendering_eq}
+	\end{figure}
+	\end{multicols}
 }
 \end{frame}
 
@@ -64,6 +71,7 @@
 \item Ray tracing pass 1
 	\begin{multicols}{2}
 	\itemized{
+	\item Building photon map
 	\item Ray tracing to find visible surfaces
 	\item Each ray includes all specular bounces
 	\item Stop when non-specular surface is found
@@ -104,7 +112,7 @@
 	\begin{multicols}{2}
 	\itemized{
 	\item Accumulate photon flux in hit points
-	\item Newly added photon improve the quality
+	\item New photons improve the quality
 	\item $d(x) = \frac{n}{\pi r^2}, ~ d'(x) = \frac{n'}{\pi r^2} $
 	}
 	\begin{figure}[b!]
@@ -120,9 +128,9 @@
 \item Radius reduction
 	\itemized{
 		\item Radius reduces with each pass to increase quality
-		\item Compute new photons $\hat{N}(x) = N(x) + \alpha M(x)$
-		\item New radius $\hat{R}(x) = R(x) \left(\frac{N(x) + \alpha M(x)}{N(x) + M(x)}  \right)^{\frac{1}{2}}$
 		\item There has to be a gain in total number of photons
+		\item Keep fraction of new photons $\hat{N}(x) = N(x) + \alpha M(x)$
+		\item New radius $\hat{R}(x) = R(x) \left(\frac{N(x) + \alpha M(x)}{N(x) + M(x)}  \right)^{\frac{1}{2}}$
 	}
 }
 \end{frame}
@@ -132,7 +140,7 @@
 \itemized{
 \item Flux correction
 	\itemized{
-		\item Flux from new pass has to be normalized
+		\item Reduced radius = incorrect accumulated flux
 		\item $\tau_N(x, \omega_o) = \sum_{p=1}^{N(x)} f(x, \omega_o, \omega_i) \phi'_p(x_p, \omega_i) $
 		\item $\tau_{\hat{N}}(x, \omega_o) = \left( \tau_{N}(x, \omega_o) + \tau_{M}(x, \omega_o) \right) \frac{N(x) + \alpha M(x)}{N(x) + M(x)}$
 	}
@@ -168,9 +176,9 @@
 \item Possible improvements
 	\itemized{
 		\item Locally adaptive
-		\item Optimal number of total photon
-		\item Optimal direction direction
-		\item Optimal intensity
+		\item Optimal number of total photons
+		\item Optimal direction to shoot photons
+		\item Optimal photon intensity
 	}
 }
 \end{frame}
