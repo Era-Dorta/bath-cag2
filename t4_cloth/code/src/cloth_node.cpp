@@ -123,6 +123,34 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	mi_point_to_world(state, &aux, &vert_p[2]);
 	vert_p[2] = aux;
 
+	miUint num_tex = 0;
+	if (!mi_query(miQ_NUM_TEXTURES, state, miNULLTAG, &num_tex)) {
+		mi_error("Cloth shader could not get number of textures");
+		return miFALSE;
+	}
+
+	miVector tex_p[3] = { { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 } };
+	q[0] = &tex_p[0];
+	q[1] = &tex_p[1];
+	q[2] = &tex_p[2];
+	if (!mi_query(miQ_PRI_VERTICES_TEX, state, miNULLTAG, q, 0)) {
+		mi_error("Could not recover texture points in cloth shader");
+		return miFALSE;
+	}
+
+	// Translate all textures 1,1,1 so that there are no division by zero when
+	// computing the vectors t and s
+	const miVector ones = { 1, 1, 0 };
+	mi_vector_add(&tex_p[0], &tex_p[0], &ones);
+
+	aux.x = state->bary[0] * tex_p[0].x + state->bary[1] * tex_p[1].x
+			+ state->bary[2] * tex_p[2].x;
+	aux.y = state->bary[0] * tex_p[0].y + state->bary[1] * tex_p[1].y
+			+ state->bary[2] * tex_p[2].y;
+	aux.z = state->bary[0] * tex_p[0].z + state->bary[1] * tex_p[1].z
+			+ state->bary[2] * tex_p[2].z;
+	const miVector tex_inter = aux;
+
 	/* Vectors are in columnwise
 	 * Matrices in mental ray are a row of 16 values, using the convention
 	 * r = v * M, where the translation component in the matrix in the last
@@ -134,10 +162,35 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	 * Rotations are counterclockwise, and the functions angles are in
 	 * radians */
 
+	miScalar u2v1_u1v2_inv = 1.0
+			/ (tex_p[1].x * tex_p[0].y - tex_p[0].x * tex_p[1].y);
+	miScalar u1_inv = 1.0 / tex_p[0].x;
+	miVector abc, def;
+	def.x = (tex_p[1].x * vert_p[0].x - tex_p[0].x * vert_p[1].x)
+			* u2v1_u1v2_inv;
+	def.y = (tex_p[1].x * vert_p[0].y - tex_p[0].x * vert_p[1].y)
+			* u2v1_u1v2_inv;
+	def.z = (tex_p[1].x * vert_p[0].z - tex_p[0].x * vert_p[1].z)
+			* u2v1_u1v2_inv;
+	abc.x = (vert_p[0].x - tex_p[0].y * def.x) * u1_inv;
+	abc.y = (vert_p[0].y - tex_p[0].y * def.y) * u1_inv;
+	abc.z = (vert_p[0].z - tex_p[0].y * def.z) * u1_inv;
+
+#ifdef DEBUG
+	if (tex_p[0].x == 0
+			|| (tex_p[1].x * tex_p[0].y - tex_p[0].x * tex_p[1].y) == 0) {
+		mi_warning("Divide by zero in cloth node");
+	}
+#endif
+
 	// Build a coordinate system, n, t, s as in the paper
 	// Get a vector t that lies on the triangle
 	miVector t;
-	mi_vector_sub(&t, &vert_p[0], &vert_p[1]);
+
+	t.x = (tex_inter.x + 1) * abc.x + tex_inter.y * def.x;
+	t.y = (tex_inter.x + 1) * abc.y + tex_inter.y * def.y;
+	t.y = (tex_inter.x + 1) * abc.z + tex_inter.y * def.z;
+
 	mi_vector_normalize(&t);
 
 	// s has to be orthogonal to n and t
