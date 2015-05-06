@@ -17,6 +17,7 @@ extern "C" DLLEXPORT int cloth_node_version(void) {
 	return (1);
 }
 
+//TODO Move all the data to the custom argument in the state variable
 const static miScalar eta = 1.46; // From the first measurements in the paper
 const static miScalar k_d = 0.3;
 const static miScalar gamma_s = 12;
