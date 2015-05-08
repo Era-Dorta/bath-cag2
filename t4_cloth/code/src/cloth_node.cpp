@@ -193,7 +193,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 
 	t.x = (tex_inter.x + 1) * abc.x + tex_inter.y * def.x;
 	t.y = (tex_inter.x + 1) * abc.y + tex_inter.y * def.y;
-	t.y = (tex_inter.x + 1) * abc.z + tex_inter.y * def.z;
+	t.z = (tex_inter.x + 1) * abc.z + tex_inter.y * def.z;
 
 	mi_vector_normalize(&t);
 
