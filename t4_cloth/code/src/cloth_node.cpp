@@ -259,10 +259,11 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	//cos(x/2) = sqrt((1 + cos(x))*0.5)
 
 	// d = i - r
-	const miScalar cos_p_d = fabs(cos_p_i * cos_p_r - sin_p_i * sin_p_r);
-	const miScalar cos_t_d = fabs(cos_t_i * cos_t_r - sin_t_i * sin_t_r);
+	const miScalar cos_p_d = cos_p_i * cos_p_r - sin_p_i * sin_p_r;
+	const miScalar cos_t_d = cos_t_i * cos_t_r - sin_t_i * sin_t_r;
 	const miScalar cos_p_d2 = sqrtf((1 + cos_p_d) * 0.5);
-	miScalar inv_cos_t_d_2 = 1.0 / (cos_t_d * cos_t_d);
+	const miScalar cos_t_d2_2 = (1 + cos_t_d) * 0.5;
+	miScalar inv_cos_t_d_2 = 1.0 / cos_t_d2_2;
 
 	const miScalar g_lobe_v = gamma_v * exp(1);
 	const miScalar g_lobe_s = gamma_s * exp(1);
@@ -271,7 +272,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 			//* (1 - cos_t_i) * (1 - cos_t_i)
 			//* (1 - cos_t_i) * (1 - cos_t_i) * (1 - cos_t_i);
 			mi_fresnel(air_eta, eta, cos_t_i, cos_t_r);
-	const miScalar F = 1 - F_r;
+	const miScalar F_t = 1 - F_r;
 
 	//miScalar t_h = (t_i + t_r) * 0.5;
 	//miScalar t_d = (t_i - t_r) * 0.5;
@@ -286,12 +287,12 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 				//dot_nl = iter->get_dot_nl();
 				iter->get_contribution(&color);
 
-				miScalar vol_scatter = F * ((1 - k_d) + g_lobe_v + k_d)
+				miScalar vol_scatter = F_t * F_t * ((1 - k_d) + g_lobe_v + k_d)
 						/ (cos_t_i + cos_t_r);
-				vol_scatter = vol_scatter * 0.01;
+				vol_scatter = vol_scatter * 0.0001;
 
-				miScalar surf_reflection = F * cos_p_d2 * 0.5 * g_lobe_s;
-				surf_reflection = surf_reflection * 0.01;
+				miScalar surf_reflection = F_r * cos_p_d2 * g_lobe_s;
+				surf_reflection = surf_reflection * 0.0001;
 
 				sum.r += (surf_reflection * specular->r
 						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_2;
