@@ -3,6 +3,8 @@
 #include "shader.h"
 #include "mayaapi.h"
 
+#define _DEBUG
+
 struct cloth_node {
 	miColor ambience; /* ambient color multiplier */
 	miColor diffuse; /* diffuse color */
@@ -52,7 +54,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	 * ilumination here and the indirect one will be computed in the photon
 	 * shader and added in mi_compute_avg_radiance*/
 
-	miColor *diff;
+	miColor *diff, *specular;
 	miTag *light; /* tag of light instance */
 	int n_l; /* number of light sources */
 	int i_l; /* offset of light sources */
@@ -68,6 +70,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	}
 
 	diff = mi_eval_color(&paras->diffuse);
+	specular = mi_eval_color(&paras->specular);
 	m = *mi_eval_integer(&paras->mode);
 
 	//*result = *mi_eval_color(&paras->ambience); /* ambient term */
@@ -177,7 +180,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	abc.y = (vert_p[0].y - tex_p[0].y * def.y) * u1_inv;
 	abc.z = (vert_p[0].z - tex_p[0].y * def.z) * u1_inv;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	if (tex_p[0].x == 0
 			|| (tex_p[1].x * tex_p[0].y - tex_p[0].x * tex_p[1].y) == 0) {
 		mi_warning("Divide by zero in cloth node");
@@ -230,17 +233,45 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	mi_vector_transform(&aux, &aux1, trans_to_axis);
 	const miVector w_r = aux;
 
-	// Because the vectors are normalized and we set the cordinate system for
-	// t,n,s, we can easyly compute cos and sin of theta and phi, see page
+	// Because the vectors are normalised and we set the coordinate system for
+	// t,n,s, we can easily compute cos and sin of theta and phi, see page
 	// 456 in PBRT book
-	miScalar cos_t_i = fabs(w_i.z);
-	miScalar cos_p_i = fabs(w_i.y);
+	// Theta -> angle with respect to s
+	// Phi -> angle with respect to n
+	const miScalar cos_t_i = fabs(w_i.z);
+	const miScalar sin_t_i = sqrtf(1 - cos_t_i * cos_t_i);
+	const miScalar cos_p_i = fabs(w_i.y);
+	const miScalar sin_p_i = sqrtf(1 - cos_p_i * cos_p_i);
 	//miScalar t_i = acos(cos_t_i);
 
-	miScalar cos_t_r = fabs(w_r.z);
-	miScalar cos_p_r = fabs(w_r.y);
+	const miScalar cos_t_r = fabs(w_r.z);
+	const miScalar sin_t_r = sqrtf(1 - cos_t_r * cos_t_r);
+	const miScalar cos_p_r = fabs(w_r.y);
+	const miScalar sin_p_r = sqrtf(1 - cos_p_r * cos_p_r);
 	//miScalar t_r = acos(cos_t_r);
 
+	//cos^2 + sin^2 = 1
+	//sin(x) = sqrt(1 - cos^2(x))
+	//sin(α + β) = sin(α)cos(β) + cos(α)sin(β)
+	//sin(α – β) = sin(α)cos(β) – cos(α)sin(β)
+	//cos(α + β) = cos(α)cos(β) – sin(α)sin(β)
+	//cos(α – β) = cos(α)cos(β) + sin(α)sin(β)
+	//cos(x/2) = sqrt((1 + cos(x))*0.5)
+
+	// d = i - r
+	const miScalar cos_p_d = fabs(cos_p_i * cos_p_r - sin_p_i * sin_p_r);
+	const miScalar cos_t_d = fabs(cos_t_i * cos_t_r - sin_t_i * sin_t_r);
+	const miScalar cos_p_d2 = sqrtf((1 + cos_p_d) * 0.5);
+	miScalar inv_cos_t_d_2 = 1.0 / (cos_t_d * cos_t_d);
+
+	const miScalar g_lobe_v = gamma_v * exp(1);
+	const miScalar g_lobe_s = gamma_s * exp(1);
+	const miScalar F_r = //eta
+			//+ (1 - eta) * powf(1 - cos_t_i,5);
+			//* (1 - cos_t_i) * (1 - cos_t_i)
+			//* (1 - cos_t_i) * (1 - cos_t_i) * (1 - cos_t_i);
+			mi_fresnel(air_eta, eta, cos_t_i, cos_t_r);
+	const miScalar F = 1 - F_r;
 
 	//miScalar t_h = (t_i + t_r) * 0.5;
 	//miScalar t_d = (t_i - t_r) * 0.5;
@@ -254,17 +285,20 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 			while (iter->sample()) {
 				//dot_nl = iter->get_dot_nl();
 				iter->get_contribution(&color);
-				miScalar g_lobe = gamma_v * exp(1);
-				miScalar F_r = mi_fresnel(air_eta, eta, cos_t_i, cos_t_r);
-				miScalar F = 1 - F_r;
 
-				miScalar vol_scatter = F * ((1 - k_d) + g_lobe + k_d)
+				miScalar vol_scatter = F * ((1 - k_d) + g_lobe_v + k_d)
 						/ (cos_t_i + cos_t_r);
-				vol_scatter = vol_scatter * 0.02;
+				vol_scatter = vol_scatter * 0.01;
 
-				sum.r += vol_scatter * A.x * diff->r;
-				sum.g += vol_scatter * A.y * diff->g;
-				sum.b += vol_scatter * A.z * diff->b;
+				miScalar surf_reflection = F * cos_p_d2 * 0.5 * g_lobe_s;
+				surf_reflection = surf_reflection * 0.01;
+
+				sum.r += (surf_reflection * specular->r
+						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_2;
+				sum.g += (surf_reflection * specular->g
+						+ vol_scatter * A.y * diff->g) * inv_cos_t_d_2;
+				sum.b += (surf_reflection * specular->b
+						+ vol_scatter * A.z * diff->b) * inv_cos_t_d_2;
 			}
 			samples = iter->get_number_of_samples();
 			if (samples > 0) {
