@@ -263,7 +263,7 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 	const miScalar cos_t_d = cos_t_i * cos_t_r - sin_t_i * sin_t_r;
 	const miScalar cos_p_d2 = sqrtf((1 + cos_p_d) * 0.5);
 	const miScalar cos_t_d2_2 = (1 + cos_t_d) * 0.5;
-	miScalar inv_cos_t_d_2 = 1.0 / cos_t_d2_2;
+	const miScalar inv_cos_t_d_2 = 2.0 / (1 + cos_t_d);
 
 	const miScalar g_lobe_v = gamma_v * exp(1);
 	const miScalar g_lobe_s = gamma_s * exp(1);
