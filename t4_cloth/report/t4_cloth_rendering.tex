@@ -23,7 +23,56 @@ Moreover, its appearance can vary from diffuse to highly specular.
 Several methods have been proposed to render cloth fabrics efficiently and realistically.
 One of the earliest approaches was based on simple empirical shading models \cite{Weft1986}.
 The main objective was to accomplish believe shading, disregarding physical accuracy.
-As a general division, there are image based approached, geometric models and volumetric models.
+
+The methods can be broadly divided into three groups, data based models, geometric models and volumetric models.
+
+The data based approach focuses on collecting reflectance information, that will be later used to model the cloth.
+Bidirectional Texture Function (BTF) \cite{Dana1999} is a function that is often used to sampled in the data based techniques.
+
+Geometric models focus on simulation the micro-geometry of the cloth in conjunction with global illumination.
+The light scattering is simulated for each fibre in the thread, where the fibres are modelled as perfect cylinders.
+To be able to model the the complete scattering effects on a surface, Bidirectional Scattering-Surface Reflectance Distribution Function (BSSRDF) \cite{NicodemusFredEandRichmond1977} have been used.
+With this function, complex light phenomena like subsurface scattering are modelled.
+
+\section{Methodology}
+
+We have chosen to implement a recent paper based on microcylinders for fast realistic cloth rendering \cite{Sadeghi2013}.
+The authors proposed a model of fabric based on two microcylinders oriented in two orthogonal directions as shown in Figure \ref{fig:microcylinders}.
+
+The reflectance of a single cylinder is defined as,
+
+\begin{equation}
+L_r = \int \frac{\left(f_{r,s}(t, \omega_i, \omega_r) + f_{r,v}(t,\omega_i,\omega_r)\right)L_i(\omega_i)cos(\theta_i)\delta \omega_i}{cos^2(\theta_d)}
+\label{eq:full_model}
+\end{equation}
+
+where $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction, $F_r$ is an approximated Fresnel reflection terms in  the form of $F_r(\eta, \theta) = \eta + (1 - \eta)(1 - cos(\theta)^5)$ CITE BOOK, $F_t = 1 - F_r$ is a Fresnel transmission term, $\eta$ are Fresnel coefficients, $g(\gamma, \theta) = \gamma e ^{p-1}$ is a Gaussian lobe with $p$ is the lobe axis, $\lambda$ is the sharpness, the direction $v$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
+
+The surface reflection term in Equation \ref{eq:full_model} is defined as,
+
+\begin{equation}
+f_{r,s}(t, \omega_i, \omega_r) = F_r(\eta, \omega_i) cos(\phi_d/2)g(\gamma_s, \theta_h)
+\end{equation}
+
+where $\theta_h = (\theta_i+\theta_r)/2$ and , $\phi_d = \phi_i-\phi_r$.
+The volume scattering term in Equation \ref{eq:full_model} is defined as,
+
+\begin{equation}
+f_{r,v}(t,\omega_i,\omega_r) = F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} A
+\end{equation}
+
+where $k_d$ is a scattering constant and $A$ is a albedo constant.
+
+\begin{figure}[htbp!]
+\centering
+	\includegraphics[scale=0.35]{images/microcylinders}
+	\caption{Sadehi et. al. \cite{Sadeghi2013} shading model, where $\omega_i$ is the incident light direction, $n$ is the surface normal and $t_1,t_2$ are the orthogonal thread directions.}
+	\label{fig:microcylinders}
+\end{figure}
+
+\section{Results}
+
+\section{Conclusion and Future Work}
 
 \bibliographystyle{plain}
 \bibliography{t4_report}
