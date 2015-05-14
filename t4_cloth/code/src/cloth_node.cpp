@@ -130,13 +130,13 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 	//cos(x/2) = sqrt((1 + cos(x))*0.5)
 	// d = i - r
 	const miScalar cos_p_d = clamp(cos_p_i * cos_p_r + sin_p_i * sin_p_r);
-	const miScalar cos_t_d = clamp(cos_t_i * cos_t_r + sin_t_i * sin_t_r);
-	const miScalar cos_p_d2 = clamp(
+	const miScalar cos_2t_d = clamp(cos_t_i * cos_t_r + sin_t_i * sin_t_r);
+	const miScalar cos_p2_d = clamp(
 			sqrtf(std::max(0.0f, (1.0f + cos_p_d) * 0.5f)));
 	//const miScalar cos_t_d2_2 = (1 + cos_t_d) * 0.5;
 
 	// cos(x/2) = sqrt((1 + cos(x))*0.5) -> 1 / cos(x/2)^2 = 2 / (1 + cos(x))
-	const miScalar inv_cos_t_d_sq = 2.0 / (1 + cos_t_d);
+	const miScalar inv_cos_t_d_sq = 2.0 / (1 + cos_2t_d);
 	const miScalar g_lobe_v = gamma_v * exp(1);
 	const miScalar g_lobe_s = gamma_s * exp(1);
 	const miScalar F_r = //eta
@@ -164,7 +164,7 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 						/ (cos_t_i + cos_t_r);
 				//vol_scatter = vol_scatter * 0.01;
 				vol_scatter = clamp(vol_scatter, 0, 1);
-				miScalar surf_reflection = F_r * cos_p_d2 * g_lobe_s;
+				miScalar surf_reflection = F_r * cos_p2_d * g_lobe_s;
 				surf_reflection = surf_reflection * 0.000;
 				sum.r += (surf_reflection * specular->r
 						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_sq;
