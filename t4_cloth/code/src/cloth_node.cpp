@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include "shader.h"
 #include "mayaapi.h"
@@ -45,6 +46,17 @@ void mi_matrix_info(const char* s, const miMatrix& v) {
 	mi_warning("%s %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, "
 			"%f", s, v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9],
 			v[10], v[11], v[12], v[13], v[14], v[15]);
+}
+
+miScalar inline clamp(const miScalar &value, const miScalar min = -1,
+		const miScalar max = 1) {
+	if (value < min) {
+		return min;
+	}
+	if (value > max) {
+		return max;
+	}
+	return value;
 }
 
 void computeBRDF(const miVector& tex_inter, const miVector& abc,
@@ -94,15 +106,20 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 	// 456 in PBRT book
 	// Theta -> angle with respect to s
 	// Phi -> angle with respect to n
-	const miScalar cos_t_i = fabs(w_i.z);
-	const miScalar sin_t_i = sqrtf(1 - cos_t_i * cos_t_i);
-	const miScalar cos_p_i = fabs(w_i.y);
-	const miScalar sin_p_i = sqrtf(1 - cos_p_i * cos_p_i);
+
+	const miScalar cos_t_i = w_i.z;
+	const miScalar sin_t_i = clamp(
+			sqrtf(std::max(0.0f, 1 - cos_t_i * cos_t_i)));
+	const miScalar cos_p_i = w_i.y;
+	const miScalar sin_p_i = clamp(
+			sqrtf(std::max(0.0f, 1 - cos_p_i * cos_p_i)));
 	//miScalar t_i = acos(cos_t_i);
-	const miScalar cos_t_r = fabs(w_r.z);
-	const miScalar sin_t_r = sqrtf(1 - cos_t_r * cos_t_r);
-	const miScalar cos_p_r = fabs(w_r.y);
-	const miScalar sin_p_r = sqrtf(1 - cos_p_r * cos_p_r);
+	const miScalar cos_t_r = w_r.z;
+	const miScalar sin_t_r = clamp(
+			sqrtf(std::max(0.0f, 1 - cos_t_r * cos_t_r)));
+	const miScalar cos_p_r = w_r.y;
+	const miScalar sin_p_r = clamp(
+			sqrtf(std::max(0.0f, 1 - cos_p_r * cos_p_r)));
 	//miScalar t_r = acos(cos_t_r);
 	//cos^2 + sin^2 = 1
 	//sin(x) = sqrt(1 - cos^2(x))
@@ -112,11 +129,15 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 	//cos(α – β) = cos(α)cos(β) + sin(α)sin(β)
 	//cos(x/2) = sqrt((1 + cos(x))*0.5)
 	// d = i - r
-	const miScalar cos_p_d = cos_p_i * cos_p_r - sin_p_i * sin_p_r;
-	const miScalar cos_t_d = cos_t_i * cos_t_r - sin_t_i * sin_t_r;
-	const miScalar cos_p_d2 = sqrtf((1 + cos_p_d) * 0.5);
-	const miScalar cos_t_d2_2 = (1 + cos_t_d) * 0.5;
-	const miScalar inv_cos_t_d_2 = 2.0 / (1 + cos_t_d);
+	const miScalar cos_p_d = clamp(cos_p_i * cos_p_r - sin_p_i * sin_p_r);
+	const miScalar cos_t_d = clamp(cos_t_i * cos_t_r - sin_t_i * sin_t_r);
+	const miScalar cos_p_d2 = clamp(
+			sqrtf(std::max(0.0f, (1.0f + cos_p_d) * 0.5f)));
+	//const miScalar cos_t_d2_2 = (1 + cos_t_d) * 0.5;
+
+	// cos(x/2) = sqrt((1 + cos(x))*0.5) -> 1 / cos(x/2)^2 = 2 / (1 + cos(x))
+	//TODO const miScalar inv_cos_t_d_sq = 2.0 / (1 + cos_t_d);
+	const miScalar inv_cos_t_d_sq = 1;
 	const miScalar g_lobe_v = gamma_v * exp(1);
 	const miScalar g_lobe_s = gamma_s * exp(1);
 	const miScalar F_r = //eta
@@ -124,7 +145,8 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 			//* (1 - cos_t_i) * (1 - cos_t_i)
 			//* (1 - cos_t_i) * (1 - cos_t_i) * (1 - cos_t_i);
 			mi_fresnel(air_eta, eta, cos_t_i, cos_t_r);
-	const miScalar F_t = 1 - F_r;
+	const miScalar F_t = //TODO 1 - F_r;
+			1;
 	//miScalar t_h = (t_i + t_r) * 0.5;
 	//miScalar t_d = (t_i - t_r) * 0.5;
 
@@ -141,15 +163,16 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 				iter->get_contribution(&color);
 				miScalar vol_scatter = F_t * F_t * ((1 - k_d) * g_lobe_v + k_d)
 						/ (cos_t_i + cos_t_r);
-				vol_scatter = vol_scatter * 0.0001;
+				//vol_scatter = vol_scatter * 0.01;
+				vol_scatter = clamp(vol_scatter, 0, 1);
 				miScalar surf_reflection = F_r * cos_p_d2 * g_lobe_s;
-				surf_reflection = surf_reflection * 0.0001;
+				surf_reflection = surf_reflection * 0.000;
 				sum.r += (surf_reflection * specular->r
-						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_2;
+						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_sq;
 				sum.g += (surf_reflection * specular->g
-						+ vol_scatter * A.y * diff->g) * inv_cos_t_d_2;
+						+ vol_scatter * A.y * diff->g) * inv_cos_t_d_sq;
 				sum.b += (surf_reflection * specular->b
-						+ vol_scatter * A.z * diff->b) * inv_cos_t_d_2;
+						+ vol_scatter * A.z * diff->b) * inv_cos_t_d_sq;
 			}
 			samples = iter->get_number_of_samples();
 			if (samples > 0) {
