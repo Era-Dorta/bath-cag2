@@ -50,13 +50,13 @@ void mi_matrix_info(const char* s, const miMatrix& v) {
 void computeBRDF(const miVector& tex_inter, const miVector& abc,
 		const miVector& def, const miVector& n, const miVector& p, int m,
 		int n_l, miState* state, miTag* light, miColor* specular, miColor* diff,
-		miColor* result) {
+		int uInc, int vInc, miColor* result) {
 	// Build a coordinate system, n, t, s as in the paper
 	// Get a vector t that lies on the triangle
 	miVector t;
-	t.x = (tex_inter.x + 1) * abc.x + tex_inter.y * def.x;
-	t.y = (tex_inter.x + 1) * abc.y + tex_inter.y * def.y;
-	t.z = (tex_inter.x + 1) * abc.z + tex_inter.y * def.z;
+	t.x = (tex_inter.x + uInc) * abc.x + (tex_inter.y + vInc) * def.x;
+	t.y = (tex_inter.x + uInc) * abc.y + (tex_inter.y + vInc) * def.y;
+	t.z = (tex_inter.x + uInc) * abc.z + (tex_inter.y + vInc) * def.z;
 	mi_vector_normalize(&t);
 	// s has to be orthogonal to n and t
 	miVector s;
@@ -299,9 +299,13 @@ extern "C" DLLEXPORT miBoolean cloth_node(miColor *result, miState *state,
 #endif
 
 	// Build a coordinate system, n, t, s as in the paper
-	// Get a vector t that lies on the triangle
+	// Compute for first thread
 	computeBRDF(tex_inter, abc, def, n, p, m, n_l, state, light, specular, diff,
-			result);
+			0, 1, result);
+
+	// Compute for second thread
+	computeBRDF(tex_inter, abc, def, n, p, m, n_l, state, light, specular, diff,
+			1, 0, result);
 
 	// TODO How to compute the Gaussian lobe
 
