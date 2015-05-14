@@ -91,12 +91,28 @@ L_r(\omega_r) = a_1 L_{r,1}(\omega_r) + a_2 L_{r,2}(\omega_r),
 where $a_1$ and $a_2$ are the area coverage ratio for the first and second thread within the patch, in our case we assume a watertight pattern of equally size threads, leading to $a_1 = a_2 = 0.5$, $L_1$ and $l_2$ are the outgoing radiances for the first and second thread computed as shown in Equation \ref{eq:full_model}.
 
 In order to compute the thread direction $t$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
-Given an intersection point in a triangle $x_p, y_p,z_p$
+Given an intersection point in a triangle $\mathbf{p} = \left[ x_p, y_p,z_p \right]$ and its texture coordinates $u_0, v_0$.
+We define $t$ vector as the vector $\overrightarrow{\mathbf{p}\mathbf{p}'}$ such that $\mathbf{p}'$ texture coordinates are $u_1 = u_0 + 1$ and $v_1 = v_0$.
+In our shader we can easily compute the texture coordinates of the triangle vertices, however we can not immediately get a 3d coordinate from a new texture coordinate.
+Assuming that the 3d to texture transformation is an affine matrix we can write the system as
+
+\begin{equation}
+\begin{pmatrix}
+u & v
+\end{pmatrix}
+\begin{pmatrix}
+a & b & c \\
+d & e & f
+\end{pmatrix} =
+\begin{pmatrix}
+x & y & z
+\end{pmatrix}
+\end{equation}
 
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=\textwidth]{images/thread_3d_coord}
-	\caption{To compute the vector $t$, we follow the $u,v$ coordinates of the intersection point $x_p, y_p,z_p$.}
+	\caption{To compute the vector $t$, we follow the $u,v$ coordinates of the intersection point $\mathbf{p} = \left[ x_p, y_p,z_p \right]$.}
 	\label{fig:thread_uv_coord}
 \end{figure}
 
