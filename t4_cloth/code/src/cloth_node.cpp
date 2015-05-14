@@ -139,7 +139,7 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 			while (iter->sample()) {
 				//dot_nl = iter->get_dot_nl();
 				iter->get_contribution(&color);
-				miScalar vol_scatter = F_t * F_t * ((1 - k_d) + g_lobe_v + k_d)
+				miScalar vol_scatter = F_t * F_t * ((1 - k_d) * g_lobe_v + k_d)
 						/ (cos_t_i + cos_t_r);
 				vol_scatter = vol_scatter * 0.0001;
 				miScalar surf_reflection = F_r * cos_p_d2 * g_lobe_s;
