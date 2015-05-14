@@ -43,7 +43,7 @@ The authors proposed a model of fabric based on two microcylinders oriented in t
 The reflectance of a single cylinder is defined as
 
 \begin{equation}
-L_r = \int \frac{\left(f_{r,s}(t, \omega_i, \omega_r) + f_{r,v}(t,\omega_i,\omega_r)\right)L_i(\omega_i)cos(\theta_i)\delta \omega_i}{cos^2(\theta_d)}
+L_r = \int \frac{\left(f_{r,s}(t, \omega_i, \omega_r) + f_{r,v}(t,\omega_i,\omega_r)\right)L_i(\omega_i)cos(\theta_i)\delta \omega_i}{cos^2(\theta_d)},
 \label{eq:full_model}
 \end{equation}
 
@@ -53,7 +53,7 @@ Note that radiometric notation \cite{Marschner2003} is used to define $L_r$, whi
 The surface reflection term in Equation \ref{eq:full_model} is defined as
 
 \begin{equation}
-f_{r,s}(t, \omega_i, \omega_r) = F_r(\eta, \omega_i) cos(\phi_d/2)g(\gamma_s, \theta_h)
+f_{r,s}(t, \omega_i, \omega_r) = F_r(\eta, \omega_i) cos(\phi_d/2)g(\gamma_s, \theta_h),
 \end{equation}
 
 where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \omega_i) = \eta + (1 - \eta)(1 - h \cdot \omega_i)^5$ where $h = (\omega_r + \omega_i)/ \left|\omega_r + \omega_i \right|$ is the normalized halfway vector and $\eta$ is the reflectance for $h \cdot \omega_i = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{p-1}$ is a Gaussian lobe \cite{Wang2008} where $p$ is the lobe axis, $\lambda$ is the sharpness, the direction $v$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
@@ -61,7 +61,7 @@ where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a F
 The volume scattering term in Equation \ref{eq:full_model} is defined as
 
 \begin{equation}
-f_{r,v}(t,\omega_i,\omega_r) = F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} A
+f_{r,v}(t,\omega_i,\omega_r) = F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} A,
 \end{equation}
 
 where $k_d$ is a scattering constant, $A$ is an albedo constant, $F_t = 1 - F_r$ is a Fresnel transmission term, $\omega_r'$ is a projection of $\omega_r$ into a plane that contains the normal $n$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / cos(m)$ where $m$ is the angle between $\omega_r$ and its projection $\omega_r'$.
@@ -80,6 +80,24 @@ where $k_d$ is a scattering constant, $A$ is an albedo constant, $F_t = 1 - F_r$
 	\caption{\citeauthor{Sadeghi2013} shading model \cite{Sadeghi2013}, showing $\theta$ and $\phi$ angles given a pair of directions $\omega_i$ and $\omega_r$.}
 	\label{fig:cloth_directions}
 \end{minipage}
+\end{figure}
+
+The outgoing radiance in the path shown in Figure \ref{fig:cloth_directions} is
+
+\begin{equation}
+L_r(\omega_r) = a_1 L_{r,1}(\omega_r) + a_2 L_{r,2}(\omega_r),
+\end{equation}
+
+where $a_1$ and $a_2$ are the area coverage ratio for the first and second thread within the patch, in our case we assume a watertight pattern of equally size threads, leading to $a_1 = a_2 = 0.5$, $L_1$ and $l_2$ are the outgoing radiances for the first and second thread computed as shown in Equation \ref{eq:full_model}.
+
+In order to compute the thread direction $t$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
+Given an intersection point in a triangle $x_p, y_p,z_p$
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=\textwidth]{images/thread_3d_coord}
+	\caption{To compute the vector $t$, we follow the $u,v$ coordinates of the intersection point $x_p, y_p,z_p$.}
+	\label{fig:thread_uv_coord}
 \end{figure}
 
 \section{Results}
