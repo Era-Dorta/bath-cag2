@@ -21,7 +21,7 @@ Moreover, its appearance can vary from diffuse to highly specular.
 
 \section{Previous work}
 
-Several methods have been proposed to render cloth fabrics efficiently and realistically.
+Solving global illumination generally involves providing a solution to the rendering equation \cite{Kajiya1986}.
 One of the earliest approaches was based on simple empirical shading models \cite{Weft1986}.
 The main objective was to accomplish believe shading, disregarding physical accuracy.
 
@@ -37,12 +37,11 @@ With this function, complex light phenomena like subsurface scattering are model
 
 \section{Methodology}
 
+\subsection{Shading model}
+\label{sec:shading_model}
 We have chosen to implement a recent paper \cite{Sadeghi2013} which presents a microcylinder based model for fast and realistic cloth rendering.
 The authors propose a model of fabric based on two microcylinders oriented in two orthogonal directions, as shown in Figure \ref{fig:microcylinders}.
-Before we begin lets define a normalized vector $\mathbf{s} = \mathbf{n} \times \mathbf{t}$, where $\times$ is the vector cross product operator.
-With the vectors $\left\lbrace \mathbf{t},\mathbf{n},\mathbf{s} \right\rbrace$ we can define a Cartesian coordinate system, whose centre will be a triangle ray-intersection point $\mathbf{p}$.
-Having all vectors defined with respect to this coordinate system will allow to compute more easily the quantities that will be introduced below.
-The transformation matrix that will transform from world coordinates to this system using column vectors with homogeneous coordinates is
+\citeauthor{Sadeghi2013} define the reflectance model for a single thread in the fabric as
 
 \begin{figure}[ht!]
 \begin{minipage}[b]{.45\textwidth}
@@ -59,24 +58,6 @@ The transformation matrix that will transform from world coordinates to this sys
 	\label{fig:cloth_directions}
 \end{minipage}
 \end{figure}
-
-\begin{equation}
-M = M_{trans}M_{rot} =
-\begin{pmatrix}
-1 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 \\
-0 & 0 & 1 & 0 \\
--p_x & -p_y & -p_z & 1 \\
-\end{pmatrix}
-\begin{pmatrix}
-t_x & n_x & s_x & 0 \\
-t_y & n_y & s_y & 0 \\
-t_z & n_z & s_z & 0 \\
-0 & 0 & 0 & 1 \\
-\end{pmatrix}
-\end{equation}
-
-The reflectance of a single cylinder is defined as
 
 \begin{equation}
 L_r = \int \frac{\left(f_{r,s}(\mathbf{t}, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) + f_{r,v}(\mathbf{t},\boldsymbol{\omega_i},\boldsymbol{\omega_r})\right)L_i(\boldsymbol{\omega_i})cos(\theta_i)\delta \boldsymbol{\omega_i}}{cos^2(\theta_d)},
@@ -158,6 +139,29 @@ a& = \frac{x_1 - v_1 d}{u_1},& b& = \frac{y_1 - v_1 e}{u_1},&  c& = \frac{z_1 - 
 
 Notice that the term of $1/(u_2 v_1 - u_1 v_2)$ is shared, so it can be precomputed in order to increase performance.
 The aforementioned method will give $\mathbf{t}_1$, for $\mathbf{t}_2$ the process is equivalent with the exception that $\hat{\mathbf{u}}$ will be incremented on the $v$ direction, $\hat{\mathbf{u}} = \left[ u_p, v_p + 1\right]$.
+
+\subsection{Implementation considerations}
+
+In order to compute more easily quantities such as the $\theta$ or $\phi$ angles introduced in the previous section, we will defined a new coordinate system with the vectors $\left\lbrace \mathbf{t},\mathbf{n},\mathbf{s} \right\rbrace$, whose centre will be the triangle ray-intersection point $\mathbf{p}$, where $\mathbf{s}$ is a normalized vector $\mathbf{s} = \mathbf{n} \times \mathbf{t}$ and $\times$ is the vector cross product operator.
+The matrix that will transform from world coordinates to this system is
+
+\begin{equation}
+M = M_{trans}M_{rot} =
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+-p_x & -p_y & -p_z & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+t_x & n_x & s_x & 0 \\
+t_y & n_y & s_y & 0 \\
+t_z & n_z & s_z & 0 \\
+0 & 0 & 0 & 1 \\
+\end{pmatrix},
+\end{equation}
+
+such that $\mathbf{x}M=\mathbf{x}'_{new}$, where $\mathbf{x}$ is the original row vector in homogeneous coordinates and $\mathbf{x}'_{new}$ is the transformed vector.
 
 \section{Results}
 
