@@ -14,8 +14,8 @@ max version "3.12.2"
 declare shader
 	color "cloth_node" (
 		color		"ambience",  #: default .2, .2, .2, 1.
-		color		"ambient",   #: default .5, .5, .5, 1.
 		color 		"diffuse",   #: default .7, .7, .7, 1.
+		color		"specular",   #: default .5, .5, .5, 1.
 		integer		"mode",      # light selection mode 0..2, 4
 					             # mode 4 handles lightlinking
 					             # automatically, no need to check
@@ -32,7 +32,8 @@ declare shader
 end declare
 declare shader
 	color "cloth_photon" (
-		color "diffuse_color" default 1 1 1 )
+		color "diffuse_color" default 1 1 1,
+		color "specular_color" default 1 1 1 )
 	#: nodeid 6799 # This is the node ID for binary Maya files.
 	version 1
 end declare
