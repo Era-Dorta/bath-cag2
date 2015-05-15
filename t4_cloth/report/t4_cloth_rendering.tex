@@ -37,34 +37,12 @@ With this function, complex light phenomena like subsurface scattering are model
 
 \section{Methodology}
 
-We have chosen to implement a recent paper based on microcylinders for fast realistic cloth rendering \cite{Sadeghi2013}.
-The authors proposed a model of fabric based on two microcylinders oriented in two orthogonal directions as shown in Figure \ref{fig:microcylinders}.
-
-The reflectance of a single cylinder is defined as
-
-\begin{equation}
-L_r = \int \frac{\left(f_{r,s}(t, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) + f_{r,v}(t,\boldsymbol{\omega_i},\boldsymbol{\omega_r})\right)L_i(\boldsymbol{\omega_i})cos(\theta_i)\delta \boldsymbol{\omega_i}}{cos^2(\theta_d)},
-\label{eq:full_model}
-\end{equation}
-
-where $\mathbf{t}$ is the thread direction, $\boldsymbol{\omega_i}$ is the ray incoming direction, $\boldsymbol{\omega_r}$ is the ray outgoing direction, $\theta_i, ~\theta_r, ~ \phi_i \mbox{ and } \phi_r$ are angles as shown in Figure \ref{fig:cloth_directions},  $\theta_d = \theta_i-\theta_r$ and $L_i$ is the incoming irradiance in the evaluated point.
-Note that radiometric notation \cite{Marschner2003} is used to define $L_r$, which represents the outgoing radiance over a infinitesimal arc length of the cylinder and how the integral extends over the entire sphere instead of the typical hemisphere.
-
-The surface reflection term in Equation \ref{eq:full_model} is defined as
-
-\begin{equation}
-f_{r,s}(\mathbf{t}, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) = F_r(\eta, \boldsymbol{\omega_i}) cos(\phi_d/2)g(\gamma_s, \theta_h),
-\end{equation}
-
-where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \boldsymbol{\omega_i}) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \boldsymbol{\omega_i})^5$ where $\mathbf{h} = (\boldsymbol{\omega_r} + \boldsymbol{\omega_i})/ \left|\boldsymbol{\omega_r} + \boldsymbol{\omega_i} \right|$ is the normalized halfway vector and $\eta$ is the reflectance for $\mathbf{h} \cdot \boldsymbol{\omega_i} = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{v} \cdot \mathbf{p}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{p}$ is the lobe axis, the direction $\mathbf{v}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
-
-The volume scattering term in Equation \ref{eq:full_model} is defined as
-
-\begin{equation}
-f_{r,v}(\mathbf{t},\boldsymbol{\omega_i},\boldsymbol{\omega_r}) = F_t(\eta, \boldsymbol{\omega_i}) F_t(\eta', \boldsymbol{\omega_r}') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} \mathbf{k_a},
-\end{equation}
-
-where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\boldsymbol{\omega_r}'$ is a projection of $\boldsymbol{\omega_r}$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / cos(m)$ where $m$ is the angle between $\boldsymbol{\omega_r}$ and its projection $\boldsymbol{\omega_r}'$.
+We have chosen to implement a recent paper \cite{Sadeghi2013} which presents a microcylinder based model for fast and realistic cloth rendering.
+The authors propose a model of fabric based on two microcylinders oriented in two orthogonal directions, as shown in Figure \ref{fig:microcylinders}.
+Before we begin lets define a normalized vector $\mathbf{s} = \mathbf{n} \times \mathbf{t}$, where $\times$ is the vector cross product operator.
+With the vectors $\left\lbrace \mathbf{t},\mathbf{n},\mathbf{s} \right\rbrace$ we can define a Cartesian coordinate system, whose centre will be a triangle ray-intersection point $\mathbf{p}$.
+Having all vectors defined with respect to this coordinate system will allow to compute more easily the quantities that will be introduced below.
+The transformation matrix that will transform from world coordinates to this system using column vectors with homogeneous coordinates is
 
 \begin{figure}[ht!]
 \begin{minipage}[b]{.45\textwidth}
@@ -81,6 +59,48 @@ where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant v
 	\label{fig:cloth_directions}
 \end{minipage}
 \end{figure}
+
+\begin{equation}
+M = M_{trans}M_{rot} =
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+-p_x & -p_y & -p_z & 1 \\
+\end{pmatrix}
+\begin{pmatrix}
+t_x & n_x & s_x & 0 \\
+t_y & n_y & s_y & 0 \\
+t_z & n_z & s_z & 0 \\
+0 & 0 & 0 & 1 \\
+\end{pmatrix}
+\end{equation}
+
+The reflectance of a single cylinder is defined as
+
+\begin{equation}
+L_r = \int \frac{\left(f_{r,s}(\mathbf{t}, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) + f_{r,v}(\mathbf{t},\boldsymbol{\omega_i},\boldsymbol{\omega_r})\right)L_i(\boldsymbol{\omega_i})cos(\theta_i)\delta \boldsymbol{\omega_i}}{cos^2(\theta_d)},
+\label{eq:full_model}
+\end{equation}
+
+where $\mathbf{t}$ is the thread direction, $\boldsymbol{\omega_i}$ is the ray incoming direction, $\boldsymbol{\omega_r}$ is the ray outgoing direction, $\theta_i, ~\theta_r, ~ \phi_i \mbox{ and } \phi_r$ are angles as shown in Figure \ref{fig:cloth_directions},  $\theta_d = \theta_i-\theta_r$ and $L_i$ is the incoming irradiance in the evaluated point.
+Note that radiometric notation \cite{Marschner2003} is used to define $L_r$, which represents the outgoing radiance over a infinitesimal arc length of the cylinder and how the integral extends over the entire sphere instead of the typical hemisphere.
+
+The surface reflection term in Equation \ref{eq:full_model} is defined as
+
+\begin{equation}
+f_{r,s}(\mathbf{t}, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) = F_r(\eta, \boldsymbol{\omega_i}) cos(\phi_d/2)g(\gamma_s, \theta_h),
+\end{equation}
+
+where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \boldsymbol{\omega_i}) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \boldsymbol{\omega_i})^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\boldsymbol{\omega_i} + \boldsymbol{\omega_r})/ \left|\boldsymbol{\omega_i} + \boldsymbol{\omega_r} \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \boldsymbol{\omega_i} = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{v} \cdot \mathbf{p}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{p}$ is the lobe axis, the direction $\mathbf{v}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
+
+The volume scattering term in Equation \ref{eq:full_model} is defined as
+
+\begin{equation}
+f_{r,v}(\mathbf{t},\boldsymbol{\omega_i},\boldsymbol{\omega_r}) = F_t(\eta, \boldsymbol{\omega_i}) F_t(\eta', \boldsymbol{\omega_r}') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} \mathbf{k_a},
+\end{equation}
+
+where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\boldsymbol{\omega_r}'$ is a projection of $\boldsymbol{\omega_r}$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / cos(m)$ where $m$ is the angle between $\boldsymbol{\omega_r}$ and its projection $\boldsymbol{\omega_r}'$.
 
 The outgoing radiance in the path shown in Figure \ref{fig:cloth_directions} is
 
