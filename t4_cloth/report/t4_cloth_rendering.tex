@@ -90,11 +90,11 @@ L_r(\boldsymbol{\omega_r}) = a_1 L_{r,1}(\boldsymbol{\omega_r}) + a_2 L_{r,2}(\b
 
 where $a_1$ and $a_2$ are the area coverage ratio for the first and second thread within the patch, in our case we assume a watertight pattern of equally size threads, leading to $a_1 = a_2 = 0.5$, $L_1$ and $l_2$ are the outgoing radiances for the first and second thread computed as shown in Equation \ref{eq:full_model}.
 
-In order to compute the thread direction $\mathbf{t}$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
+In order to compute a thread direction $\mathbf{t}$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
 Given an intersection point in a triangle $\mathbf{p} = \left[ x_p, y_p,z_p \right]$ and its texture coordinates $\mathbf{u} = \left[ u_p, v_p \right]$.
 We define $\mathbf{t}$ vector as the vector $\mathbf{t} = (\hat{\mathbf{p}} - \mathbf{p})/ \left|\hat{\mathbf{p}} + \mathbf{p} \right|$ such that $\hat{\mathbf{p}}$ texture coordinates are $\hat{\mathbf{u}} = \left[ u_p + 1, v_p \right]$.
 In our shader we can easily compute the texture coordinates of the triangle vertices, however we can not immediately get a world position from a new texture coordinate.
-Assuming that the 3d to texture transformation is an affine matrix $T$, we can write the system as
+Assuming that the 3d to texture transformation is an affine matrix $T$,
 
 \begin{equation}
 \mathbf{u} T = \mathbf{p} \rightarrow
@@ -108,6 +108,7 @@ d & e & f
 \begin{pmatrix}
 x & y & z
 \end{pmatrix}
+\label{eq:uv_to_3d}
 \end{equation}
 
 \begin{figure}[ht!]
@@ -116,6 +117,27 @@ x & y & z
 	\caption{To compute the vector $\mathbf{t}$, we follow the texture coordinates of the intersection point $\mathbf{p}$.}
 	\label{fig:thread_uv_coord}
 \end{figure}
+
+The system in Equation \ref{eq:uv_to_3d} has six unknowns and three equations, therefore we need two pairs of world points - texture coordinates to solve $T$.
+Writing out the terms for two known points $\mathbf{p}_1$ and $\mathbf{p}_2$ in the triangle,
+
+\begin{equation}
+\begin{split}
+x_1 = u_1 a + v_1 d, \quad y_1 = u_1 b + v_1 e, \quad z_1 = u_1 c + v_1 f,\\
+x_2 = u_2 a + v_2 d, \quad y_2 = u_2 b + v_2 e, \quad z_2 = u_2 c + v_2 f.
+\end{split}
+\end{equation}
+
+Solving for each term analytically,
+
+%a &= \frac{x_1 - v_1 d}{u_1} \quad a = \frac{x_2 - v_2 d}{u_2} \\
+\begin{align}
+d& = \frac{u_2 x_1 - u_1 x_2}{u_2 v_1 - u_1 v_2},& e& = \frac{u_2 y_1 - u_1 y_2}{u_2 v_1 - u_1 v_2},& f& = \frac{u_2 z_1 - u_1 z_2}{u_2 v_1 - u_1 v_2}, \\
+a& = \frac{x_1 - v_1 d}{u_1},& b& = \frac{y_1 - v_1 e}{u_1},&  c& = \frac{z_1 - v_1 f}{u_1}.
+\end{align}
+
+Notice that the term of $1/(u_2 v_1 - u_1 v_2)$ is shared, so it can be precomputed in order to increase performance.
+The aforementioned method will give $\mathbf{t}_1$, for $\mathbf{t}_2$ the process is equivalent with the exception that $\hat{\mathbf{u}}$ will be incremented on the $v$ direction, $\hat{\mathbf{u}} = \left[ u_p, v_p + 1\right]$.
 
 \section{Results}
 
