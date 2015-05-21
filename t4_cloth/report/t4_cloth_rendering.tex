@@ -270,8 +270,14 @@ Our implementation only includes the basic light scattering proposed by the auth
 Another drawback of the model is the optimization of parameters, being so complex that they have to be adjusted manually.
 How to efficiently apply importance sampling to reduce the rendering times and increase quality, has been addressed with several extensions to the original paper \cite{Wang2014, Mizutani2014}.
 %Another drawback of this model is a complicated application of parameter optimization techniques; therefore, derivation of appropriate parameters of individual threads is left completely to users and their experience.
+
 %All these methods mainly focus on developing a comprehensive reflectance model for cloth fabrics and do not propose an efficient rendering method of cloth fabrics under environment lighting
+
 %The main difficulty of interactive cloth rendering resides in the integral of high-frequency complex functions, previous method limit it to a simple lighting model.
+
+%These methods can simulate the appearance of complex highlights and color shifts which cannot be fully handled by pure analytical models. 
+%However, the main disadvantage of these models is the need to express the structure of the materials which leads to the description of a specific kind of materials. 
+%All the analytical methods use the exact above procedure to represent the material reflection properties and in the process part of the reflection information gets lost.
 
 \newpage
 \bibliographystyle{plainnat}
