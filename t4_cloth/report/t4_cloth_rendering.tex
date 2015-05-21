@@ -265,6 +265,19 @@ We have implemented the basic light scattering model in Mental Ray\textsuperscri
 \FloatBarrier
 \section{Conclusion and Future Work}
 
+Our implementation only includes the basic light scattering proposed by the authors \cite{Sadeghi2013}; a clear future work would be to add all the remaining features in our code.
+
+Model fails at close ups.
+
+A drawback of this model is a complicated application of parameter optimization techniques; therefore, derivation of appropriate parameters of individual threads is left completely to users and their experience
+
+All these methods mainly focus on developing a comprehensive reflectance model for cloth fabrics and do not propose an efficient rendering method of cloth fabrics under environment lighting
+
+The main difficulty of interactive cloth rendering resides in the integral of high-frequency complex functions, previous method limit it to a simple lighting model.
+
+Importance sampling \cite{Wang2014, Mizutani2014}.
+
+\newpage
 \bibliographystyle{plainnat}
 \bibliography{t4_report}
 
