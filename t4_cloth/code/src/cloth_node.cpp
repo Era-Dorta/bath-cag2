@@ -26,10 +26,9 @@ const static miScalar r_0 = ((eta - 1) / (eta + 1)) * ((eta - 1) / (eta + 1));
 const static miScalar k_d = 0.3;
 const static miScalar gamma_s = 12;
 const static miScalar gamma_v = 24;
-const static miScalar a = 0.33;
+const static miScalar a[2] = { 0.5, 0.5 };
+;
 const static miVector A = { 0.2 * 0.3, 0.8 * 0.3, 0.3 };
-const static miScalar a1 = 0.5;
-const static miScalar a2 = 0.5;
 const static miScalar air_eta = 1;
 const static miScalar ior_in = 1;
 
@@ -179,8 +178,6 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 				//clamp(mi_fresnel(air_eta, eta, cos_t_i, cos_t_r), 0, 1);
 				const miScalar F_t = 1 - F_r;
 
-				//miScalar t_h = (t_i + t_r) * 0.5;
-				//miScalar t_d = (t_i - t_r) * 0.5;
 
 				//dot_nl = iter->get_dot_nl();
 				iter->get_contribution(&color);
@@ -199,9 +196,9 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 			samples = iter->get_number_of_samples();
 			if (samples > 0) {
 				miScalar inv_samples = 1 / samples;
-				result->r += sum.r * inv_samples;
-				result->g += sum.g * inv_samples;
-				result->b += sum.b * inv_samples;
+				result->r += sum.r * inv_samples * a[vInc];
+				result->g += sum.g * inv_samples * a[vInc];
+				result->b += sum.b * inv_samples * a[vInc];
 			}
 		}
 	}
