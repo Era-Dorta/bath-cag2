@@ -66,7 +66,7 @@ The authors propose a model of fabric based on two microcylinders oriented in tw
 \end{figure}
 
 \begin{equation}
-L_r = \int \frac{\left(f_{r,s}(\tb, \omegai, \omegar) + f_{r,v}(\tb,\omegai,\omegar)\right)L_i(\omegai)cos(\theta_i)\delta \omegai}{cos^2(\theta_d)},
+L_r = \int \frac{\left(f_{r,s}(\tb, \omegai, \omegar) + f_{r,v}(\tb,\omegai,\omegar)\right)L_i(\omegai)\cos(\theta_i)\delta \omegai}{\cos^2(\theta_d)},
 \label{eq:full_model}
 \end{equation}
 
@@ -76,7 +76,7 @@ Note that radiometric notation \cite{Marschner2003} is used to define $L_r$, whi
 The surface reflection term in Equation \ref{eq:full_model} is defined as
 
 \begin{equation}
-f_{r,s}(\tb, \omegai, \omegar) = F_r(\eta, \omegai) cos(\phi_d/2)g(\gamma_s, \theta_h),
+f_{r,s}(\tb, \omegai, \omegar) = F_r(\eta, \omegai) \cos(\phi_d/2)g(\gamma_s, \theta_h),
 \end{equation}
 
 where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \omegai) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \omegai)^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\omegai + \omegar)/ \left|\omegai + \omegar \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \omegai = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{v} \cdot \mathbf{p}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{p}$ is the lobe axis, the direction $\mathbf{v}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
@@ -84,10 +84,10 @@ where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a F
 The volume scattering term in Equation \ref{eq:full_model} is defined as
 
 \begin{equation}
-f_{r,v}(\tb,\omegai,\omegar) = F_t(\eta, \omegai) F_t(\eta', \omegar') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} \mathbf{k_a},
+f_{r,v}(\tb,\omegai,\omegar) = F_t(\eta, \omegai) F_t(\eta', \omegar') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos(\theta_i) + \cos(\theta_r)} \mathbf{k_a},
 \end{equation}
 
-where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\omegar'$ is a projection of $\omegar$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / cos(m)$ where $m$ is the angle between $\omegar$ and its projection $\omegar'$.
+where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\omegar'$ is a projection of $\omegar$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / \cos(m)$ where $m$ is the angle between $\omegar$ and its projection $\omegar'$.
 
 The outgoing radiance in the path shown in Figure \ref{fig:cloth_directions} is
 
@@ -118,7 +118,7 @@ x & y & z
 \label{eq:uv_to_3d}
 \end{equation}
 
-\begin{figure}[ht!]
+\begin{figure}[htbp!]
 \centering
 \includegraphics[width=\textwidth]{images/thread_3d_coord}
 	\caption{To compute the vector $\tb$, we follow the texture coordinates of the intersection point $\mathbf{p}$.}
@@ -151,11 +151,20 @@ The aforementioned method will give $\tb_1$, for $\tb_2$ the process is equivale
 
 In order to render cloth fabrics the authors evaluate the outgoing radiance from each patch, which is assumed to be locally flat and smaller than a pixel in the image.
 This patch is defined as the smallest thread weaving patter such that the fabric can be constructed by repeating this patch.
-For each thread in the patch a tangent curved is defined, this curve will be sampled at fixed positions giving the normal direction in that position, with it the BRDF will be evaluated and the total outgoing radiance can be computed as follows,
+For each thread in the patch a tangent curved is defined, as shown in Figure~\ref{fig:tanget_curve} this curve will be sampled at fixed positions giving the normal direction in that position, with it the BRDF will be evaluated and the total outgoing radiance can be computed as follows,
 
 \begin{equation}
-L_{r}()
+L_{r}(\omegar) = \frac{1}{N_j} \sum_\tb \int L_i(\omegai) f_s(\tb, \omegai, \omegar) \cos \theta_i d \omegai,
 \end{equation}
+
+where $N_j$ is the number of samples.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.7\textwidth]{images/tanget_curve}
+	\caption{Weaving pattern and tangent curves: (top left) a weaving pattern example, (bottom left) the smallest patch, (top right) tangent curve for the blue thread in the smallest patch, (bottom right) tangent curve for the orange thread in the smallest patch, arrows indicate a normal sampled at that point, image taken from \cite{Sadeghi2013}.}
+	\label{fig:tanget_curve}
+\end{figure}
 
 \subsection{Other implementation considerations}
 
