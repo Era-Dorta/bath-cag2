@@ -133,17 +133,17 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 				// Theta -> angle with respect to s
 				// Phi -> angle with respect to n
 
-				const miScalar cos_t_i = w_i.z;
+				const miScalar cos_t_i = clamp(w_i.z);
 				const miScalar sin_t_i = clamp(
 						sqrtf(std::max(0.0f, 1 - cos_t_i * cos_t_i)));
-				const miScalar cos_p_i = w_i.y;
+				const miScalar cos_p_i = clamp(w_i.y);
 				const miScalar sin_p_i = clamp(
 						sqrtf(std::max(0.0f, 1 - cos_p_i * cos_p_i)));
 				//miScalar t_i = acos(cos_t_i);
-				const miScalar cos_t_r = w_r.z;
+				const miScalar cos_t_r = clamp(w_r.z);
 				const miScalar sin_t_r = clamp(
 						sqrtf(std::max(0.0f, 1 - cos_t_r * cos_t_r)));
-				const miScalar cos_p_r = w_r.y;
+				const miScalar cos_p_r = clamp(w_r.y);
 				const miScalar sin_p_r = clamp(
 						sqrtf(std::max(0.0f, 1 - cos_p_r * cos_p_r)));
 				//miScalar t_r = acos(cos_t_r);
