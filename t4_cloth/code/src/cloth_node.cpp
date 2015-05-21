@@ -169,9 +169,9 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 				const miScalar g_lobe_v = gamma_v * exp(1);
 				const miScalar g_lobe_s = gamma_s * exp(1);
 
-				miScalar dot_ir = mi_vector_dot(&h, &v);
 				const miScalar F_r = clamp(
-						r_0 + (1 - r_0) * powf(1 - dot_ir, 5), 0, 1);
+						r_0 + (1 - r_0) * powf(1 - mi_vector_dot(&h, &v), 5), 0,
+						1);
 				//clamp(mi_schlick_scatter(&w_i_chan, &w_r_chan, eta), 0, 1);
 				//clamp(mi_fresnel(air_eta, eta, cos_t_i, cos_t_r), 0, 1);
 				const miScalar F_t = 1 - F_r;
