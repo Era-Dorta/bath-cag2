@@ -196,9 +196,10 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 			}
 			samples = iter->get_number_of_samples();
 			if (samples > 0) {
-				result->r += sum.r / samples;
-				result->g += sum.g / samples;
-				result->b += sum.b / samples;
+				miScalar inv_samples = 1 / samples;
+				result->r += sum.r * inv_samples;
+				result->g += sum.g * inv_samples;
+				result->b += sum.b * inv_samples;
 			}
 		}
 	}
