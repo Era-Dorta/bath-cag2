@@ -5,6 +5,10 @@
 \usepackage{graphicx}
 \usepackage[numbers]{natbib}
  
+\newcommand{\omegai}{\boldsymbol{\omega_i}}
+\newcommand{\omegar}{\boldsymbol{\omega_r}}
+\newcommand{\tb}{\mathbf{t}}
+ 
 \begin{document}
   
 \title{Task 4. Cloth Rendering}
@@ -37,8 +41,10 @@ With this function, complex light phenomena like subsurface scattering are model
 
 \section{Methodology}
 
-\subsection{Shading model}
-\label{sec:shading_model}
+In this section we will discus in detail the theoretical and practical aspects of the chosen paper.
+
+\subsection{Light scattering model}
+\label{sec:light_scattering_model}
 We have chosen to implement a recent paper \cite{Sadeghi2013} which presents a microcylinder based model for fast and realistic cloth rendering.
 The authors propose a model of fabric based on two microcylinders oriented in two orthogonal directions, as shown in Figure \ref{fig:microcylinders}.
 \citeauthor{Sadeghi2013} define the reflectance model for a single thread in the fabric as
@@ -47,53 +53,53 @@ The authors propose a model of fabric based on two microcylinders oriented in tw
 \begin{minipage}[b]{.45\textwidth}
 \centering
 \includegraphics[width=1\textwidth]{images/microcylinders}
-	\caption{\citeauthor{Sadeghi2013} shading model \cite{Sadeghi2013}, where $\boldsymbol{\omega_i}$ is the incident light direction, $\mathbf{n}$ is the surface normal and $\mathbf{t_1},\mathbf{t_2}$ are the orthogonal thread directions.}
+	\caption{\citeauthor{Sadeghi2013} shading model \cite{Sadeghi2013}, where $\omegai$ is the incident light direction, $\mathbf{n}$ is the surface normal and $\mathbf{t_1},\mathbf{t_2}$ are the orthogonal thread directions.}
 	\label{fig:microcylinders}
 \end{minipage}
 \hfill
 \begin{minipage}[b]{.45\textwidth}
 \centering
 \includegraphics[width=1\textwidth]{images/cloth_directions}
-	\caption{\citeauthor{Sadeghi2013} shading model \cite{Sadeghi2013}, showing $\theta$ and $\phi$ angles given a pair of directions $\boldsymbol{\omega_i}$ and $\boldsymbol{\omega_r}$.}
+	\caption{\citeauthor{Sadeghi2013} shading model \cite{Sadeghi2013}, showing $\theta$ and $\phi$ angles given a pair of directions $\omegai$ and $\omegar$.}
 	\label{fig:cloth_directions}
 \end{minipage}
 \end{figure}
 
 \begin{equation}
-L_r = \int \frac{\left(f_{r,s}(\mathbf{t}, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) + f_{r,v}(\mathbf{t},\boldsymbol{\omega_i},\boldsymbol{\omega_r})\right)L_i(\boldsymbol{\omega_i})cos(\theta_i)\delta \boldsymbol{\omega_i}}{cos^2(\theta_d)},
+L_r = \int \frac{\left(f_{r,s}(\tb, \omegai, \omegar) + f_{r,v}(\tb,\omegai,\omegar)\right)L_i(\omegai)cos(\theta_i)\delta \omegai}{cos^2(\theta_d)},
 \label{eq:full_model}
 \end{equation}
 
-where $\mathbf{t}$ is the thread direction, $\boldsymbol{\omega_i}$ is the ray incoming direction, $\boldsymbol{\omega_r}$ is the ray outgoing direction, $\theta_i, ~\theta_r, ~ \phi_i \mbox{ and } \phi_r$ are angles as shown in Figure \ref{fig:cloth_directions},  $\theta_d = \theta_i-\theta_r$ and $L_i$ is the incoming irradiance in the evaluated point.
+where $\tb$ is the thread direction, $\omegai$ is the ray incoming direction, $\omegar$ is the ray outgoing direction, $\theta_i, ~\theta_r, ~ \phi_i \mbox{ and } \phi_r$ are angles as shown in Figure \ref{fig:cloth_directions},  $\theta_d = \theta_i-\theta_r$ and $L_i$ is the incoming irradiance in the evaluated point.
 Note that radiometric notation \cite{Marschner2003} is used to define $L_r$, which represents the outgoing radiance over a infinitesimal arc length of the cylinder and how the integral extends over the entire sphere instead of the typical hemisphere.
 
 The surface reflection term in Equation \ref{eq:full_model} is defined as
 
 \begin{equation}
-f_{r,s}(\mathbf{t}, \boldsymbol{\omega_i}, \boldsymbol{\omega_r}) = F_r(\eta, \boldsymbol{\omega_i}) cos(\phi_d/2)g(\gamma_s, \theta_h),
+f_{r,s}(\tb, \omegai, \omegar) = F_r(\eta, \omegai) cos(\phi_d/2)g(\gamma_s, \theta_h),
 \end{equation}
 
-where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \boldsymbol{\omega_i}) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \boldsymbol{\omega_i})^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\boldsymbol{\omega_i} + \boldsymbol{\omega_r})/ \left|\boldsymbol{\omega_i} + \boldsymbol{\omega_r} \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \boldsymbol{\omega_i} = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{v} \cdot \mathbf{p}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{p}$ is the lobe axis, the direction $\mathbf{v}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
+where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \omegai) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \omegai)^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\omegai + \omegar)/ \left|\omegai + \omegar \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \omegai = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{v} \cdot \mathbf{p}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{p}$ is the lobe axis, the direction $\mathbf{v}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
 
 The volume scattering term in Equation \ref{eq:full_model} is defined as
 
 \begin{equation}
-f_{r,v}(\mathbf{t},\boldsymbol{\omega_i},\boldsymbol{\omega_r}) = F_t(\eta, \boldsymbol{\omega_i}) F_t(\eta', \boldsymbol{\omega_r}') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} \mathbf{k_a},
+f_{r,v}(\tb,\omegai,\omegar) = F_t(\eta, \omegai) F_t(\eta', \omegar') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos(\theta_i) + cos(\theta_r)} \mathbf{k_a},
 \end{equation}
 
-where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\boldsymbol{\omega_r}'$ is a projection of $\boldsymbol{\omega_r}$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / cos(m)$ where $m$ is the angle between $\boldsymbol{\omega_r}$ and its projection $\boldsymbol{\omega_r}'$.
+where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\omegar'$ is a projection of $\omegar$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / cos(m)$ where $m$ is the angle between $\omegar$ and its projection $\omegar'$.
 
 The outgoing radiance in the path shown in Figure \ref{fig:cloth_directions} is
 
 \begin{equation}
-L_r(\boldsymbol{\omega_r}) = a_1 L_{r,1}(\boldsymbol{\omega_r}) + a_2 L_{r,2}(\boldsymbol{\omega_r}),
+L_r(\omegar) = a_1 L_{r,1}(\omegar) + a_2 L_{r,2}(\omegar),
 \end{equation}
 
 where $a_1$ and $a_2$ are the area coverage ratio for the first and second thread within the patch, in our case we assume a watertight pattern of equally size threads, leading to $a_1 = a_2 = 0.5$, $L_1$ and $l_2$ are the outgoing radiances for the first and second thread computed as shown in Equation \ref{eq:full_model}.
 
-In order to compute a thread direction $\mathbf{t}$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
+In order to compute a thread direction $\tb$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
 Given an intersection point in a triangle $\mathbf{p} = \left[ x_p, y_p,z_p \right]$ and its texture coordinates $\mathbf{u} = \left[ u_p, v_p \right]$.
-We define $\mathbf{t}$ vector as the vector $\mathbf{t} = (\hat{\mathbf{p}} - \mathbf{p})/ \left|\hat{\mathbf{p}} + \mathbf{p} \right|$ such that $\hat{\mathbf{p}}$ texture coordinates are $\hat{\mathbf{u}} = \left[ u_p + 1, v_p \right]$.
+We define $\tb$ vector as the vector $\tb = (\hat{\mathbf{p}} - \mathbf{p})/ \left|\hat{\mathbf{p}} + \mathbf{p} \right|$ such that $\hat{\mathbf{p}}$ texture coordinates are $\hat{\mathbf{u}} = \left[ u_p + 1, v_p \right]$.
 In our shader we can easily compute the texture coordinates of the triangle vertices, however we can not immediately get a world position from a new texture coordinate.
 Assuming that the 3d to texture transformation is an affine matrix $T$,
 
@@ -115,7 +121,7 @@ x & y & z
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=\textwidth]{images/thread_3d_coord}
-	\caption{To compute the vector $\mathbf{t}$, we follow the texture coordinates of the intersection point $\mathbf{p}$.}
+	\caption{To compute the vector $\tb$, we follow the texture coordinates of the intersection point $\mathbf{p}$.}
 	\label{fig:thread_uv_coord}
 \end{figure}
 
@@ -138,11 +144,22 @@ a& = \frac{x_1 - v_1 d}{u_1},& b& = \frac{y_1 - v_1 e}{u_1},&  c& = \frac{z_1 - 
 \end{align}
 
 Notice that the term of $1/(u_2 v_1 - u_1 v_2)$ is shared, so it can be precomputed in order to increase performance.
-The aforementioned method will give $\mathbf{t}_1$, for $\mathbf{t}_2$ the process is equivalent with the exception that $\hat{\mathbf{u}}$ will be incremented on the $v$ direction, $\hat{\mathbf{u}} = \left[ u_p, v_p + 1\right]$.
+The aforementioned method will give $\tb_1$, for $\tb_2$ the process is equivalent with the exception that $\hat{\mathbf{u}}$ will be incremented on the $v$ direction, $\hat{\mathbf{u}} = \left[ u_p, v_p + 1\right]$.
 
-\subsection{Implementation considerations}
+\subsection{Shading model}
+\label{sec:shading_model}
 
-In order to compute more easily quantities such as the $\theta$ or $\phi$ angles introduced in the previous section, we will defined a new coordinate system with the vectors $\left\lbrace \mathbf{t},\mathbf{n},\mathbf{s} \right\rbrace$, whose centre will be the triangle ray-intersection point $\mathbf{p}$, where $\mathbf{s}$ is a normalized vector $\mathbf{s} = \mathbf{n} \times \mathbf{t}$ and $\times$ is the vector cross product operator.
+In order to render cloth fabrics the authors evaluate the outgoing radiance from each patch, which is assumed to be locally flat and smaller than a pixel in the image.
+This patch is defined as the smallest thread weaving patter such that the fabric can be constructed by repeating this patch.
+For each thread in the patch a tangent curved is defined, this curve will be sampled at fixed positions giving the normal direction in that position, with it the BRDF will be evaluated and the total outgoing radiance can be computed as follows,
+
+\begin{equation}
+L_{r}()
+\end{equation}
+
+\subsection{Other implementation considerations}
+
+In order to compute more easily quantities such as the $\theta$ or $\phi$ angles introduced in the previous section, we will defined a new coordinate system with the vectors $\left\lbrace \tb,\mathbf{n},\mathbf{s} \right\rbrace$, whose centre will be the triangle ray-intersection point $\mathbf{p}$, where $\mathbf{s}$ is a normalized vector $\mathbf{s} = \mathbf{n} \times \tb$ and $\times$ is the vector cross product operator.
 The matrix that will transform from world coordinates to this system is
 
 \begin{equation}
