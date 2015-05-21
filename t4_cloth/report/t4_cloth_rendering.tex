@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage[numbers]{natbib}
 \usepackage{textcomp} % Degree symbol
+\usepackage{placeins} % Float barrier
  
 \newcommand{\omegai}{\boldsymbol{\omega_i}}
 \newcommand{\omegar}{\boldsymbol{\omega_r}}
@@ -238,7 +239,7 @@ t_z & n_z & s_z & 0 \\
 
 such that $\mathbf{x}M=\mathbf{x}'_{new}$, where $\mathbf{x}$ is the original row vector in homogeneous coordinates and $\mathbf{x}'_{new}$ is the transformed vector.
 
-We decided to implement the shader in Maya's\texttrademark Mental Ray\texttrademark rendering software.
+We decided to implement the shader in Maya's\textsuperscript\textregistered Mental Ray\textsuperscript\textregistered rendering software.
 The rationale under this choice lays in the advantages of integrating work in a established framework, which allows us to easily use the shader for a dynamic cloth simulation.
 Mental Ray\texttrademark approximates \citeauthor{Kajiya1986}'s equation \cite{Kajiya1986} using photon mapping \cite{Jensen1996}.
 Our approach is to compute an initial estimate of the outgoing radiance $L_{ri}$ for each direct hit during the raytracing path.
@@ -250,10 +251,18 @@ L_r = L_{ri} + \sum_{i = 1}^{I} \psi_i L_{ri},
 
 where $I$ is the total number of photons inside a fixed radius around $\mathbf{p}$ and $\psi_i$ is the normalized flux of the ith photon, which is computed from an initial arbitrary flux shared by all photons and decreases with an absorption rate per bounce.
 
-TODO Add analysis of the current paper, what is it based on, what is it actually modelling, what are the limitations, etc
-
 \section{Results}
 
+We have implemented the basic light scattering model in Mental Ray\textsuperscript\textregistered, Figure~\ref{fig:result1}.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.5\textwidth]{images/result1}
+	\caption{Rendered result.}
+	\label{fig:result1}
+\end{figure}
+
+\FloatBarrier
 \section{Conclusion and Future Work}
 
 \bibliographystyle{plainnat}
