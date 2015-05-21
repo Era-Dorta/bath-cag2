@@ -187,11 +187,12 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 				vol_scatter = clamp(vol_scatter, 0, 1);
 				miScalar surf_reflection = F_r * cos_p2_d * g_lobe_s;
 				surf_reflection = surf_reflection * 0.000;
-				sum.r += (surf_reflection * specular->r
+				surf_reflection = surf_reflection * 0.01;
+				sum.r += (surf_reflection * color.r
 						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_sq;
-				sum.g += (surf_reflection * specular->g
+				sum.g += (surf_reflection * color.g
 						+ vol_scatter * A.y * diff->g) * inv_cos_t_d_sq;
-				sum.b += (surf_reflection * specular->b
+				sum.b += (surf_reflection * color.b
 						+ vol_scatter * A.z * diff->b) * inv_cos_t_d_sq;
 			}
 			samples = iter->get_number_of_samples();
