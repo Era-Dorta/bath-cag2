@@ -4,6 +4,7 @@
 \usepackage{amsmath,amsthm,amssymb,bm}
 \usepackage{graphicx}
 \usepackage[numbers]{natbib}
+\usepackage{textcomp} % Degree symbol
  
 \newcommand{\omegai}{\boldsymbol{\omega_i}}
 \newcommand{\omegar}{\boldsymbol{\omega_r}}
@@ -155,6 +156,7 @@ For each thread in the patch a tangent curved is defined, as shown in Figure~\re
 
 \begin{equation}
 L_{r}(\omegar) = \frac{1}{N_j} \sum_\tb \int L_i(\omegai) f_s(\tb, \omegai, \omegar) \cos \theta_i d \omegai,
+\label{eq:path_lr}
 \end{equation}
 
 where $N_j$ is the number of samples.
@@ -165,6 +167,19 @@ where $N_j$ is the number of samples.
 	\caption{Weaving pattern and tangent curves: (top left) a weaving pattern example, (bottom left) the smallest patch, (top right) tangent curve for the blue thread in the smallest patch, (bottom right) tangent curve for the orange thread in the smallest patch, arrows indicate a normal sampled at that point, image taken from \cite{Sadeghi2013}.}
 	\label{fig:tanget_curve}
 \end{figure}
+
+\citeauthor{Sadeghi2013} also add a shadowing and masking term to improve the quality of their results, the authors add a new term that will account for threads occluding each other depending on the viewing direction.
+The effect of the masking term will be specially relevant at grazing angle viewing and lighting directions.
+In Equation~\ref{eq:path_lr} the term $f_s(\tb, \omegai, \omegar)$ will be multiplied by $M(\tb, \omegai, \omegar)$ such that,
+
+\begin{equation}
+\begin{split}
+M(\tb, \omegai, \omegar) =& (1 - u(\phi_d)) \max(\cos(\phi_i), 0) \times \max(\cos(\phi_r), 0) + \\
+& u(\phi_d) \min( \max(\cos(\phi_i), 0), \max(\cos(\phi_r), 0) ),
+\end{split}
+\end{equation}
+
+where $u$ is a unit height Gaussian function with standard deviation between $15$\textdegree and $25$\textdegree; an in depth discussion on how to compute $u$ can be found in \citeauthor{Ashikmin2000} \cite{Ashikmin2000} Section 4.2 New Shadowing Term.
 
 \subsection{Other implementation considerations}
 
