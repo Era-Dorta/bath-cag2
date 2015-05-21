@@ -121,7 +121,7 @@ x & y & z
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=\textwidth]{images/thread_3d_coord}
+\includegraphics[width=0.8\textwidth]{images/thread_3d_coord}
 	\caption{To compute the vector $\tb$, we follow the texture coordinates of the intersection point $\mathbf{p}$.}
 	\label{fig:thread_uv_coord}
 \end{figure}
@@ -179,11 +179,45 @@ M(\tb, \omegai, \omegar) =& (1 - u(\phi_d)) \max(\cos(\phi_i), 0) \times \max(\c
 \end{split}
 \end{equation}
 
-where $u$ is a unit height Gaussian function with standard deviation between $15$\textdegree and $25$\textdegree; an in depth discussion on how to compute $u$ can be found in \citeauthor{Ashikmin2000} \cite{Ashikmin2000} Section 4.2 New Shadowing Term.
+where $\times$ is the vector cross product operator, $u$ is a unit height Gaussian function with standard deviation between $15$\textdegree and $25$\textdegree; an in depth discussion on how to compute $u$ can be found in \citeauthor{Ashikmin2000} \cite{Ashikmin2000} Section 4.2 New Shadowing Term.
+
+The authors add a reweighting factor to account for $\omegai$ and $\omegar$ being too far from $n$.
+By projecting the thread length in the direction of the viewer, tangents that are more visible for the viewer will have a greater contribution.
+The reweighting factor $P(\tb, \omegai, \omegar)$ will be computed as follows,
+
+\begin{equation}
+\begin{split}
+P(\tb, \omegai, \omegar) =& (1 - u(\Psi_d)) \max(\cos(\Psi_i), 0) \times \max(\cos(\Psi_r), 0) + \\
+& u(\Psi_d) \min( \max(\cos(\Psi_i), 0), \max(\cos(\Psi_r), 0) ),
+\end{split}
+\end{equation}
+
+where $\Psi$ are the angles between $\mathbf{n}$ and the projection of $\boldsymbol{\omega}$ into the plane that contains $\tb$ and $\mathbf{n}$, as shown in Figure~\ref{fig:psi_thread_angles}.
+
+\begin{figure}[htbp!]
+\centering
+\includegraphics[width=0.4\textwidth]{images/psi_thread_angles}
+	\caption{$\Psi$ angles in the thread for a given $\omegai$ and $\omegar$, image taken from \cite{Sadeghi2013}.}
+	\label{fig:psi_thread_angles}
+\end{figure}
+
+There is also a normalization factor $Q$ to account for the number of samples and for weaving patterns that are not water tight,
+
+\begin{equation}
+Q = \frac{a_1}{N_1} \sum_\tb P(\tb, \omegai, \omegar) + \sum_\tb P(\tb, \omegai, \omegar) + (1 - a_1 - a_2)(\omegar \cdot \mathbf{n}),
+\end{equation}
+
+where $N_1$ and $N_2$ are the number of samples of each thread direction.
+
+Finally, the complete model for the outgoing radiance is
+
+\begin{equation}
+L_{r}(\omegar) = \frac{1}{Q N_j} \sum_\tb \int L_i(\omegai) f_s(\tb, \omegai, \omegar) M(\tb, \omegai, \omegar) P(\tb, \omegai, \omegar)  \cos \theta_i d \omegai.
+\end{equation}
 
 \subsection{Other implementation considerations}
 
-In order to compute more easily quantities such as the $\theta$ or $\phi$ angles introduced in the previous section, we will defined a new coordinate system with the vectors $\left\lbrace \tb,\mathbf{n},\mathbf{s} \right\rbrace$, whose centre will be the triangle ray-intersection point $\mathbf{p}$, where $\mathbf{s}$ is a normalized vector $\mathbf{s} = \mathbf{n} \times \tb$ and $\times$ is the vector cross product operator.
+In order to compute more easily quantities such as the $\theta$ or $\phi$ angles introduced in the previous section, we will defined a new coordinate system with the vectors $\left\lbrace \tb,\mathbf{n},\mathbf{s} \right\rbrace$, whose centre will be the triangle ray-intersection point $\mathbf{p}$, where $\mathbf{s}$ is a normalized vector $\mathbf{s} = \mathbf{n} \times \tb$.
 The matrix that will transform from world coordinates to this system is
 
 \begin{equation}
