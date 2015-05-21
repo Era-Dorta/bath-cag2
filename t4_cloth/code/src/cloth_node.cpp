@@ -64,6 +64,8 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 		const miVector& def, const miVector& n, const miVector& p, int m,
 		int n_l, miState* state, miTag* light, miColor* specular, miColor* diff,
 		int uInc, int vInc, miColor* result) {
+
+	const miVector v100 = { 1, 0, 0 };
 	// Build a coordinate system, n, t, s as in the paper
 	// Get a vector t that lies on the triangle
 	miVector t;
@@ -166,8 +168,9 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 				// cos(x/2) = sqrt((1 + cos(x))*0.5) -> 1 / cos(x/2)^2 = 2 / (1 + cos(x))
 				const miScalar inv_cos_t_d_sq = 2.0 / (1 + cos_2t_d);
 
-				const miScalar g_lobe_v = gamma_v * exp(1);
-				const miScalar g_lobe_s = gamma_s * exp(1);
+				const miScalar vp_gauss_exp = exp(mi_vector_dot(&v100, &h) - 1);
+				const miScalar g_lobe_v = gamma_v * vp_gauss_exp;
+				const miScalar g_lobe_s = gamma_s * vp_gauss_exp;
 
 				const miScalar F_r = clamp(
 						r_0 + (1 - r_0) * powf(1 - mi_vector_dot(&h, &v), 5), 0,
@@ -185,7 +188,7 @@ void computeBRDF(const miVector& tex_inter, const miVector& abc,
 						/ (cos_t_i + cos_t_r);
 				vol_scatter = clamp(vol_scatter, 0, 1);
 				miScalar surf_reflection = F_r * cos_p2_d * g_lobe_s;
-				surf_reflection = surf_reflection * 0.01;
+				surf_reflection = surf_reflection * 0.1;
 				sum.r += (surf_reflection * color.r
 						+ vol_scatter * A.x * diff->r) * inv_cos_t_d_sq;
 				sum.g += (surf_reflection * color.g
