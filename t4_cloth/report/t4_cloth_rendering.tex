@@ -81,7 +81,7 @@ The surface reflection term in Equation \ref{eq:full_model} is defined as
 f_{r,s}(\tb, \omegai, \omegar) = F_r(\eta, \omegai) \cos(\phi_d/2)g(\gamma_s, \theta_h),
 \end{equation}
 
-where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \omegai) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \omegai)^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\omegai + \omegar)/ \left|\omegai + \omegar \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \omegai = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{v} \cdot \mathbf{p}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{p}$ is the lobe axis, the direction $\mathbf{v}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
+where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \omegai) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \omegai)^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\omegai + \omegar)/ \left|\omegai + \omegar \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \omegai = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{j} \cdot \mathbf{q}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{q}$ is the lobe axis, the direction $\mathbf{j}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
 
 The volume scattering term in Equation \ref{eq:full_model} is defined as
 
@@ -111,8 +111,8 @@ Assuming that the 3d to texture transformation is an affine matrix $T$,
 u & v
 \end{pmatrix}
 \begin{pmatrix}
-a & b & c \\
-d & e & f
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23}
 \end{pmatrix} =
 \begin{pmatrix}
 x & y & z
@@ -132,8 +132,8 @@ Writing out the terms for two known points $\mathbf{p}_1$ and $\mathbf{p}_2$ in 
 
 \begin{equation}
 \begin{split}
-x_1 = u_1 a + v_1 d, \quad y_1 = u_1 b + v_1 e, \quad z_1 = u_1 c + v_1 f,\\
-x_2 = u_2 a + v_2 d, \quad y_2 = u_2 b + v_2 e, \quad z_2 = u_2 c + v_2 f.
+x_1 = u_1 a_{11} + v_1 a_{21}, \quad y_1 = u_1 a_{12} + v_1 a_{22}, \quad z_1 = u_1 a_{13} + v_1 a_{23},\\
+x_2 = u_2 a_{11} + v_2 a_{21}, \quad y_2 = u_2 a_{12} + v_2 a_{22}, \quad z_2 = u_2 a_{13} + v_2 a_{23}.
 \end{split}
 \end{equation}
 
@@ -141,8 +141,8 @@ Solving for each term analytically,
 
 %a &= \frac{x_1 - v_1 d}{u_1} \quad a = \frac{x_2 - v_2 d}{u_2} \\
 \begin{align}
-d& = \frac{u_2 x_1 - u_1 x_2}{u_2 v_1 - u_1 v_2},& e& = \frac{u_2 y_1 - u_1 y_2}{u_2 v_1 - u_1 v_2},& f& = \frac{u_2 z_1 - u_1 z_2}{u_2 v_1 - u_1 v_2}, \\
-a& = \frac{x_1 - v_1 d}{u_1},& b& = \frac{y_1 - v_1 e}{u_1},&  c& = \frac{z_1 - v_1 f}{u_1}.
+a_{21}& = \frac{u_2 x_1 - u_1 x_2}{u_2 v_1 - u_1 v_2},& a_{22}& = \frac{u_2 y_1 - u_1 y_2}{u_2 v_1 - u_1 v_2},& a_{23}& = \frac{u_2 z_1 - u_1 z_2}{u_2 v_1 - u_1 v_2}, \\
+a_{11}& = \frac{x_1 - v_1 a_{21}}{u_1},& a_{12}& = \frac{y_1 - v_1 a_{22}}{u_1},&  a_{13}& = \frac{z_1 - v_1 a_{23}}{u_1}.
 \end{align}
 
 Notice that the term of $1/(u_2 v_1 - u_1 v_2)$ is shared, so it can be precomputed in order to increase performance.
