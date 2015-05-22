@@ -30,7 +30,6 @@ Moreover, its appearance can vary from diffuse to highly specular.
 Solving global illumination generally involves providing a solution to the rendering equation \cite{Kajiya1986}.
 One of the earliest approaches was based on simple empirical shading models \cite{Weft1986}.
 The main objective was to accomplish believe shading, disregarding physical accuracy.
-
 The methods can be broadly divided into three groups, data based models, geometric models and volumetric models.
 
 The data based approach focuses on collecting reflectance information, that will be later used to model the cloth.
@@ -40,6 +39,10 @@ Geometric models focus on simulation the micro-geometry of the cloth in conjunct
 The light scattering is simulated for each fibre in the thread, where the fibres are modelled as perfect cylinders.
 To be able to model the the complete scattering effects on a surface, Bidirectional Scattering-Surface Reflectance Distribution Function (BSSRDF) \cite{NicodemusFredEandRichmond1977} have been used.
 With this function, complex light phenomena like subsurface scattering are modelled.
+
+Procedural models \cite{Irawan2012} with enfasis on accurately handling specular reflections have been proposed, this model does not required image data and relies on textures for close up views.
+
+A survey of physically-based methods in cloth simulations was presented by \cite{Schroder2012}, we also refer the readers to \cite{Yuen2011}'s survey for example-based and procedural-based techniques.
 
 \section{Methodology}
 
