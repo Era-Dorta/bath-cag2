@@ -27,13 +27,17 @@ Moreover, its appearance can vary from diffuse to highly specular.
 
 \section{Previous work}
 
-Solving global illumination generally involves providing a solution to the rendering equation \cite{Kajiya1986}.
+Solving for global illumination generally involves providing a solution to the rendering equation \cite{Kajiya1986}.
 One of the earliest approaches was based on simple empirical shading models \cite{Weft1986}.
-The main objective was to accomplish believe shading, disregarding physical accuracy.
-The methods can be broadly divided into three groups, data based models, geometric models and volumetric models.
+The main objective was to accomplish believable shading, disregarding physical accuracy.
+Ever since, an increasing number of methods have been proposed, this techniques can be broadly divided into two groups, data-based models and procedural models.
 
-The data based approach focuses on collecting reflectance information, that will be later used to model the cloth.
+The data-based approach focuses on collecting reflectance information, that will be later used to model the cloth.
 Bidirectional Texture Function (BTF) \cite{Dana1999} is a function that is often used to sampled in the data based techniques.
+\cite{Sattler2003} captured BTF from a rectangular probed and generated view-dependant texture-maps for the cloth.
+\citeauthor{Wang2008} \cite{Wang2008} proposed a variation of the previous technique, the authors modeled the captured data as a microfacet-based BRDF to which they fitted a normal distribution function for each facet.
+Within the data-based models, a volumetric method was proposed by \citeauthor{Zhao:2011} \cite{Zhao:2011}.
+The authors capture a X-ray computed tomography (CT) scanner of the fabric, which is later matched to images of the same material.
 
 Geometric models focus on simulation the micro-geometry of the cloth in conjunction with global illumination.
 The light scattering is simulated for each fibre in the thread, where the fibres are modelled as perfect cylinders.
@@ -42,7 +46,7 @@ With this function, complex light phenomena like subsurface scattering are model
 
 Procedural models \cite{Irawan2012} with enfasis on accurately handling specular reflections have been proposed, this model does not required image data and relies on textures for close up views.
 
-A survey of physically-based methods in cloth simulations was presented by \cite{Schroder2012}, we also refer the readers to \cite{Yuen2011}'s survey for example-based and procedural-based techniques.
+A survey of physically-based methods in cloth simulations was presented by \citeauthor{Schroder2012} \cite{Schroder2012}, we also refer the readers to \citeauthor{Yuen2011}'s \cite{Yuen2011} survey for example-based and procedural-based techniques.
 
 \section{Methodology}
 
