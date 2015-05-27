@@ -6,6 +6,7 @@
 \usepackage[numbers]{natbib}
 \usepackage{textcomp} % Degree symbol
 \usepackage{placeins} % Float barrier
+\usepackage{subcaption} % To use subfigures with subcaptions
  
 \newcommand{\omegai}{\boldsymbol{\omega_i}}
 \newcommand{\omegar}{\boldsymbol{\omega_r}}
@@ -159,8 +160,9 @@ The aforementioned method will give $\tb_1$, for $\tb_2$ the process is equivale
 \label{sec:shading_model}
 
 In order to render cloth fabrics the authors evaluate the outgoing radiance from each patch, which is assumed to be locally flat and smaller than a pixel in the image.
-This patch is defined as the smallest thread weaving patter such that the fabric can be constructed by repeating this patch.
-For each thread in the patch a tangent curved is defined, as shown in Figure~\ref{fig:tanget_curve} this curve will be sampled at fixed positions giving the normal direction in that position, with it the BRDF will be evaluated and the total outgoing radiance can be computed as follows,
+This patch is defined as the smallest thread weaving patter such that the fabric can be constructed by repeating this patch, as shown in Figure~\ref{fig:tanget_curve}.
+For each thread in the patch a tangent curved is defined, this curve will be sampled at fixed positions giving the normal direction in that position, as shown in Figure~\ref{fig:tanget_curve}.
+The BRDF will be evaluated for each sample and the total outgoing radiance will be computed as follows,
 
 \begin{equation}
 L_{r}(\omegar) = \frac{1}{N_j} \sum_\tb \int L_i(\omegai) f_s(\tb, \omegai, \omegar) \cos \theta_i d \omegai,
@@ -260,13 +262,31 @@ where $I$ is the total number of photons inside a fixed radius around $\mathbf{p
 
 \section{Results}
 
-We have implemented the basic light scattering model in Mental Ray\textsuperscript\textregistered, Figure~\ref{fig:result1}.
+We have implemented the basic light scattering model in Mental Ray\textsuperscript\textregistered.
+To better understand the effects of the different terms in the BRDF, results for the different parts are evaluated separately.
+The cloth rendered using only the volume scattering term in shown in Figure~\ref{fig:scatter_only}, using only the reflection term is shown in Figure~\ref{fig:reflect_only_x5}, note that for visualization purposes the reflection term has been increased by a factor of 5.
+Lastly, a rendered image for the fabric using both terms is shown in Figure~\ref{fig:full_model}.
+
+\begin{figure}[htbp!]
+        \centering
+        \begin{subfigure}[t]{0.48\textwidth}
+                \includegraphics[width=\textwidth]{images/scatter_only}
+                \caption{Effect of the volume scattering term.}
+                \label{fig:scatter_only}
+        \end{subfigure}
+        \begin{subfigure}[t]{0.48\textwidth}
+                \includegraphics[width=\textwidth]{images/reflect_only_x5}
+                \caption{Effect of the reflection term, scaled by 2 to improve visibility.}
+                \label{fig:reflect_only_x5}
+        \end{subfigure}
+        \caption{Evaluating the effects of the different terms of the BRDF.}
+\end{figure}
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.5\textwidth]{images/result1}
-	\caption{Rendered result.}
-	\label{fig:result1}
+\includegraphics[width=0.8\textwidth]{images/full_model}
+	\caption{Final result.}
+	\label{fig:full_model}
 \end{figure}
 
 \FloatBarrier
