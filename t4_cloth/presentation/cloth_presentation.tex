@@ -1,0 +1,367 @@
+\documentclass{beamer}
+% \usepackage{lmodern}
+%=====================================================================
+% Color definition
+\definecolor{jvagreen}{RGB}{0,104,	139}
+\definecolor{jvagold}{RGB}{255, 255, 255}
+\setbeamercolor{section in head/foot}{fg = jvagold, bg = jvagreen}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{picture}
+\usepackage{amsmath}
+\usepackage{multimedia}
+\DeclareMathOperator{\Tr}{Tr}
+\graphicspath{{../}}
+%\setbeameroption{show notes}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{textpos}
+
+\usebackgroundtemplate
+{
+    \includegraphics[width=\paperwidth,height=\paperheight]{img/blank.jpg}%
+}
+\beamertemplatenavigationsymbolsempty
+
+%=====================================================================
+% Templates - headline, frametitle
+
+\makeatletter
+% Komprimiert die miniframe Kreise auf eine Linie
+\beamer@compresstrue
+\makeatother
+
+% Definiert die headline
+\setbeamertemplate{headline}
+{ 
+%\includegraphics[width=\paperwidth]{pic} % test logo
+\begin{beamercolorbox}[wd=\paperwidth,right]{section in head/foot}
+    \rule{\paperwidth}{1pt}
+    %Vertikaler Abstand
+    \vskip20pt
+    %Fügt die Standard-Navi ein (miniframes)
+    %\insertnavigation{\paperwidth}
+    \vskip8pt
+    %\rule{\paperwidth}{0.5pt}
+    %\vskip25.5pt % same height of the example provided, but IMHO is too much
+    \rule{\paperwidth}{1pt}
+\end{beamercolorbox} 
+}
+\setbeamertemplate{footline}
+{ 
+%\includegraphics[width=\paperwidth]{pic} % test logo
+\begin{beamercolorbox}[wd=\paperwidth,right]{section in head/foot}
+    \rule{\paperwidth}{1pt}
+    %Vertikaler Abstand
+    \vskip10pt
+    %Fügt die Standard-Navi ein (miniframes)
+    \insertnavigation{\paperwidth}
+    \vskip8pt
+    \rule{\paperwidth}{0.5pt}
+    %\vskip25.5pt % same height of the example provided, but IMHO is too much
+    %\rule{\paperwidth}{1pt}
+\end{beamercolorbox} 
+}
+
+% definition of the frametitle
+\setbeamertemplate{frametitle}
+{
+\vskip-24pt % to shift up the frametitle
+\hbox{ 
+ \begin{beamercolorbox}[wd=.0675\textwidth]{} % left shift
+ \end{beamercolorbox} 
+ \begin{beamercolorbox}[sep=4pt]{section in head/foot}
+ \insertframetitle
+ \end{beamercolorbox} 
+ }
+}
+
+\mode<presentation>
+{
+    \setbeamertemplate{itemize item}[circle]
+    \setbeamercolor{itemize item}{fg = jvagreen}
+    \setbeamertemplate{itemize subitem}[circle]
+    \setbeamercolor{itemize subitem}{fg = jvagreen}
+}
+
+\renewcommand\footnoterule{}
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%\logo{\includegraphics[height=0.6cm]{img/cde_basic_green}}
+%\let\oldequation=\equation
+%\let\endoldequation=\endequation
+%\renewenvironment{equation}{\vspace{1cm}\begin{oldequation}}{\end{oldequation}\vspace{15mm}}
+
+\begin{document}
+
+\addtobeamertemplate{frametitle}{}{%
+\begin{textblock*}{100mm}(-0.9cm,-0.6cm)
+\includegraphics[height=0.5cm,width=1.5cm]{img/uob-logo-white-transparent}
+\end{textblock*}
+\begin{textblock*}{100mm}(0.98\textwidth,-0.6cm)
+\includegraphics[height=0.5cm,width=1cm]{img/cde_tag_white}
+\end{textblock*}
+}
+
+\title[Research ideas]{
+  Research ideas}
+
+% Optional: a subtitle to be dispalyed on the title slide
+% \subtitle{Show where you're from}
+% \subtitle{Presented by: Ieva Kazlauskaite}
+% The author(s) of the presentation:
+%  - again first a short version to be displayed at the bottom;
+%  - next the full list of authors, which may include contact information;
+\author[Garoe Dorta Perez]{
+   Garoe Dorta Perez } 
+
+
+% The institute:
+%  - to start the name of the university as displayed on the top of each slide
+%    this can be adjusted such that you can also create a Dutch version
+%  - next the institute information as displayed on the title slide
+\institute[University of Bath]{
+University of Bath \\
+Centre For Digital Entertainment
+}
+
+% Add a date and possibly the name of the event to the slides
+%  - again first a short version to be shown at the bottom of each slide
+%  - second the full date and event name for the title slide
+
+%\date{Presented by Ieva Kazlauskaite, 30 April 2015}
+
+% TITLE PAGE
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+%\section{Overview}
+% CONTENT PAGE
+\begin{frame}
+  \frametitle{Overview}
+  \tableofcontents
+\end{frame}
+
+%----------------------------------------------------------------------
+\section{Previous work}
+\subsection{ }
+
+\begin{frame}{Previous work: EngD first year}
+\note{Highlight more teamwork in skin project}
+\begin{multicols}{2}
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Appearance model for cloth
+\item Skin rendering
+\end{itemize}
+\end{multicols}
+\begin{center}
+\begin{figure}
+\movie[width=0.48\textwidth, autostart, loop]
+        {\includegraphics[width=0.5\textwidth]{img/cloth_render}}{img/cloth_render_video.mp4}
+~
+\movie[width=0.48\textwidth, autostart, loop]
+        {\includegraphics[width=0.3\textwidth]{img/cloth_render}}{img/cloth_render_video.mp4}
+\caption*{\tiny{Left shows cloth rendering scene, right shows skin rendering scene.}}
+\end{figure}
+\end{center}
+\end{frame}
+
+\section{Main Interest}
+\note{Interest started with videogames, evolved to rendering and research, as you know rendering has bla bla problems}
+\subsection{ }
+\begin{frame}{Main interest: The problem}
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Rendering images realistically
+	\begin{itemize}
+	\setlength\itemsep{0.5em}
+	\item Computationally expensive for large or complex scenes
+	\item Tradeoff between speed and quality
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Main interest: Formal definition}
+\note{As you know, the rendering equation bla bla}
+\begin{equation*}  
+L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o}) + \int_\Omega f(\mathbf{p}, \boldsymbol{\omega_o}, \boldsymbol{\omega_i}) L_i(\mathbf{p}, \boldsymbol{\omega_i}) | \cos \theta_i | d \boldsymbol{\omega_i}
+\end{equation*}
+
+\begin{multicols}{2}
+\begin{figure}[b!]
+\includegraphics[width=0.5\textwidth]{img/render_definition}
+\caption*{\tiny{Diagram of light emitted from $\mathbf{p}$, image taken from [PH10].}}
+\end{figure}
+
+\vfill
+\columnbreak
+\vspace*{\fill}
+\small{where $L_o$ is the outgoing radiance, $L_i$ incoming radiance, $L_e$ emitted radiance, $f$ BRDF function, $\mathbf{p}$ surface point, $\boldsymbol{\omega_i}$ incident light, $\boldsymbol{\omega_o}$ outgoing light, $\Omega$ hemisphere above $\mathbf{p}$, $\theta_i$ angle of incidence. }
+\end{multicols}
+\end{frame}
+
+%\begin{frame}{Main theme: Path tracing approach 1}
+%\note{As you know, path tracing bla bla}
+%\begin{itemize}
+%\setlength\itemsep{0.5em}
+%\item Monte Carlo path tracing
+%\end{itemize}
+%\begin{center}
+%\begin{figure}
+%\includegraphics[width=0.7\textwidth]{img/path_tracing}
+%\caption*{\tiny{Diagram of simple path tracing from eye to light source, image taken from [PH10].}}
+%\end{figure}
+%\end{center}
+%\end{frame}
+
+\subsection{Cloth rendering}
+%\subsection{Appearance models}
+\begin{frame}{Cloth rendering: The problem}
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Render cloth fast and realistically 
+		\begin{itemize}
+		\setlength\itemsep{0.5em}
+		\item Small threads
+		\item Weaving patterns
+		\end{itemize}
+\end{itemize}
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.4\textwidth]{img/cloth_real} 
+~
+\includegraphics[width=0.4\textwidth]{img/cloth_reference}
+\caption*{\tiny{Left shows a close up view of fabric, right shows a picture of cloth, images taken from [SBD*13].}}
+\end{center}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Cloth rendering: Current approach 1}
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Two microcylinders [SBD*13]
+\end{itemize}
+\begin{center}
+\begin{figure}
+\includegraphics[width=0.4\textwidth]{img/cloth_model}
+~
+\includegraphics[width=0.5\textwidth]{img/microcylinders}
+\caption*{\tiny{Left shows model in a triangle mesh, right shows scattering cones in a patch, images taken from [SBD*13].}}
+\end{figure}
+\end{center}
+\end{frame}
+
+\begin{frame}{Cloth rendering: Current approach 2}
+%L_r = L_e + \int_{\Omega} f(t, \omega_i, \omega_r) L_i cos(\theta) \delta \omega_i, \\
+\begin{equation*} 
+\mbox{BRDF: } f(t, \omega_i, \omega_r) =  \frac{\mbox{Reflection term} + \mbox{Volume scattering term}}{\mbox{Normalization factor}},
+\end{equation*}
+
+\begin{multicols}{2}
+
+\begin{figure}[!htb]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{img/cloth_directions}
+        \caption*{\tiny{Angle definitions for a single thread, image taken from [SBD*13].}}
+    \end{minipage}%
+\end{figure}
+
+%
+%\begin{figure}[t!]
+%\begin{minipage}{\textwidth}
+%\includegraphics[width=0.4\textwidth]{img/cloth_directions}
+%\caption*{\tiny{Image taken from [SBD*13]}}
+%\end{minipage}{\textwidth}
+%\end{figure}
+%
+\vfill
+\columnbreak
+\vspace*{0.2cm}
+\small{ where $f$ is the BRDF function, $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction. }
+\vspace*{1cm}
+\newline
+Importance sampling extensions by [MI] and [WXK].
+\end{multicols}
+
+\end{frame}
+
+\begin{frame}{Cloth rendering: My work vs state of the art}
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Results
+\end{itemize}
+\begin{figure}[!htb]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{img/cloth_paper}
+        \caption*{Cloth render result from [SBD*13].}
+    \end{minipage}%
+	\centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/cloth_render}
+        \caption*{Cloth render with our code.}
+    \end{minipage}%    
+\end{figure}
+\end{frame}
+
+\begin{frame}{Cloth rendering: Possible improvements}
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Fixed close up with hybrid model
+\item BRDF modifications for speed or quality
+\item Estimate good values for parameters
+	\begin{itemize}
+	\item Picture of target cloth
+	\item 2D Manifold of parameters space 
+	\end{itemize}		
+\end{itemize}
+\end{frame}
+
+\section*{}
+
+\begin{frame}[plain,c]
+\begin{center}
+\huge Thank you
+\\~\\
+\Large Questions?
+\end{center}
+\end{frame}
+
+\begin{frame}{Cloth rendering: Technical}
+
+%L_r = L_e + \int_{\Omega} f(t, \omega_i, \omega_r) L_i cos(\theta) \delta \omega_i, \\
+\begin{equation*} 
+\begin{split}
+\mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
+ \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{cos \theta_i + cos \theta_r} A \right) / cos^2(\theta_d),
+\end{split}
+\end{equation*}
+
+\begin{multicols}{2}
+\begin{figure}[b!]
+\includegraphics[width=0.4\textwidth]{img/cloth_directions}
+\end{figure}
+
+\vfill
+\columnbreak
+\vspace*{\fill}
+\small{where $F$ are Fresnel terms, $\eta$ are Fresnel coefficients, $g$ is a Gaussian lobe, $k_d$ is a scattering constant, $\gamma$ are Gaussian widths, $\theta_h = (\theta_i+\theta_r)/2$ and $\phi_d = \phi_i-\phi_r$. }
+\end{multicols}
+
+\end{frame}
+%----------------------------------------------------------------------
+
+\end{document}
