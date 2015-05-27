@@ -260,69 +260,69 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 
 \end{frame}
 
-\begin{frame}{Cloth rendering: Current approach 2}
+\begin{frame}{BRDF}
 
 %L_r = L_e + \int_{\Omega} f(t, \omega_i, \omega_r) L_i cos(\theta) \delta \omega_i, \\
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) =  \left( \vphantom{\int}  \overbrace{ F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) }^\text{Reflection term} + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) =  \left( \vphantom{\int}  F_r(\eta, \omega_i) \overbrace{\cos(\phi_d/2)}^\text{Cylinder reflection} g(\gamma_s, \theta_h)  + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) =  \left( \vphantom{\int}  F_r(\eta, \omega_i) \cos(\phi_d/2) \overbrace{g(\gamma_s, \theta_h)}^\text{Cylinder roughness}  + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) =  \left( \vphantom{\int}  \overbrace{F_r(\eta, \omega_i)}^\text{Attenuation factor} \cos(\phi_d/2) g(\gamma_s, \theta_h)  + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
- \left. \overbrace{F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A}^\text{Volume scattering term} \right) / \cos^2(\theta_d),
+ \left. \overbrace{F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A}^\text{Volume scattering term} \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
- \left. \overbrace{F_t(\eta, \omega_i) F_t(\eta, \omega_r)}^\text{Attenuation factor} \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. \overbrace{F_t(\eta, \omega_i) F_t(\eta', \omega_r')}^\text{Attenuation factor} \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)\overbrace{g(\gamma_v, \theta_h)}^\text{Scattering cone} +k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)\overbrace{g(\gamma_v, \theta_h)}^\text{Scattering cone} +k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h) +k_d}{\underbrace{\cos \theta_i + \cos \theta_r}_\text{Normalization factor} } A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h) +k_d}{\underbrace{\cos \theta_i + \cos \theta_r}_\text{Normalization factor} } A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}}
 
 \only<+>{\begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h) +k_d}{\cos \theta_i + \cos \theta_r } A \right) / \overbrace{\cos^2(\theta_d)}^\text{Normalization factor},
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h) +k_d}{\cos \theta_i + \cos \theta_r } A \right) / \overbrace{\cos^2(\theta_d)}^\text{Normalization factor},
 \end{split}
 \end{equation*}}
 
