@@ -198,7 +198,7 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 %\end{center}
 %\end{frame}
 
-\subsection{Cloth rendering}
+%\subsection{Cloth rendering}
 %\subsection{Appearance models}
 \begin{frame}{The problem}
 \begin{itemize}
@@ -259,6 +259,9 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 \end{multicols}
 
 \end{frame}
+
+\section{Proposed model}
+\subsection{BRDF}
 
 \begin{frame}{BRDF}
 
@@ -327,30 +330,32 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 \end{equation*}}
 
 \begin{multicols}{2}
-\begin{figure}[b!]
+\begin{figure}[htbp!]
 \includegraphics[width=0.35\textwidth]{img/cloth_directions}
+\label{fig:cloth_directions}
 \end{figure}
 
-\footnotesize{where $f$ is the BRDF function, $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction, $F$ are Fresnel terms, $\eta$ are Fresnel coefficients, $g$ is a Gaussian lobe, $k_d$ is a scattering constant, $\gamma$ are Gaussian widths, $\theta_h = (\theta_i+\theta_r)/2$ and $\phi_d = \phi_i-\phi_r$. }
+\scriptsize{where $f$ is the BRDF function, $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction, $F$ are Fresnel terms, $\eta$ are Fresnel coefficients, $\theta$ and $phi$ angles are shown in the figure, $g$ is a Gaussian lobe, $k_d$ is a scattering constant, $A$ is an albedo constant, $\gamma$ are Gaussian widths, $\theta_h = (\theta_i+\theta_r)/2$ and $\phi_d = \phi_i-\phi_r$. }
 \end{multicols}
 
 \end{frame}
 
-\begin{frame}{Shading Model 1}
+\subsection{Shading Model}
+\begin{frame}{Shading Model}
 \begin{figure}[b!]
 \includegraphics[width=\textwidth]{img/tanget_curve}
 \caption*{\tiny{Normal sampling, (top-left) cloth patch, (bottom-left) smallest cloth patch, (top-right) blue thread tangent curve, (bottom-right) red thread tangent curve, image taken from [SBD*13].}}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Shading Model 2}
+\begin{frame}{Shading Model}
 \begin{figure}[b!]
 \includegraphics[width=0.8\textwidth]{img/masking}
 \caption*{\tiny{Masking examples, Green arrow points view from above, red arrow points view at grazing angle, image taken from [SBD*13].}}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Shading Model 3}
+\begin{frame}{Shading Model}
 \begin{equation*}
 L_r(\omega_r) = Q(t) \sum \int L_i(\omega_i) f(t, \omega_i, \omega_r) M(t) P(t) \cos \theta_i d \omega_i,
 \end{equation*}
@@ -358,24 +363,25 @@ L_r(\omega_r) = Q(t) \sum \int L_i(\omega_i) f(t, \omega_i, \omega_r) M(t) P(t) 
 \footnotesize{where $f$ is the BRDF function, $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction, $\theta_i$ is the incoming ray angle, $Q(t)$ is a normalization factor for samples and non watertight patches, $M(t)$ is the masking term and $P(t)$ is a view-projection normalization factor.}
 \end{frame}
 
+\section{Results and Conclusion}
+\subsection{ }
+
 \begin{frame}{Results}
-\begin{itemize}
-\setlength\itemsep{0.5em}
-\item Results
-\end{itemize}
+
 \begin{figure}[!htb]
     \centering
-    \begin{minipage}{.5\textwidth}
+    \begin{minipage}{.48\textwidth}
         \centering
         \includegraphics[width=0.8\textwidth]{img/cloth_paper}
         \caption*{Cloth render result from [SBD*13].}
     \end{minipage}%
 	\centering
-    \begin{minipage}{.5\textwidth}
+	~
+    \begin{minipage}{.48\textwidth}
         \centering
         \movie[width=\textwidth, autostart, loop]
         {\includegraphics[width=\textwidth]{img/cloth_render}}{img/cloth_render_video.mp4}
-        \caption*{Cloth render with our code.}
+        \caption*{Our cloth implementation in Maya\textsuperscript\textregistered using MentalRay\textsuperscript\textregistered.}
     \end{minipage}%    
 \end{figure}
 \end{frame}
@@ -387,7 +393,7 @@ L_r(\omega_r) = Q(t) \sum \int L_i(\omega_i) f(t, \omega_i, \omega_r) M(t) P(t) 
 \item Limitations
 	\begin{itemize}
 	\setlength\itemsep{0.5em}
-	\item Requires data capture
+	\item Requires captured data
 	\item Difficult parametrization
 	\end{itemize}
 \item Future work
