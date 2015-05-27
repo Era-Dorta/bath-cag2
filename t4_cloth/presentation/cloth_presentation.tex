@@ -328,12 +328,34 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 
 \begin{multicols}{2}
 \begin{figure}[b!]
-\includegraphics[width=0.4\textwidth]{img/cloth_directions}
+\includegraphics[width=0.35\textwidth]{img/cloth_directions}
 \end{figure}
 
 \footnotesize{where $f$ is the BRDF function, $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction, $F$ are Fresnel terms, $\eta$ are Fresnel coefficients, $g$ is a Gaussian lobe, $k_d$ is a scattering constant, $\gamma$ are Gaussian widths, $\theta_h = (\theta_i+\theta_r)/2$ and $\phi_d = \phi_i-\phi_r$. }
 \end{multicols}
 
+\end{frame}
+
+\begin{frame}{Shading Model 1}
+\begin{figure}[b!]
+\includegraphics[width=\textwidth]{img/tanget_curve}
+\caption*{\tiny{Normal sampling, (top-left) cloth patch, (bottom-left) smallest cloth patch, (top-right) blue thread tangent curve, (bottom-right) red thread tangent curve, image taken from [SBD*13].}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Shading Model 2}
+\begin{figure}[b!]
+\includegraphics[width=0.8\textwidth]{img/masking}
+\caption*{\tiny{Masking examples, Green arrow points view from above, red arrow points view at grazing angle, image taken from [SBD*13].}}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Shading Model 3}
+\begin{equation*}
+L_r(\omega_r) = Q(t) \sum \int L_i(\omega_i) f(t, \omega_i, \omega_r) M(t) P(t) \cos \theta_i d \omega_i,
+\end{equation*}
+
+\footnotesize{where $f$ is the BRDF function, $t$ is the thread direction, $\omega_i$ is the ray incoming direction, $\omega_r$ is the ray outgoing direction, $\theta_i$ is the incoming ray angle, $Q(t)$ is a normalization factor for samples and non watertight patches, $M(t)$ is the masking term and $P(t)$ is a view-projection normalization factor.}
 \end{frame}
 
 \begin{frame}{Cloth rendering: My work vs state of the art}
@@ -424,7 +446,7 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 \begin{equation*} 
 \begin{split}
 \mbox{BRDF: } f(t, \omega_i, \omega_r) = \left( \vphantom{\int} F_r(\eta, \omega_i) \cos(\phi_d/2)g(\gamma_s, \theta_h) + \right. \\ 
- \left. F_t(\eta, \omega_i) F_t(\eta, \omega_r) \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
+ \left. F_t(\eta, \omega_i) F_t(\eta', \omega_r') \frac{(1-k_d)g(\gamma_v, \theta_h)+k_d}{\cos \theta_i + \cos \theta_r} A \right) / \cos^2(\theta_d),
 \end{split}
 \end{equation*}
 
