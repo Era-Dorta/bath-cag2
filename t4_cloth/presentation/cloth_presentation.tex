@@ -220,7 +220,43 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 \end{figure}
 \end{frame}
 
-\begin{frame}{Appearance model}
+\begin{frame}{Previous work}
+
+\begin{multicols}{2}
+
+\begin{itemize}
+\setlength\itemsep{0.5em}
+\item Exampled-based
+		\begin{itemize}
+		\setlength\itemsep{0.5em}
+		\item Data acquisition
+		\item BRDF fitting
+		\item Not flexible but fast
+		\end{itemize}
+\item Procedurally-based
+		\begin{itemize}
+		\setlength\itemsep{0.5em}
+		\item Extending BRDF
+		\item Flexible but slow
+		\end{itemize}
+\end{itemize}
+
+\begin{figure}[t!]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{img/volumetricCloth} 
+\caption*{\tiny{Cloth rendered with a volumetric technique, image taken from [JAM*10].}}
+\end{center}
+\end{figure}
+\end{multicols}
+
+
+
+\end{frame}
+
+\section{Proposed Model}
+
+\subsection{Appearance Model}
+\begin{frame}{Appearance Model}
 \begin{itemize}
 \setlength\itemsep{0.5em}
 \item Two microcylinders [SBD*13]
@@ -235,7 +271,7 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 \end{center}
 \end{frame}
 
-\begin{frame}{Appearance model}
+\begin{frame}{Appearance Model}
 %L_r = L_e + \int_{\Omega} f(t, \omega_i, \omega_r) L_i cos(\theta) \delta \omega_i, \\
 \begin{equation*} 
 \mbox{BRDF: } f(t, \omega_i, \omega_r) =  \frac{\mbox{Reflection term} + \mbox{Volume scattering term}}{\mbox{Normalization factor}},
@@ -260,10 +296,9 @@ L_o (\mathbf{p}, \boldsymbol{\omega_o}) = L_e(\mathbf{p}, \boldsymbol{\omega_o})
 
 \end{frame}
 
-\section{Proposed model}
-\subsection{BRDF}
+\subsection{BRDF Model}
 
-\begin{frame}{BRDF}
+\begin{frame}{BRDF Model}
 
 %L_r = L_e + \int_{\Omega} f(t, \omega_i, \omega_r) L_i cos(\theta) \delta \omega_i, \\
 \only<+>{\begin{equation*} 
@@ -418,6 +453,7 @@ L_r(\omega_r) = Q(t) \sum \int L_i(\omega_i) f(t, \omega_i, \omega_r) M(t) P(t) 
 \let\thefootnote\relax\footnotetext{
 \textbf{References} \newline \newline
 \tiny{
+[JAM*10] Jackob W. et al. A radiative transfer framework for rendering materials with anisotropic structure. ACM 2010 \newline
 [SBD*13] Sadeghi, I. et al. A practical microcylinder appearance model for cloth rendering. ACM 2013 \newline
 [PH10] Pharr, M. et al. Physically based rendering: From theory to implementation, Morgan Kaufmann, 2010 \newline
 [MI] Mizutani K. et al. Importance Sampling for Cloth Rendering under Environment Light, Mathematical Progress in Expressive Image Synthesis I, 2014 \newline 
