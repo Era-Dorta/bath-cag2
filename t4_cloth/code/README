@@ -1,0 +1,5 @@
+To run the code
+1- Run cmake and make to build the plugin
+2- Place the plugin into your maya mental ray plugins folder
+3a- Edit the paths on render.sh and run the script to generate one image
+3b- Load the scene into maya and render from the GUI
