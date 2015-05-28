@@ -61,8 +61,9 @@ In this section we will discus in detail the theoretical and practical aspects o
 \subsection{Light scattering model}
 \label{sec:light_scattering_model}
 We have chosen to implement a recent paper \cite{Sadeghi2013} which presents a microcylinder based model for fast and realistic cloth rendering.
-The authors propose a model of fabric based on two microcylinders oriented in two orthogonal directions, as shown in Figure \ref{fig:microcylinders}.
-\citeauthor{Sadeghi2013} define the reflectance model for a single thread in the fabric as
+This model overcomes the limitations of \citeauthor{Irawan2012}'s work \cite{Irawan2012} and it can also be implemented in GPU where it achieves real time performance.
+The authors propose a model of fabric based on two microcylinders oriented in orthogonal directions, as shown in Figure \ref{fig:microcylinders}.
+The reflectance model for a single thread in the fabric is defined as
 
 \begin{figure}[ht!]
 \begin{minipage}[b]{.45\textwidth}
@@ -85,7 +86,7 @@ L_r = \int \frac{\left(f_{r,s}(\tb, \omegai, \omegar) + f_{r,v}(\tb,\omegai,\ome
 \label{eq:full_model}
 \end{equation}
 
-where $\tb$ is the thread direction, $\omegai$ is the ray incoming direction, $\omegar$ is the ray outgoing direction, $\theta_i, ~\theta_r, ~ \phi_i \mbox{ and } \phi_r$ are angles as shown in Figure \ref{fig:cloth_directions},  $\theta_d = \theta_i-\theta_r$ and $L_i$ is the incoming irradiance in the evaluated point.
+where $\tb$ is the thread direction, $\omegai$ is the ray incoming direction, $\omegar$ is the ray outgoing direction, $\theta_i, ~\theta_r, ~ \phi_i \mbox{ and } \phi_r$ are angles as shown in Figure \ref{fig:cloth_directions},  $\theta_d = \theta_i-\theta_r$ and $L_i$ is the incoming radiance in the evaluated point.
 Note that radiometric notation \cite{Marschner2003} is used to define $L_r$, which represents the outgoing radiance over a infinitesimal arc length of the cylinder and how the integral extends over the entire sphere instead of the typical hemisphere.
 
 The surface reflection term in Equation \ref{eq:full_model} is defined as
@@ -95,6 +96,7 @@ f_{r,s}(\tb, \omegai, \omegar) = F_r(\eta, \omegai) \cos(\phi_d/2)g(\gamma_s, \t
 \end{equation}
 
 where $\theta_h = (\theta_i+\theta_r)/2$, $\phi_d = \phi_i-\phi_r$, $F_r$ is a Fresnel reflection term that is computed using \citeauthor{Schlick1994}'s approximation \cite{Schlick1994} $F_r(\eta, \omegai) = \eta + (1 - \eta)(1 - \mathbf{h} \cdot \omegai)^5$ where $\cdot$ is the vector dot product operator, $\mathbf{h} = (\omegai + \omegar)/ \left|\omegai + \omegar \right|$ is the normalized halfway vector, $\eta$ is the reflectance for $\mathbf{h} \cdot \omegai = 1$, $g(\gamma, \theta) = \gamma \mathrm{e} ^{\mathbf{j} \cdot \mathbf{q}-1}$ is a Gaussian lobe \cite{Wang2009} where $\mathbf{q}$ is the lobe axis, the direction $\mathbf{j}$ is the spherical parameter in the resulting function and $\gamma$ is the amplitude.
+The $\cos(\phi_d/2)$ term controls the intensity given the incoming and outgoing rays, and the Gaussian term is added to simulate surface roughness in the previously smooth cylinders, this Gaussian term is therefore an approximation to microfacets on the cylinders.
 
 The volume scattering term in Equation \ref{eq:full_model} is defined as
 
@@ -103,6 +105,7 @@ f_{r,v}(\tb,\omegai,\omegar) = F_t(\eta, \omegai) F_t(\eta', \omegar') \frac{(1-
 \end{equation}
 
 where $k_d$ is a scattering constant, $\mathbf{k_a}$ is an rgb albedo constant vector, $F_t = 1 - F_r$ is a Fresnel transmission term, $\omegar'$ is a projection of $\omegar$ into a plane that contains the normal $\mathbf{n}$ and $\eta'$ is computed using the Bravais index \cite{Marschner2003} as $\eta'(m) = \sqrt{\eta^2 - sin^2(m)}  / \cos(m)$ where $m$ is the angle between $\omegar$ and its projection $\omegar'$.
+The Gaussian term $g(\gamma_v, \theta_h)$ in introduced to control the width of the scattering cone shown in Figure\ref{fig:microcylinders}, and the division by $\cos(\theta_i) + \cos(\theta_r)$ is added as a normalization factor \cite{chandrasekhar2013}.
 
 The outgoing radiance in the path shown in Figure \ref{fig:cloth_directions} is
 
@@ -110,13 +113,13 @@ The outgoing radiance in the path shown in Figure \ref{fig:cloth_directions} is
 L_r(\omegar) = a_1 L_{r,1}(\omegar) + a_2 L_{r,2}(\omegar),
 \end{equation}
 
-where $a_1$ and $a_2$ are the area coverage ratio for the first and second thread within the patch, in our case we assume a watertight pattern of equally size threads, leading to $a_1 = a_2 = 0.5$, $L_1$ and $l_2$ are the outgoing radiances for the first and second thread computed as shown in Equation \ref{eq:full_model}.
+where $a_1$ and $a_2$ are the area coverage ratio for the first and second thread within the patch, in our implementation we assumed a watertight pattern of equally size threads, leading to $a_1 = a_2 = 0.5$, $L_1$ and $L_2$ are the outgoing radiances for the first and second thread computed as shown in Equation~\ref{eq:full_model}.
 
-In order to compute a thread direction $\tb$ without using external data structures, we follow a fixed texture axis as shown in Figure \ref{fig:thread_uv_coord}.
+In order to compute a thread direction $\tb$ without using external data structures, we follow a fixed texture, axis as shown in Figure \ref{fig:thread_uv_coord}.
 Given an intersection point in a triangle $\mathbf{p} = \left[ x_p, y_p,z_p \right]$ and its texture coordinates $\mathbf{u} = \left[ u_p, v_p \right]$.
 We define $\tb$ vector as the vector $\tb = (\hat{\mathbf{p}} - \mathbf{p})/ \left|\hat{\mathbf{p}} + \mathbf{p} \right|$ such that $\hat{\mathbf{p}}$ texture coordinates are $\hat{\mathbf{u}} = \left[ u_p + 1, v_p \right]$.
 In our shader we can easily compute the texture coordinates of the triangle vertices, however we can not immediately get a world position from a new texture coordinate.
-Assuming that the 3d to texture transformation is an affine matrix $T$,
+We assume that the 3D world space to texture space transformation is an affine matrix $T$, that is constant for each triangle and it can be written as
 
 \begin{equation}
 \mathbf{u} T = \mathbf{p} \rightarrow
@@ -129,7 +132,7 @@ a_{21} & a_{22} & a_{23}
 \end{pmatrix} =
 \begin{pmatrix}
 x & y & z
-\end{pmatrix}
+\end{pmatrix}.
 \label{eq:uv_to_3d}
 \end{equation}
 
@@ -158,8 +161,8 @@ a_{21}& = \frac{u_2 x_1 - u_1 x_2}{u_2 v_1 - u_1 v_2},& a_{22}& = \frac{u_2 y_1 
 a_{11}& = \frac{x_1 - v_1 a_{21}}{u_1},& a_{12}& = \frac{y_1 - v_1 a_{22}}{u_1},&  a_{13}& = \frac{z_1 - v_1 a_{23}}{u_1}.
 \end{align}
 
-Notice that the term of $1/(u_2 v_1 - u_1 v_2)$ is shared, so it can be precomputed in order to increase performance.
-The aforementioned method will give $\tb_1$, for $\tb_2$ the process is equivalent with the exception that $\hat{\mathbf{u}}$ will be incremented on the $v$ direction, $\hat{\mathbf{u}} = \left[ u_p, v_p + 1\right]$.
+Notice that the term of $1/(u_2 v_1 - u_1 v_2)$ is shared, so it can be computed only once per triangle in order to increase performance.
+The aforementioned method will give the thread direction $\tb_1$, for $\tb_2$ the process is equivalent with the exception that $\hat{\mathbf{u}}$ will be incremented on the $v$ direction, $\hat{\mathbf{u}} = \left[ u_p, v_p + 1\right]$.
 
 \subsection{Shading model}
 \label{sec:shading_model}
@@ -183,9 +186,9 @@ where $N_j$ is the number of samples.
 	\label{fig:tanget_curve}
 \end{figure}
 
-\citeauthor{Sadeghi2013} also add a shadowing and masking term to improve the quality of their results, the authors add a new term that will account for threads occluding each other depending on the viewing direction.
-The effect of the masking term will be specially relevant at grazing angle viewing and lighting directions.
-In Equation~\ref{eq:path_lr} the term $f_s(\tb, \omegai, \omegar)$ will be multiplied by $M(\tb, \omegai, \omegar)$ such that,
+\citeauthor{Sadeghi2013} also adds a shadowing and masking term to improve the quality of their results, the new term will account for threads occluding each other depending on the viewing direction.
+The masking effect will be specially relevant at grazing angle viewing and lighting directions.
+In Equation~\ref{eq:path_lr}, $f_s(\tb, \omegai, \omegar)$ will be multiplied by $M(\tb, \omegai, \omegar)$ such that,
 
 \begin{equation}
 \begin{split}
@@ -196,8 +199,8 @@ M(\tb, \omegai, \omegar) =& (1 - u(\phi_d)) \max(\cos(\phi_i), 0) \times \max(\c
 
 where $\times$ is the vector cross product operator, $u$ is a unit height Gaussian function with standard deviation between $15$\textdegree and $25$\textdegree; an in depth discussion on how to compute $u$ can be found in \citeauthor{Ashikmin2000} \cite{Ashikmin2000} Section 4.2 New Shadowing Term.
 
-The authors add a reweighting factor to account for $\omegai$ and $\omegar$ being too far from $n$.
-By projecting the thread length in the direction of the viewer, tangents that are more visible for the viewer will have a greater contribution.
+The authors add a reweighting factor that improves the results when $\omegai$ and $\omegar$ are far from $n$.
+By projecting the thread length in the direction of the viewer, threads that are more visible for the viewer will have a greater contribution.
 The reweighting factor $P(\tb, \omegai, \omegar)$ will be computed as follows,
 
 \begin{equation}
@@ -216,7 +219,7 @@ where $\Psi$ are the angles between $\mathbf{n}$ and the projection of $\boldsym
 	\label{fig:psi_thread_angles}
 \end{figure}
 
-There is also a normalization factor $Q$ to account for the number of samples and for weaving patterns that are not water tight,
+There is also a normalization factor $Q$ to account for the number of samples that were introduced in Equation~\ref{eq:path_lr} and for weaving patterns that are not water tight,
 
 \begin{equation}
 Q = \frac{a_1}{N_1} \sum_\tb P(\tb, \omegai, \omegar) + \sum_\tb P(\tb, \omegai, \omegar) + (1 - a_1 - a_2)(\omegar \cdot \mathbf{n}),
@@ -254,16 +257,16 @@ t_z & n_z & s_z & 0 \\
 such that $\mathbf{x}M=\mathbf{x}'_{new}$, where $\mathbf{x}$ is the original row vector in homogeneous coordinates and $\mathbf{x}'_{new}$ is the transformed vector.
 
 We decided to implement the shader in Maya's\textsuperscript\textregistered Mental Ray\textsuperscript\textregistered rendering software.
-The rationale under this choice lays in the advantages of integrating work in a established framework, which allows us to easily use the shader for a dynamic cloth simulation.
+The rationale under this choice lays in the advantages of integrating the work into a established framework, which allows us to easily use the shader for dynamic cloth simulations.
 Mental Ray\texttrademark approximates \citeauthor{Kajiya1986}'s equation \cite{Kajiya1986} using photon mapping \cite{Jensen1996}.
-Our approach is to compute an initial estimate of the outgoing radiance $L_{ri}$ for each direct hit during the raytracing path.
-In the photon map construction stage each photon hit will locally sample $L_{ri}$ using Equation \ref{eq:full_model}, from this samples an average irradiance will be evaluated, which will then be added to the initial estimate as shown below
+Our approach is to compute an initial estimate of the outgoing radiance $L_{r}$ for each direct hit during the raytracing path.
+In the photon map construction stage each photon hit will locally sample $L_{r}$ using Equation \ref{eq:full_model}, from this samples an average irradiance $L_i$ will be evaluated, which will then be added to the initial estimate as shown below
 
 \begin{equation}
 L_r = L_{ri} + \sum_{i = 1}^{I} \psi_i L_{ri},
 \end{equation}
 
-where $I$ is the total number of photons inside a fixed radius around $\mathbf{p}$ and $\psi_i$ is the normalized flux of the ith photon, which is computed from an initial arbitrary flux shared by all photons and decreases with an absorption rate per bounce.
+where $I$ is the total number of photons inside a fixed radius around $\mathbf{p}$ and $\psi_i$ is the normalized flux of the $i^{th}$ photon, which is computed from an initial arbitrary flux shared by all photons and decreases with an absorption rate per bounce.
 
 \section{Results}
 
