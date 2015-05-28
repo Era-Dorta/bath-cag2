@@ -271,7 +271,7 @@ where $I$ is the total number of photons inside a fixed radius around $\mathbf{p
 \section{Results}
 
 We have implemented the basic light scattering model in Mental Ray\textsuperscript\textregistered.
-To better understand the effects of the different terms in the BRDF, results for the different parts are evaluated separately.
+In order to provide a deeper insight of the effects of the different terms in the BRDF, results for the different parts are evaluated separately.
 The cloth rendered using only the volume scattering term in shown in Figure~\ref{fig:scatter_only}, using only the reflection term is shown in Figure~\ref{fig:reflect_only_x5}, note that for visualization purposes the reflection term has been increased by a factor of 5.
 Lastly, a rendered image for the fabric using both terms is shown in Figure~\ref{fig:full_model}.
 
@@ -301,18 +301,9 @@ Lastly, a rendered image for the fabric using both terms is shown in Figure~\ref
 \section{Conclusion and Future Work}
 
 Our implementation only includes the basic light scattering proposed by the authors \cite{Sadeghi2013}; so a evident line of future work would be to add the remaining features from the paper into our code.
-\citeauthor{Sadeghi2013} model works under the assumption that the cloth patches are smaller than a pixel in the image, this leads to incorrect render images at close ups.
+\citeauthor{Sadeghi2013} model works under the assumption that the cloth patches are smaller than a pixel in the image, this leads to incorrect rendered images at close ups.
 Another drawback of the model is the optimization of parameters, being so complex that they have to be adjusted manually.
-How to efficiently apply importance sampling to reduce the rendering times and increase quality, has been addressed with several extensions to the original paper \cite{Wang2014, Mizutani2014}.
-%Another drawback of this model is a complicated application of parameter optimization techniques; therefore, derivation of appropriate parameters of individual threads is left completely to users and their experience.
-
-%All these methods mainly focus on developing a comprehensive reflectance model for cloth fabrics and do not propose an efficient rendering method of cloth fabrics under environment lighting
-
-%The main difficulty of interactive cloth rendering resides in the integral of high-frequency complex functions, previous method limit it to a simple lighting model.
-
-%These methods can simulate the appearance of complex highlights and color shifts which cannot be fully handled by pure analytical models. 
-%However, the main disadvantage of these models is the need to express the structure of the materials which leads to the description of a specific kind of materials. 
-%All the analytical methods use the exact above procedure to represent the material reflection properties and in the process part of the reflection information gets lost.
+How to efficiently apply importance sampling to reduce the rendering times and increase quality has been addressed with several extensions~\cite{Wang2014, Mizutani2014}.
 
 \newpage
 \bibliographystyle{plainnat}
